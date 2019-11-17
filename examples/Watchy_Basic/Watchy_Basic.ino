@@ -1,3 +1,8 @@
+/*
+ * Watchy - Basic Example 
+ * Sets the RTC time if not set, goes to sleep and wakes up every minute to update the time on the display
+ */
+ 
 #include <DS3232RTC.h>
 #include <GxEPD.h>
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
