@@ -13,3 +13,6 @@
     * All Other Settings: leave to default
     * You may have to install the [CP2104 USB to Serial drivers](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers) if the port is not automatically detected
     * Have Fun! :)
+    
+    
+Looking for Watchy hardware details? Go here https://github.com/sqfmi/Watchy-Hardware    
