@@ -2,7 +2,7 @@
 
 ![Watchy](extras/Watchy.jpg)
 
-[**[ Buy Watchy ]**](https://shop.sqfmi.com/cart/31273151463498:1)
+[**[ Buy Watchy ]**](https://shop.sqfmi.com/cart/31273151496266:1)
 
 ## Setup
 1. In the Arduino IDE Boards Manager, install support for the ESP32. You can find instructions here: https://github.com/espressif/arduino-esp32/blob/master/docs/arduino-ide/boards_manager.md
