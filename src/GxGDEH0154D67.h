@@ -9,7 +9,7 @@
 //
 // License: GNU GENERAL PUBLIC LICENSE V3, see LICENSE
 //
-// Library: https://github.com/ZinggJM/GxEPD
+// Library: https://github.com/sqfmi/GxEPD
 
 #ifndef _GxGDEH0154D67_H_
 #define _GxGDEH0154D67_H_
