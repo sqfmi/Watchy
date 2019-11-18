@@ -1,9 +1,9 @@
-// class GxGDEH0154D67 : Display class for GDEP015OC1 e-Paper from Dalian Good Display Co., Ltd.: www.good-display.com
+// class GxGDEH0154D67 : Display class for GDEH0154D67 e-Paper from Dalian Good Display Co., Ltd.: www.good-display.com
 //
-// based on Demo Example from Good Display, available here: http://www.good-display.com/download_detail/downloadsId=515.html
-// Controller : IL3829 : http://www.good-display.com/download_detail/downloadsId=534.html
+// based on Demo Example from Good Display, available here: http://www.e-paper-display.com/download_detail/downloadsId=806.html
+// Controller : SSD1681 : http://www.e-paper-display.com/download_detail/downloadsId=825.html
 //
-// Author : J-M Zingg
+// Author : SQFMI
 //
 // Version : see library.properties
 //
