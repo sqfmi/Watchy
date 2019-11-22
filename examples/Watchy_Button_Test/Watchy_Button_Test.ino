@@ -78,7 +78,7 @@ void handleButton()
   display.deepSleep();
 }
 
-void updateTime()
+void updateTime(bool fullRefresh)
 {
     RTC.begin();
     if(RTC.oscStopped(false)){ //check if RTC has been stopped
@@ -106,7 +106,11 @@ void updateTime()
       display.print('0');
     }    
     display.print(currentTime.Minute);
-    display.update();
+    if(fullRefresh){
+      display.update();
+    }else{
+      display.updateWindow(0, 0 , GxEPD_WIDTH, GxEPD_HEIGHT, true);
+    }
     display.deepSleep();
 }
 
@@ -139,8 +143,8 @@ void detect_wakeup_reason(){
 
   switch(wakeup_reason)
   {
-    case ESP_SLEEP_WAKEUP_EXT0: updateTime(); break; //RTC Alarm
+    case ESP_SLEEP_WAKEUP_EXT0: updateTime(false); break; //RTC Alarm
     case ESP_SLEEP_WAKEUP_EXT1: handleButton(); break; //Button Press
-    default: updateTime(); //Reset
+    default: updateTime(true); //Reset
   }
 }
