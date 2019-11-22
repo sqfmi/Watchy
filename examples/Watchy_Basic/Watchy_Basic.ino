@@ -10,14 +10,24 @@
 #include "GxGDEH0154D67.h"
 #include "DSEG7_Classic_Bold_48.h"
 
+#define RTC_PIN GPIO_NUM_33
+
 DS3232RTC RTC(false);
 GxIO_Class io(SPI, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16); // arbitrary selection of 17, 16
 GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16), 4
 
-
 void setup()
 {
-    esp_sleep_enable_ext0_wakeup(GPIO_NUM_33,0); //enable deep sleep wake on RTC interrupt
+    detect_wakeup_reason();
+    delay(100);
+    esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
+    esp_deep_sleep_start();
+}
+
+void loop(){}
+
+void updateTime(bool fullRefresh)
+{
     RTC.begin();
     if(RTC.oscStopped(false)){ //check if RTC has been stopped
       RTC.squareWave(SQWAVE_NONE); //disable square wave output
@@ -26,22 +36,15 @@ void setup()
       RTC.alarmInterrupt(ALARM_2, true); //enable alarm interrupt
     }
     RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
-    showTime();
-    esp_deep_sleep_start();
-}
+    tmElements_t currentTime;
+    RTC.read(currentTime);
 
-void loop(){}
-
-void showTime()
-{
     display.init();
     display.fillScreen(GxEPD_BLACK);
     display.setTextColor(GxEPD_WHITE);
     display.setFont(&DSEG7_Classic_Bold_48);
     display.setCursor(15, 120);
 
-    tmElements_t currentTime;
-    RTC.read(currentTime);
     if(currentTime.Hour < 10){
       display.print('0');
     }
@@ -51,7 +54,13 @@ void showTime()
       display.print('0');
     }    
     display.print(currentTime.Minute);
-    display.update();
+    
+    if(fullRefresh){
+      display.update();
+    }else{
+      display.updateWindow(0, 0, GxEPD_WIDTH, GxEPD_HEIGHT, true); 
+    }
+    
     display.deepSleep();
 }
 
@@ -75,4 +84,16 @@ time_t compileTime()
 
     time_t t = makeTime(tm);
     return t + FUDGE;        //add fudge factor to allow for compile time
+}
+
+void detect_wakeup_reason(){
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT0: updateTime(false); break; //RTC Alarm
+    default: updateTime(true); //Reset
+  }
 }
