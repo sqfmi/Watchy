@@ -25,8 +25,8 @@
 #define RTC_PIN GPIO_NUM_33
 #define BTN_1 GPIO_SEL_39
 #define BTN_2 GPIO_SEL_36
-#define BTN_3 GPIO_SEL_35
-#define BTN_4 GPIO_SEL_34
+#define BTN_3 GPIO_SEL_34
+#define BTN_4 GPIO_SEL_35
 #define BTN_PIN_MASK BTN_1|BTN_2|BTN_3|BTN_4
 
 DS3232RTC RTC(false);
