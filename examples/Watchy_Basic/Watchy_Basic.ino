@@ -2,7 +2,8 @@
  * Watchy - Basic Example 
  * Sets the RTC time if not set, goes to sleep and wakes up every minute to update the time on the display
  */
- 
+
+#include <WiFi.h>
 #include <DS3232RTC.h>
 #include <GxEPD.h>
 #include <GxIO/GxIO_SPI/GxIO_SPI.h>
@@ -18,50 +19,55 @@ GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16
 
 void setup()
 {
-    detect_wakeup_reason();
-    delay(100);
-    esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
-    esp_deep_sleep_start();
+  esp_sleep_wakeup_cause_t wakeup_reason;
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+  switch(wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT0: updateTime(false); break; //RTC Alarm Interrupt
+    default: updateTime(true); //Hard Reset
+  }
+  esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
+  esp_deep_sleep_start();
 }
 
 void loop(){}
 
-void updateTime(bool fullRefresh)
+void updateTime(bool reset)
 {
-    RTC.begin();
-    if(RTC.oscStopped(false)){ //check if RTC has been stopped
-      RTC.squareWave(SQWAVE_NONE); //disable square wave output
-      RTC.set(compileTime()); //set RTC time to compile time
-      RTC.setAlarm(ALM2_EVERY_MINUTE, 0, 0, 0, 1); //set alarm to every minute
-      RTC.alarmInterrupt(ALARM_2, true); //enable alarm interrupt
-    }
-    RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
-    tmElements_t currentTime;
-    RTC.read(currentTime);
+  RTC.begin();
+  if(reset){
+    RTC.squareWave(SQWAVE_NONE); //disable square wave output
+    RTC.set(compileTime()); //set RTC time to compile time
+    RTC.setAlarm(ALM2_EVERY_MINUTE, 0, 0, 0, 0);
+    RTC.alarmInterrupt(ALARM_2, true); //enable alarm interrupt
+  }
+  RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
+  tmElements_t currentTime;
+  RTC.read(currentTime);
 
-    display.init();
-    display.fillScreen(GxEPD_BLACK);
-    display.setTextColor(GxEPD_WHITE);
-    display.setFont(&DSEG7_Classic_Bold_48);
-    display.setCursor(15, 120);
+  display.init();
+  display.fillScreen(GxEPD_BLACK);
+  display.setTextColor(GxEPD_WHITE);
+  display.setFont(&DSEG7_Classic_Bold_48);
+  display.setCursor(15, 120);
 
-    if(currentTime.Hour < 10){
-      display.print('0');
-    }
-    display.print(currentTime.Hour);
-    display.print(':');
-    if(currentTime.Minute < 10){
-      display.print('0');
-    }    
-    display.print(currentTime.Minute);
-    
-    if(fullRefresh){
-      display.update();
-    }else{
-      display.updateWindow(0, 0, GxEPD_WIDTH, GxEPD_HEIGHT, true); 
-    }
-    
-    display.deepSleep();
+  if(currentTime.Hour < 10){
+    display.print('0');
+  }
+  display.print(currentTime.Hour);
+  display.print(':');
+  if(currentTime.Minute < 10){
+    display.print('0');
+  }    
+  display.print(currentTime.Minute);
+  
+  if(reset){
+    display.update();
+  }else{
+    display.updateWindow(0, 0, GxEPD_WIDTH, GxEPD_HEIGHT, true); 
+  }
+
+  display.deepSleep();
 }
 
 time_t compileTime()
@@ -84,16 +90,4 @@ time_t compileTime()
 
     time_t t = makeTime(tm);
     return t + FUDGE;        //add fudge factor to allow for compile time
-}
-
-void detect_wakeup_reason(){
-  esp_sleep_wakeup_cause_t wakeup_reason;
-
-  wakeup_reason = esp_sleep_get_wakeup_cause();
-
-  switch(wakeup_reason)
-  {
-    case ESP_SLEEP_WAKEUP_EXT0: updateTime(false); break; //RTC Alarm
-    default: updateTime(true); //Reset
-  }
 }
