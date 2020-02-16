@@ -7,8 +7,6 @@
 //
 // Version : see library.properties
 //
-// License: GNU GENERAL PUBLIC LICENSE V3, see LICENSE
-//
 // Library: https://github.com/sqfmi/GxEPD
 
 #ifndef _GxGDEH0154D67_H_
@@ -109,8 +107,8 @@ class GxGDEH0154D67 : public GxEPD
     int8_t _busy;
     static const uint16_t power_on_time = 80; // ms, e.g. 73508us
     static const uint16_t power_off_time = 80; // ms, e.g. 68982us
-    static const uint16_t full_refresh_time = 4200; // ms, e.g. 1113273us
-    static const uint16_t partial_refresh_time = 300; // ms, e.g. 290867us
+    static const uint16_t full_refresh_time = 200; // ms, e.g. 1113273us
+    static const uint16_t partial_refresh_time = 200; // ms, changed to 0 to make it as fast as possible
 #if defined(ESP8266) || defined(ESP32)
   public:
     // the compiler of these packages has a problem with signature matching to base classes
@@ -130,6 +128,3 @@ class GxGDEH0154D67 : public GxEPD
 #endif
 
 #endif
-
-
-
