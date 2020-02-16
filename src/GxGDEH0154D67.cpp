@@ -4,8 +4,6 @@
 //
 // Version : see library.properties
 //
-// License: GNU GENERAL PUBLIC LICENSE V3, see LICENSE
-//
 // Library: https://github.com/sqfmi/GxEPD
 
 #include "GxGDEH0154D67.h"
@@ -18,8 +16,8 @@
 #include <avr/pgmspace.h>
 #endif
 
-// Partial Update Delay, may have an influence on degradation
-#define GxGDEH0154D67_PU_DELAY 300
+// Partial Update Delay, may have an influence on degradation. Changed to 0 to not wait after partial refresh
+#define GxGDEH0154D67_PU_DELAY 0
 
 /*const uint8_t GxGDEH0154D67::LUTDefault_full[] =
 {
