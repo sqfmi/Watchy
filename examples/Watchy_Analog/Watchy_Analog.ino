@@ -61,7 +61,7 @@ void updateTime(bool reset)
 
 void setHands(tmElements_t time){
   //hour
-  float hour_radians = ((time.Hour % 12)/12.0)*2*M_PI; //radians
+  float hour_radians = (((time.Hour % 12)+(time.Minute/60.0))/12.0)*2*M_PI; //radians
   int hour_x1 = sinf(hour_radians)*HOUR_HAND_LENGTH;
   int hour_y1 = cosf(hour_radians)*HOUR_HAND_LENGTH;
   fillRectAngle(ORIGIN_X, ORIGIN_Y, ORIGIN_X+hour_x1, ORIGIN_Y-hour_y1, HOUR_HAND_WIDTH, GxEPD_BLACK);
