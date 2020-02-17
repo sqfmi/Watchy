@@ -3,24 +3,23 @@
  * Sets the RTC time if not set, goes to sleep and wakes up every minute to update the time on the display
  */
 
-#include <WiFi.h>
+#ifndef ESP32
+#error Please select ESP32 Wrover Module under Tools > Board
+#endif
+
 #include <DS3232RTC.h>
-#include <GxEPD.h>
-#include <GxIO/GxIO_SPI/GxIO_SPI.h>
-#include <GxIO/GxIO.h>
-#include "GxGDEH0154D67.h"
+#include <GxEPD2_BW.h>
 
 #define RTC_PIN GPIO_NUM_33
-#define ORIGIN_X GxGDEH0154D67_WIDTH/2
-#define ORIGIN_Y GxGDEH0154D67_HEIGHT/2
+#define ORIGIN_X 200/2
+#define ORIGIN_Y 200/2
 #define HOUR_HAND_LENGTH 50
 #define HOUR_HAND_WIDTH 11
 #define MINUTE_HAND_LENGTH 90
 #define MINUTE_HAND_WIDTH 7
 
 DS3232RTC RTC(false);
-GxIO_Class io(SPI, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16); // arbitrary selection of 17, 16
-GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16), 4
+GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> display(GxEPD2_154_D67(/*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4)); // GDEH0154D67
 
 void setup()
 {
@@ -50,13 +49,13 @@ void updateTime(bool reset)
   tmElements_t currentTime;
   RTC.read(currentTime);
 
-  display.init();
+  display.init(0, reset); //_initial_refresh to false to prevent full update on init
   display.fillScreen(GxEPD_WHITE);
   display.setTextColor(GxEPD_BLACK);
   setHands(currentTime);
 
-  display.update();
-  display.deepSleep();
+  display.display(true);
+  display.hibernate();
 }
 
 void setHands(tmElements_t time){

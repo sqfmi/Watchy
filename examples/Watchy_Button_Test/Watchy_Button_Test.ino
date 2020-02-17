@@ -12,12 +12,13 @@
  *               |--------------|
  *                ==============  
  */
+
+#ifndef ESP32
+#error Please select ESP32 Wrover Module under Tools > Board
+#endif
  
 #include <DS3232RTC.h>
-#include <GxEPD.h>
-#include <GxIO/GxIO_SPI/GxIO_SPI.h>
-#include <GxIO/GxIO.h>
-#include "GxGDEH0154D67.h"
+#include <GxEPD2_BW.h>
 #include "DSEG7_Classic_Bold_48.h"
 #include "DSEG14_Classic_Bold_18.h"
 
@@ -30,17 +31,24 @@
 #define BTN_PIN_MASK BTN_1|BTN_2|BTN_3|BTN_4
 
 DS3232RTC RTC(false);
-GxIO_Class io(SPI, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16); // arbitrary selection of 17, 16
-GxEPD_Class display(io, /*RST=*/ 16, /*BUSY=*/ 4); // arbitrary selection of (16), 4
+GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> display(GxEPD2_154_D67(/*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4)); // GDEH0154D67
 
 
 void setup()
 {
-    detect_wakeup_reason();
-    delay(100);
-    esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
-    esp_sleep_enable_ext1_wakeup(BTN_PIN_MASK, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
-    esp_deep_sleep_start();
+  esp_sleep_wakeup_cause_t wakeup_reason;
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason)
+  {
+    case ESP_SLEEP_WAKEUP_EXT0: updateTime(false); break; //RTC Alarm Interrupt
+    case ESP_SLEEP_WAKEUP_EXT1: handleButton(); break; //Button Press
+    default: updateTime(true); //Hard Reset
+  }
+
+  esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
+  esp_sleep_enable_ext1_wakeup(BTN_PIN_MASK, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
+  esp_deep_sleep_start();
 }
 
 void loop(){}
@@ -74,40 +82,41 @@ void handleButton()
   else if (wakeupBit & BTN_1) {
     display.println("BTN 1");   
   }
-  display.update();
-  display.deepSleep();
+  display.display(false);
+  display.hibernate();
 }
 
-void updateTime()
+void updateTime(bool reset)
 {
-    RTC.begin();
-    if(RTC.oscStopped(false)){ //check if RTC has been stopped
-      RTC.squareWave(SQWAVE_NONE); //disable square wave output
-      RTC.set(compileTime()); //set RTC time to compile time
-      RTC.setAlarm(ALM2_EVERY_MINUTE, 0, 0, 0, 1); //set alarm to every minute
-      RTC.alarmInterrupt(ALARM_2, true); //enable alarm interrupt
-    }
-    RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
-    tmElements_t currentTime;
-    RTC.read(currentTime);
+  RTC.begin();
+  if(reset){
+    RTC.squareWave(SQWAVE_NONE); //disable square wave output
+    RTC.set(compileTime()); //set RTC time to compile time
+    RTC.setAlarm(ALM2_EVERY_MINUTE, 0, 0, 0, 0);
+    RTC.alarmInterrupt(ALARM_2, true); //enable alarm interrupt
+  }
+  RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
+  tmElements_t currentTime;
+  RTC.read(currentTime);
 
-    display.init();
-    display.fillScreen(GxEPD_BLACK);
-    display.setTextColor(GxEPD_WHITE);
-    display.setFont(&DSEG7_Classic_Bold_48);
-    display.setCursor(15, 120);
+  display.init(0, reset); //_initial_refresh to false to prevent full update on init
+  display.setFullWindow();
+  display.fillScreen(GxEPD_BLACK);
+  display.setTextColor(GxEPD_WHITE);
+  display.setFont(&DSEG7_Classic_Bold_48);
+  display.setCursor(15, 120);
 
-    if(currentTime.Hour < 10){
-      display.print('0');
-    }
-    display.print(currentTime.Hour);
-    display.print(':');
-    if(currentTime.Minute < 10){
-      display.print('0');
-    }    
-    display.print(currentTime.Minute);
-    display.update();
-    display.deepSleep();
+  if(currentTime.Hour < 10){
+    display.print('0');
+  }
+  display.print(currentTime.Hour);
+  display.print(':');
+  if(currentTime.Minute < 10){
+    display.print('0');
+  }    
+  display.print(currentTime.Minute);
+  display.display(true); //partial refresh
+  display.hibernate();
 }
 
 time_t compileTime()
@@ -130,17 +139,4 @@ time_t compileTime()
 
     time_t t = makeTime(tm);
     return t + FUDGE;        //add fudge factor to allow for compile time
-}
-
-void detect_wakeup_reason(){
-  esp_sleep_wakeup_cause_t wakeup_reason;
-
-  wakeup_reason = esp_sleep_get_wakeup_cause();
-
-  switch(wakeup_reason)
-  {
-    case ESP_SLEEP_WAKEUP_EXT0: updateTime(); break; //RTC Alarm
-    case ESP_SLEEP_WAKEUP_EXT1: handleButton(); break; //Button Press
-    default: updateTime(); //Reset
-  }
 }
