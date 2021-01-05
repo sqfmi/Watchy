@@ -1,77 +1,128 @@
 #include "bma.h"
-#include <Arduino.h>
 
-I2CBus *BMA::_bus = nullptr;
+#define DEBUGPORT Serial
+#ifdef DEBUGPORT
+#define DEBUG(...)      DEBUGPORT.printf(__VA_ARGS__)
+#else
+#define DEBUG(...)
+#endif
 
-BMA::BMA(I2CBus &bus)
+BMA423::BMA423()
 {
-    _bus = &bus;
+    __readRegisterFptr = nullptr;
+    __writeRegisterFptr = nullptr;
+    __delayCallBlackFptr = nullptr;
+    __init = false;
 }
 
-BMA::~BMA()
+BMA423::~BMA423()
 {
 
 }
 
-uint16_t BMA::read(uint8_t addr, uint8_t reg, uint8_t *data, uint16_t len)
+bool BMA423::begin(bma4_com_fptr_t readCallBlack,
+                   bma4_com_fptr_t writeCallBlack,
+                   bma4_delay_fptr_t delayCallBlack,
+                   uint8_t address)
 {
-    return _bus->readBytes(addr, reg, data, len);
-}
 
-uint16_t BMA::write(uint8_t addr, uint8_t reg, uint8_t *data, uint16_t len)
-{
-    return _bus->writeBytes(addr, reg, data, len);
-}
+    if (__init ||
+            readCallBlack == nullptr ||
+            writeCallBlack == nullptr ||
+            delayCallBlack == nullptr) {
+        return true;
+    }
 
-bool BMA::begin()
-{
-    _dev.dev_addr        = BMA4_I2C_ADDR_PRIMARY;
-    _dev.interface       = BMA4_I2C_INTERFACE;
-    _dev.bus_read        = read;
-    _dev.bus_write       = write;
-    _dev.delay           = delay;
-    _dev.read_write_len  = 8;
-    _dev.resolution      = 12;
-    _dev.feature_len     = BMA423_FEATURE_SIZE;
+    __readRegisterFptr = readCallBlack;
+    __writeRegisterFptr = writeCallBlack;
+    __delayCallBlackFptr = delayCallBlack;
 
-    reset();
+    __devFptr.dev_addr        = address;
+    __devFptr.interface       = BMA4_I2C_INTERFACE;
+    __devFptr.bus_read        = readCallBlack;
+    __devFptr.bus_write       = writeCallBlack;
+    __devFptr.delay           = delayCallBlack;
+    __devFptr.read_write_len  = 8;
+    __devFptr.resolution      = 12;
+    __devFptr.feature_len     = BMA423_FEATURE_SIZE;
 
-    delay(20);
+    softReset();
 
-    if (bma423_init(&_dev) != BMA4_OK) {
-        Serial.println("bma4 init fail");
+    __delayCallBlackFptr(20);
+
+    if (bma423_init(&__devFptr) != BMA4_OK) {
+        DEBUG("BMA423 FAIL\n");
         return false;
     }
 
-    config();
+    if (bma423_write_config_file(&__devFptr) != BMA4_OK) {
+        DEBUG("BMA423 Write Config FAIL\n");
+        return false;
+    }
 
-    return true;
-}
+    __init = true;
 
-void BMA::reset()
-{
-    uint8_t reg = 0xB6;
-    _bus->writeBytes(BMA4_I2C_ADDR_PRIMARY, 0x7E, &reg, 1);
-}
+    struct bma4_int_pin_config config ;
+    config.edge_ctrl = BMA4_LEVEL_TRIGGER;
+    config.lvl = BMA4_ACTIVE_HIGH;
+    config.od = BMA4_PUSH_PULL;
+    config.output_en = BMA4_OUTPUT_ENABLE;
+    config.input_en = BMA4_INPUT_DISABLE;
 
-uint16_t BMA::config()
-{
-    return bma423_write_config_file(&_dev);
-}
 
-bool BMA::getAccel(Accel &acc)
-{
-    memset(&acc, 0, sizeof(acc));
-    if (bma4_read_accel_xyz(&acc, &_dev) != BMA4_OK) {
+    if (bma4_set_int_pin_config(&config, BMA4_INTR1_MAP, &__devFptr) != BMA4_OK) {
+        DEBUG("BMA423 SET INT FAIL\n");
         return false;
     }
     return true;
 }
 
-uint8_t BMA::direction()
+void BMA423::softReset()
+{
+    uint8_t reg = BMA4_RESET_ADDR;
+    __writeRegisterFptr(BMA4_I2C_ADDR_PRIMARY, BMA4_RESET_SET_MASK, &reg, 1);
+}
+
+void BMA423::shutDown()
+{
+    bma4_set_advance_power_save(BMA4_DISABLE,  &__devFptr);
+}
+
+void BMA423::wakeUp()
+{
+    bma4_set_advance_power_save(BMA4_ENABLE, &__devFptr);
+}
+
+uint16_t BMA423::getErrorCode()
+{
+    struct bma4_err_reg err;
+    uint16_t rslt = bma4_get_error_status(&err, &__devFptr);
+    return rslt;
+}
+
+uint16_t BMA423::getStatus()
+{
+    uint8_t status;
+    bma4_get_status(&status, &__devFptr);
+    return status;
+}
+
+uint32_t BMA423::getSensorTime()
+{
+    uint32_t ms;
+    bma4_get_sensor_time(&ms, &__devFptr);
+    return ms;
+}
+
+bool BMA423::selfTest()
+{
+    return (BMA4_OK == bma4_selftest_config(BMA4_ACCEL_SELFTEST_ENABLE_MSK, &__devFptr));
+}
+
+uint8_t BMA423::getDirection()
 {
     Accel acc;
-    if (bma4_read_accel_xyz(&acc, &_dev) != BMA4_OK) {
+    if (bma4_read_accel_xyz(&acc, &__devFptr) != BMA4_OK) {
         return 0;
     }
     uint16_t absX = abs(acc.x);
@@ -86,23 +137,23 @@ uint8_t BMA::direction()
         }
     } else if ((absY > absX) && (absY > absZ)) {
         if (acc.y > 0) {
-            return DIRECTION_BOTTOM_EDGE;
+            return DIRECTION_RIGHT_EDGE;
         } else {
-            return  DIRECTION_TOP_EDGE;
+            return  DIRECTION_LEFT_EDGE;
         }
     } else {
         if (acc.x < 0) {
-            return  DIRECTION_RIGHT_EDGE;
+            return  DIRECTION_BOTTOM_EDGE;
         } else {
-            return DIRECTION_LEFT_EDGE;
+            return DIRECTION_TOP_EDGE;
         }
     }
 }
 
-float BMA::temperature()
+float BMA423::readTemperature()
 {
     int32_t data = 0;
-    bma4_get_temperature(&data, BMA4_DEG, &_dev);
+    bma4_get_temperature(&data, BMA4_DEG, &__devFptr);
     float res = (float)data / (float)BMA4_SCALE_TEMP;
     /* 0x80 - temp read from the register and 23 is the ambient temp added.
      * If the temp read from register is 0x80, it means no valid
@@ -114,127 +165,157 @@ float BMA::temperature()
 }
 
 
-void BMA::enableAccel()
+float BMA423::readTemperatureF()
 {
-    if (bma4_set_accel_enable(BMA4_ENABLE, &_dev)) {
-        return;
+    float temp = readTemperature();
+    if (temp != 0) {
+        temp = temp * 1.8 + 32.0;
     }
-    Acfg cfg;
-    cfg.odr = BMA4_OUTPUT_DATA_RATE_100HZ;
-    cfg.range = BMA4_ACCEL_RANGE_2G;
-    cfg.bandwidth = BMA4_ACCEL_NORMAL_AVG4;
-    cfg.perf_mode = BMA4_CONTINUOUS_MODE;
+    return (temp);
+}
 
-    if (bma4_set_accel_config(&cfg, &_dev)) {
-        Serial.println("[bma4] set accel config fail");
-        return;
+bool BMA423::getAccel(Accel &acc)
+{
+    memset(&acc, 0, sizeof(acc));
+    if (bma4_read_accel_xyz(&acc, &__devFptr) != BMA4_OK) {
+        return false;
     }
+    return true;
 }
 
-void BMA::disalbeIrq()
+bool BMA423::getAccelEnable()
 {
-    bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_STEP_CNTR_INT /* |BMA423_WAKEUP_INT*/, BMA4_DISABLE, &_dev);
+    uint8_t en;
+    bma4_get_accel_enable(&en, &__devFptr);
+    return (en & BMA4_ACCEL_ENABLE_POS) == BMA4_ACCEL_ENABLE_POS;
 }
 
-void BMA::enableIrq()
+bool BMA423::disableAccel()
 {
-    bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_STEP_CNTR_INT /* |BMA423_WAKEUP_INT*/, BMA4_ENABLE, &_dev);
+    return enableAccel(false);
 }
 
-//attachInterrupt bma423 int1
-void BMA::attachInterrupt()
+bool BMA423::enableAccel(bool en)
 {
-    uint16_t rslt = BMA4_OK;
-    enableAccel();
-    // rslt |= bma423_reset_step_counter(&_dev);
-    rslt |= bma423_step_detector_enable(BMA4_ENABLE, &_dev);
-    rslt |= bma423_feature_enable(BMA423_STEP_CNTR, BMA4_ENABLE, &_dev);
-    rslt |= bma423_feature_enable(BMA423_WAKEUP, BMA4_ENABLE, &_dev);
-    rslt |= bma423_feature_enable(BMA423_TILT, BMA4_ENABLE, &_dev);
-    rslt |= bma423_step_counter_set_watermark(100, &_dev);
-
-    // rslt |= bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_STEP_CNTR_INT | BMA423_WAKEUP_INT, BMA4_ENABLE, &_dev);
-
-    rslt |= bma423_map_interrupt(BMA4_INTR1_MAP,  BMA423_STEP_CNTR_INT, BMA4_ENABLE, &_dev);
-    rslt |= bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_TILT_INT, BMA4_ENABLE, &_dev);
-
-    bma423_anymotion_enable_axis(BMA423_ALL_AXIS_DIS, &_dev);
-
-    struct bma4_int_pin_config config ;
-
-    config.edge_ctrl = BMA4_LEVEL_TRIGGER;
-    config.lvl = BMA4_ACTIVE_HIGH;
-    config.od = BMA4_PUSH_PULL;
-    config.output_en = BMA4_OUTPUT_ENABLE;
-    config.input_en = BMA4_INPUT_DISABLE;
-    rslt |= bma4_set_int_pin_config(&config, BMA4_INTR1_MAP, &_dev);
-
-    // Serial.printf("[bma4] attachInterrupt %s\n", rslt != 0 ? "fail" : "pass");
-
-
-    struct bma423_axes_remap remap_data;
-    remap_data.x_axis = 0;
-    remap_data.x_axis_sign = 1;
-    remap_data.y_axis = 1;
-    remap_data.y_axis_sign = 1;
-    remap_data.z_axis  = 2;
-    remap_data.z_axis_sign  = 0;
-
-    bma423_set_remap_axes(&remap_data, &_dev);
-
+    return (BMA4_OK == bma4_set_accel_enable(en ? BMA4_ENABLE : BMA4_DISABLE, &__devFptr));
 }
 
-bool BMA::readInterrupt()
+bool BMA423::setAccelConfig(Acfg &cfg)
 {
-    return bma423_read_int_status(&_irqStatus, &_dev) == BMA4_OK;
+    return (BMA4_OK == bma4_set_accel_config(&cfg, &__devFptr));
 }
 
-uint8_t BMA::getIrqStatus()
+bool BMA423::getAccelConfig(Acfg &cfg)
 {
-    return _irqStatus;
+    return (BMA4_OK == bma4_get_accel_config(&cfg, &__devFptr));
 }
 
-uint32_t BMA::getCounter()
+bool BMA423::setRemapAxes(struct bma423_axes_remap *remap_data)
+{
+    return (BMA4_OK == bma423_set_remap_axes(remap_data, &__devFptr));
+}
+
+bool BMA423::resetStepCounter()
+{
+    return  BMA4_OK == bma423_reset_step_counter(&__devFptr) ;
+}
+
+uint32_t BMA423::getCounter()
 {
     uint32_t stepCount;
-    if (bma423_step_counter_output(&stepCount, &_dev) == BMA4_OK) {
+    if (bma423_step_counter_output(&stepCount, &__devFptr) == BMA4_OK) {
         return stepCount;
     }
     return 0;
 }
 
-bool BMA::isStepCounter()
+bool BMA423::setINTPinConfig(struct bma4_int_pin_config config, uint8_t pinMap)
 {
-    return (bool)(BMA423_STEP_CNTR_INT & _irqStatus);
+    return BMA4_OK == bma4_set_int_pin_config(&config, pinMap, &__devFptr);
 }
 
-bool BMA::isDoubleClick()
+bool BMA423::getINT()
 {
-    return (bool)(BMA423_WAKEUP_INT & _irqStatus);
+    return bma423_read_int_status(&__IRQ_MASK, &__devFptr) == BMA4_OK;
 }
 
-
-bool BMA::isTilt()
+uint8_t BMA423::getIRQMASK()
 {
-    return (bool)(BMA423_TILT_INT & _irqStatus);
+    return __IRQ_MASK;
 }
 
-
-bool BMA::isActivity()
+bool BMA423::disableIRQ(uint16_t int_map)
 {
-    return (bool)(BMA423_ACTIVITY_INT & _irqStatus);
+    return (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, int_map, BMA4_DISABLE, &__devFptr));
 }
 
-bool BMA::isAnyNoMotion()
+bool BMA423::enableIRQ(uint16_t int_map)
 {
-    return (bool)(BMA423_ANY_NO_MOTION_INT & _irqStatus);
+    return (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, int_map, BMA4_ENABLE, &__devFptr));
 }
 
+bool BMA423::enableFeature(uint8_t feature, uint8_t enable)
+{
+    if ((feature & BMA423_STEP_CNTR) == BMA423_STEP_CNTR) {
+        bma423_step_detector_enable(enable ? BMA4_ENABLE : BMA4_DISABLE, &__devFptr);
+    }
+    return (BMA4_OK == bma423_feature_enable(feature, enable, &__devFptr));
+}
 
-const char *BMA::getActivity()
+bool BMA423::isStepCounter()
+{
+    return (bool)(BMA423_STEP_CNTR_INT & __IRQ_MASK);
+}
+
+bool BMA423::isDoubleClick()
+{
+    return (bool)(BMA423_WAKEUP_INT & __IRQ_MASK);
+}
+
+bool BMA423::isTilt()
+{
+    return (bool)(BMA423_TILT_INT & __IRQ_MASK);
+}
+
+bool BMA423::isActivity()
+{
+    return (bool)(BMA423_ACTIVITY_INT & __IRQ_MASK);
+}
+
+bool BMA423::isAnyNoMotion()
+{
+    return (bool)(BMA423_ANY_NO_MOTION_INT & __IRQ_MASK);
+}
+
+bool BMA423::enableStepCountInterrupt(bool en)
+{
+    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP,  BMA423_STEP_CNTR_INT, en, &__devFptr));
+}
+
+bool BMA423::enableTiltInterrupt(bool en)
+{
+    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_TILT_INT, en, &__devFptr));
+}
+
+bool BMA423::enableWakeupInterrupt(bool en)
+{
+    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_WAKEUP_INT, en, &__devFptr));
+}
+
+bool BMA423::enableAnyNoMotionInterrupt(bool en)
+{
+    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_ANY_NO_MOTION_INT, en, &__devFptr));
+}
+
+bool BMA423::enableActivityInterrupt(bool en)
+{
+    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_ACTIVITY_INT, en, &__devFptr));
+}
+
+const char *BMA423::getActivity()
 {
     uint8_t activity;
-    bma423_activity_output(&activity, &_dev);
+    bma423_activity_output(&activity, &__devFptr);
     if (activity & BMA423_USER_STATIONARY) {
         return "BMA423_USER_STATIONARY";
     } else if (activity & BMA423_USER_WALKING) {
@@ -245,29 +326,4 @@ const char *BMA::getActivity()
         return "BMA423_STATE_INVALID";
     }
     return "None";
-}
-
-bool BMA::enableStepCountInterrupt(bool en)
-{
-    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP,  BMA423_STEP_CNTR_INT, en, &_dev));
-}
-
-bool BMA::enableTiltInterrupt(bool en)
-{
-    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_TILT_INT, en, &_dev));
-}
-
-bool BMA::enableWakeupInterrupt(bool en)
-{
-    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_WAKEUP_INT, en, &_dev));
-}
-
-bool BMA::enableAnyNoMotionInterrupt(bool en)
-{
-    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_ANY_NO_MOTION_INT, en, &_dev));
-}
-
-bool BMA::enableActivityInterrupt(bool en)
-{
-    return  (BMA4_OK == bma423_map_interrupt(BMA4_INTR1_MAP, BMA423_ACTIVITY_INT, en, &_dev));
 }

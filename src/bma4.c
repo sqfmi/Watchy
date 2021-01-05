@@ -2517,7 +2517,7 @@ uint16_t bma4_perform_accel_foc(const int32_t accel_g_value[3], struct bma4_dev 
     uint16_t rslt = 0;
     struct bma4_accel accel_value[10] = { {0} };
     struct accel_offset offset = {0};
-    struct offset_delta delta = { {0} };
+    struct offset_delta delta =  { {0,0},{0,0},{0,0} };
     struct bma4_accel_config acc_conf = {0};
     uint8_t accel_en = 0;
     uint8_t adv_pwr_save = 0;
