@@ -1,9 +1,12 @@
-
 #pragma once
 
-#include "bma423.h"
-#include "i2c_bus.h"
+#ifdef  ARDUINO
+#include <Arduino.h>
+#else
+#include <stdlib.h>
+#endif
 
+#include "bma423.h"
 
 enum {
     DIRECTION_TOP_EDGE        = 0,
@@ -13,35 +16,60 @@ enum {
     DIRECTION_DISP_UP         = 4,
     DIRECTION_DISP_DOWN       = 5
 } ;
-typedef struct bma4_dev Bma;
+
 typedef struct bma4_accel Accel;
 typedef struct bma4_accel_config Acfg;
 
-class BMA
+class BMA423
 {
-public:
-    BMA(I2CBus &bus);
-    ~BMA();
-    bool begin();
-    void reset();
-    uint8_t direction();
-    float temperature();
-    void enableAccel();
 
-    void disalbeIrq();
-    void enableIrq();
-    void attachInterrupt();
-    uint32_t getCounter();
+public:
+    BMA423();
+    ~BMA423();
+
+    bool begin(bma4_com_fptr_t readCallBlack, bma4_com_fptr_t writeCallBlack, bma4_delay_fptr_t delayCallBlack,
+               uint8_t address = BMA4_I2C_ADDR_PRIMARY);
+
+    void softReset();
+    void shutDown();
+    void wakeUp();
+    bool selfTest();
+
+    uint8_t getDirection();
+
+    bool setAccelConfig(Acfg &cfg);
+    bool getAccelConfig(Acfg &cfg);
+    bool getAccel(Accel &acc);
+    bool getAccelEnable();
+    bool disableAccel();
+    bool enableAccel(bool en = true);
+
+    bool setINTPinConfig(struct bma4_int_pin_config config, uint8_t pinMap);
+    bool getINT();
+    uint8_t getIRQMASK();
+    bool disableIRQ(uint16_t int_map = BMA423_STEP_CNTR_INT);
+    bool enableIRQ(uint16_t int_map = BMA423_STEP_CNTR_INT);
     bool isStepCounter();
     bool isDoubleClick();
-    bool readInterrupt();
     bool isTilt();
     bool isActivity();
     bool isAnyNoMotion();
-    bool getAccel(Accel &acc);
-    uint8_t getIrqStatus();
-    const char * getActivity();
 
+    bool resetStepCounter();
+    uint32_t getCounter();
+
+    float readTemperature();
+    float readTemperatureF();
+
+    uint16_t getErrorCode();
+    uint16_t getStatus();
+    uint32_t getSensorTime();
+
+
+    const char *getActivity();
+    bool setRemapAxes(struct bma423_axes_remap *remap_data);
+
+    bool enableFeature(uint8_t feature, uint8_t enable );
     bool enableStepCountInterrupt(bool en = true);
     bool enableTiltInterrupt(bool en = true);
     bool enableWakeupInterrupt(bool en = true);
@@ -49,15 +77,12 @@ public:
     bool enableActivityInterrupt(bool en = true);
 
 private:
-    static uint16_t read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *read_data, uint16_t len);
-    static uint16_t write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *read_data, uint16_t len);
+    bma4_com_fptr_t __readRegisterFptr;
+    bma4_com_fptr_t __writeRegisterFptr;
+    bma4_delay_fptr_t __delayCallBlackFptr;
 
-    uint16_t config();
-    Bma _dev;
-    static bma4_com_fptr_t _read;
-    static bma4_com_fptr_t _write;
-    static I2CBus *_bus;
-    bool _irqRead = false;
-    uint16_t _irqStatus;
-
+    uint8_t __address;
+    uint16_t __IRQ_MASK;
+    bool __init;
+    struct bma4_dev __devFptr;
 };
