@@ -1,0 +1,44 @@
+{
+    "watchfaces" : [
+        {
+            "id" : "1",
+            "name" : "Basic",
+            "author" : "SQFMI",
+            "screenshot" : "",
+            "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/Basic",
+            "version" : "1.0.0"
+        },
+        {
+            "id" : "2",
+            "name" : "7_SEG",
+            "author" : "SQFMI",
+            "screenshot" : "",
+            "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/7_SEG",
+            "version" : "1.0.0"
+        },
+        {
+            "id" : "3",
+            "name" : "DOS",
+            "author" : "SQFMI",
+            "screenshot" : "",
+            "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/DOS",
+            "version" : "1.0.0"
+        },
+        {
+            "id" : "4",
+            "name" : "Pokemon",
+            "author" : "SQFMI",
+            "screenshot" : "",
+            "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/Pokemon",
+            "version" : "1.0.0"
+        },
+        {
+            "id" : "5",
+            "name" : "StarryHorizon",
+            "author" : "dandelany",
+            "screenshot" : "",
+            "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/StarryHorizon",
+            "version" : "1.0.0"
+        }                                
+    ]
+}
