@@ -39,6 +39,14 @@
             "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/5_StarryHorizon.png",
             "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/StarryHorizon",
             "version" : "1.0.0"
-        }                                
+        },
+        {
+            "id" : "6",
+            "name" : "Tetris",
+            "author" : "SQFMI",
+            "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/6_Tetris.png",
+            "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/Tetris",
+            "version" : "1.0.0"
+        }                                  
     ]
 }
