@@ -9,10 +9,10 @@ void WatchyTetris::drawWatchFace(){
     display.drawBitmap(0, 0, tetrisbg, DISPLAY_WIDTH, DISPLAY_HEIGHT, GxEPD_BLACK);
 
     //Hour
-    display.drawBitmap(25, 20, tetris_nums[23/10], 40, 60, GxEPD_BLACK); //first digit
-    display.drawBitmap(75, 20, tetris_nums[23%10], 40, 60, GxEPD_BLACK); //second digit
+    display.drawBitmap(25, 20, tetris_nums[currentTime.Hour/10], 40, 60, GxEPD_BLACK); //first digit
+    display.drawBitmap(75, 20, tetris_nums[currentTime.Hour%10], 40, 60, GxEPD_BLACK); //second digit
 
     //Minute
-    display.drawBitmap(25, 110, tetris_nums[45/10], 40, 60, GxEPD_BLACK); //first digit
-    display.drawBitmap(75, 110, tetris_nums[45%10], 40, 60, GxEPD_BLACK); //second digit
+    display.drawBitmap(25, 110, tetris_nums[currentTime.Minute/10], 40, 60, GxEPD_BLACK); //first digit
+    display.drawBitmap(75, 110, tetris_nums[currentTime.Minute%10], 40, 60, GxEPD_BLACK); //second digit
 }
