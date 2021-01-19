@@ -47,6 +47,14 @@
             "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/6_Tetris.png",
             "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/Tetris",
             "version" : "1.0.0"
-        }                                  
+        },
+        {
+            "id" : "7",
+            "name" : "MacPaint",
+            "author" : "SQFMI",
+            "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/6_MacPaint.png",
+            "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/MacPaint",
+            "version" : "1.0.0"
+        }                                    
     ]
 }
