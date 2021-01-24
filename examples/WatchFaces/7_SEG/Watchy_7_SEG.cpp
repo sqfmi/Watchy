@@ -1,5 +1,7 @@
 #include "Watchy_7_SEG.h"
 
+#define DARKMODE true
+
 const uint8_t BATTERY_SEGMENT_WIDTH = 7;
 const uint8_t BATTERY_SEGMENT_HEIGHT = 11;
 const uint8_t BATTERY_SEGMENT_SPACING = 9;
@@ -9,15 +11,16 @@ const uint8_t WEATHER_ICON_HEIGHT = 32;
 Watchy7SEG::Watchy7SEG(){} //constructor
 
 void Watchy7SEG::drawWatchFace(){
-    display.fillScreen(GxEPD_BLACK);
+    display.fillScreen(DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);
+    display.setTextColor(DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     drawTime();
     drawDate();
     drawSteps();
     drawWeather();
     drawBattery();
-    display.drawBitmap(120, 77, WIFI_CONFIGURED ? wifi : wifioff, 26, 18, GxEPD_WHITE);
+    display.drawBitmap(120, 77, WIFI_CONFIGURED ? wifi : wifioff, 26, 18, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     if(BLE_CONFIGURED){
-        display.drawBitmap(100, 75, bluetooth, 13, 21, GxEPD_WHITE);
+        display.drawBitmap(100, 75, bluetooth, 13, 21, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     }
 }
 
@@ -62,13 +65,13 @@ void Watchy7SEG::drawDate(){
 }
 void Watchy7SEG::drawSteps(){
     uint32_t stepCount = sensor.getCounter();
-    display.drawBitmap(10, 165, steps, 19, 23, GxEPD_WHITE);
+    display.drawBitmap(10, 165, steps, 19, 23, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     display.setCursor(35, 190);
     display.println(stepCount);
 }
 void Watchy7SEG::drawBattery(){
-    display.drawBitmap(154, 73, battery, 37, 21, GxEPD_WHITE);
-    display.fillRect(159, 78, 27, BATTERY_SEGMENT_HEIGHT, GxEPD_BLACK);//clear battery segments
+    display.drawBitmap(154, 73, battery, 37, 21, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+    display.fillRect(159, 78, 27, BATTERY_SEGMENT_HEIGHT, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);//clear battery segments
     int8_t batteryLevel = 0;
     float VBAT = getBatteryVoltage();
     if(VBAT > 4.1){
@@ -85,7 +88,7 @@ void Watchy7SEG::drawBattery(){
     }
 
     for(int8_t batterySegments = 0; batterySegments < batteryLevel; batterySegments++){
-        display.fillRect(159 + (batterySegments * BATTERY_SEGMENT_SPACING), 78, BATTERY_SEGMENT_WIDTH, BATTERY_SEGMENT_HEIGHT, GxEPD_WHITE);
+        display.fillRect(159 + (batterySegments * BATTERY_SEGMENT_SPACING), 78, BATTERY_SEGMENT_WIDTH, BATTERY_SEGMENT_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     }
 }
 
@@ -101,7 +104,7 @@ void Watchy7SEG::drawWeather(){
     display.getTextBounds(String(temperature), 100, 150, &x1, &y1, &w, &h);
     display.setCursor(155 - w, 150);
     display.println(temperature);
-    display.drawBitmap(165, 110, TEMP_UNIT == "metric" ? celsius : fahrenheit, 26, 20, GxEPD_WHITE);
+    display.drawBitmap(165, 110, TEMP_UNIT == "metric" ? celsius : fahrenheit, 26, 20, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     const unsigned char* weatherIcon;
 
     //https://openweathermap.org/weather-conditions
@@ -122,5 +125,5 @@ void Watchy7SEG::drawWeather(){
     }else if(weatherConditionCode >=200){//Thunderstorm
     weatherIcon = rain; 
     }
-    display.drawBitmap(145, 158, weatherIcon, WEATHER_ICON_WIDTH, WEATHER_ICON_HEIGHT, GxEPD_WHITE);
+    display.drawBitmap(145, 158, weatherIcon, WEATHER_ICON_WIDTH, WEATHER_ICON_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
 }
