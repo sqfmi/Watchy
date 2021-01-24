@@ -17,6 +17,14 @@
             "version" : "1.0.0"
         },
         {
+            "id" : "2A",
+            "name" : "7_SEG_LIGHT",
+            "author" : "SQFMI",
+            "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/2_7_SEG_LIGHT.png",
+            "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/7_SEG",
+            "version" : "1.0.0"
+        },        
+        {
             "id" : "3",
             "name" : "DOS",
             "author" : "SQFMI",
