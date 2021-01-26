@@ -60,9 +60,17 @@
             "id" : "7",
             "name" : "MacPaint",
             "author" : "SQFMI",
-            "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/6_MacPaint.png",
+            "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/7_MacPaint.png",
             "source" : "https://github.com/sqfmi/Watchy/tree/master/examples/WatchFaces/MacPaint",
             "version" : "1.0.0"
-        }                                    
+        },
+        {
+            "id" : "8",
+            "name" : "Bahn",
+            "author" : "BraininaBowl",
+            "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/8_Bahn.png",
+            "source" : "https://github.com/BraininaBowl/Bahn-for-Watchy",
+            "version" : "1.0.0"
+        }                                      
     ]
 }
