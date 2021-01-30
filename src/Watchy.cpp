@@ -9,9 +9,26 @@ RTC_DATA_ATTR BMA423 sensor;
 RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 
+String getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length()-1;
+
+  for(int i=0; i<=maxIndex && found<=index; i++){
+    if(data.charAt(i)==separator || i==maxIndex){
+        found++;
+        strIndex[0] = strIndex[1]+1;
+        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    }
+  }
+
+  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
+
 Watchy::Watchy(){} //constructor
 
-void Watchy::init(){
+void Watchy::init(String datetime){
     esp_sleep_wakeup_cause_t wakeup_reason;
     wakeup_reason = esp_sleep_get_wakeup_cause(); //get wake up reason
     Wire.begin(SDA, SCL); //init i2c
@@ -31,7 +48,7 @@ void Watchy::init(){
             handleButtonPress();
             break;
         default: //reset
-            _rtcConfig();
+            _rtcConfig(datetime);
             _bmaConfig();
             showWatchFace(false); //full update on reset
             break;
@@ -45,7 +62,21 @@ void Watchy::deepSleep(){
   esp_deep_sleep_start();
 }
 
-void Watchy::_rtcConfig(){
+void Watchy::_rtcConfig(String datetime){
+    if(datetime != NULL){
+        const time_t FUDGE(30);//fudge factor to allow for upload time, etc. (seconds, YMMV)
+        tmElements_t tm;
+        tm.Year = getValue(datetime, ':', 0).toInt() - YEAR_OFFSET;//offset from 1970, since year is stored in uint8_t        
+        tm.Month = getValue(datetime, ':', 1).toInt();
+        tm.Day = getValue(datetime, ':', 2).toInt();
+        tm.Hour = getValue(datetime, ':', 3).toInt();
+        tm.Minute = getValue(datetime, ':', 4).toInt();
+        tm.Second = getValue(datetime, ':', 5).toInt();
+
+        time_t t = makeTime(tm) + FUDGE;
+        RTC.set(t);
+
+    }
     //https://github.com/JChristensen/DS3232RTC
     RTC.squareWave(SQWAVE_NONE); //disable square wave output
     //RTC.set(compileTime()); //set RTC time to compile time
@@ -588,7 +619,6 @@ void Watchy::_bmaConfig(){
     remap_data.y_axis_sign = 0xFF;
     remap_data.z_axis = 2;
     remap_data.z_axis_sign = 0xFF;
-
     // Need to raise the wrist function, need to set the correct axis
     sensor.setRemapAxes(&remap_data);
 
