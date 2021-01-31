@@ -2,6 +2,9 @@
 
 ![Watchy](https://watchy.sqfmi.com/img/watchy_render.png)
 
+[**Pre-order Watchy!**](https://www.crowdsupply.com/sqfmi/watchy)
+Now with injection molded or CNC'd aluminum case
+
 Visit [**https://watchy.sqfmi.com**](https://watchy.sqfmi.com) for documentation, hardware design files, and more!
 
 ## Setup
