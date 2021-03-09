@@ -163,7 +163,7 @@ void Watchy::showMenu(byte menuIndex, bool partialRefresh){
     uint16_t w, h;
     int16_t yPos;
 
-    char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware"};
+    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware"};
     for(int i=0; i<MENU_LENGTH; i++){
     yPos = 30+(MENU_HEIGHT*i);
     display.setCursor(0, yPos);
@@ -240,8 +240,6 @@ void Watchy::setTime(){
 
     int8_t setIndex = SET_HOUR;
 
-    int16_t  x1, y1;
-    uint16_t w, h;
     int8_t blink = 0;
 
     pinMode(DOWN_BTN_PIN, INPUT);
@@ -509,7 +507,7 @@ weatherData Watchy::getWeatherData(){
         btStop();
     }else{//No WiFi, use RTC Temperature
         uint8_t temperature = RTC.temperature() / 4; //celsius
-        if(TEMP_UNIT == "imperial"){
+        if(strcmp(TEMP_UNIT, "imperial") == 0){
             temperature = temperature * 9. / 5. + 32.; //fahrenheit
         }
         currentWeather.temperature = temperature;
