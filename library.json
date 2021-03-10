@@ -1,0 +1,28 @@
+{
+  "name": "Watchy",
+  "version": "1.2.3",
+  "description": "Watchy - An Open Source E-Paper Watch by SQFMI",
+  "authors": [
+    {
+      "name": "SQFMI",
+      "url": "https://github.com/sqfmi"
+    }
+  ],
+  "homepage": "https://watchy.sqfmi.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqfmi/Watchy.git"
+  },
+  "frameworks": "arduino",
+  "platforms": ["espressif32"],
+  "dependencies": [
+    { "name": "Adafruit GFX Library" },
+    { "name": "Arduino_JSON" },
+    { "name": "DS3232RTC" },
+    { "name": "GxEPD2" },
+    {
+      "name": "WiFiManager",
+      "version": "https://github.com/tzapu/WiFiManager.git#2.0.3-alpha"
+    }
+  ]
+}
