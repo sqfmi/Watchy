@@ -150,7 +150,82 @@ void Watchy::handleButtonPress(){
       }
       showMenu(menuIndex, true);
     }
-  }    
+  }
+  
+  /***************** fast menu *****************/
+  bool timeout = false;
+  long lastTimeout = millis();
+  pinMode(MENU_BTN_PIN, INPUT);
+  pinMode(BACK_BTN_PIN, INPUT);
+  pinMode(UP_BTN_PIN, INPUT);
+  pinMode(DOWN_BTN_PIN, INPUT);
+  while(!timeout){
+      if(millis() - lastTimeout > 5000){
+          timeout = true;
+      }else{
+          if(digitalRead(MENU_BTN_PIN) == 1){
+            lastTimeout = millis();  
+            if(guiState == MAIN_MENU_STATE){//if already in menu, then select menu item
+                switch(menuIndex)
+                {
+                    case 0:
+                    showBattery();
+                    break;
+                    case 1:
+                    showBuzz();
+                    break;          
+                    case 2:
+                    showAccelerometer();
+                    break;
+                    case 3:
+                    setTime();
+                    break;
+                    case 4:
+                    setupWifi();
+                    break;                    
+                    case 5:
+                    showUpdateFW();
+                    break;
+                    default:
+                    break;                              
+                }
+            }else if(guiState == FW_UPDATE_STATE){
+                updateFWBegin();
+            }
+          }else if(digitalRead(BACK_BTN_PIN) == 1){
+            lastTimeout = millis();
+            if(guiState == MAIN_MENU_STATE){//exit to watch face if already in menu
+            RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
+            RTC.read(currentTime);
+            showWatchFace(false);
+            break; //leave loop
+            }else if(guiState == APP_STATE){
+            showMenu(menuIndex, false);//exit to menu if already in app
+            }else if(guiState == FW_UPDATE_STATE){
+            showMenu(menuIndex, false);//exit to menu if already in app
+            }            
+          }else if(digitalRead(UP_BTN_PIN) == 1){
+            lastTimeout = millis();
+            if(guiState == MAIN_MENU_STATE){//increment menu index
+            menuIndex--;
+            if(menuIndex < 0){
+                menuIndex = MENU_LENGTH - 1;
+            }    
+            showFastMenu(menuIndex);
+            }            
+          }else if(digitalRead(DOWN_BTN_PIN) == 1){
+            lastTimeout = millis();
+            if(guiState == MAIN_MENU_STATE){//decrement menu index
+            menuIndex++;
+            if(menuIndex > MENU_LENGTH - 1){
+                menuIndex = 0;
+            }
+            showFastMenu(menuIndex);
+            }         
+          }
+      }
+  }
+  display.hibernate();    
 }
 
 void Watchy::showMenu(byte menuIndex, bool partialRefresh){
@@ -179,7 +254,36 @@ void Watchy::showMenu(byte menuIndex, bool partialRefresh){
     }
 
     display.display(partialRefresh);
-    display.hibernate();
+    //display.hibernate();
+
+    guiState = MAIN_MENU_STATE;    
+}
+
+void Watchy::showFastMenu(byte menuIndex){
+    display.setFullWindow();
+    display.fillScreen(GxEPD_BLACK);
+    display.setFont(&FreeMonoBold9pt7b);
+
+    int16_t  x1, y1;
+    uint16_t w, h;
+    int16_t yPos;
+
+    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware"};
+    for(int i=0; i<MENU_LENGTH; i++){
+    yPos = 30+(MENU_HEIGHT*i);
+    display.setCursor(0, yPos);
+    if(i == menuIndex){
+        display.getTextBounds(menuItems[i], 0, yPos, &x1, &y1, &w, &h);
+        display.fillRect(x1-1, y1-10, 200, h+15, GxEPD_WHITE);
+        display.setTextColor(GxEPD_BLACK);
+        display.println(menuItems[i]);      
+    }else{
+        display.setTextColor(GxEPD_WHITE);
+        display.println(menuItems[i]);
+    }   
+    }
+
+    display.display(true);
 
     guiState = MAIN_MENU_STATE;    
 }
@@ -417,7 +521,6 @@ void Watchy::showAccelerometer(){
         // Get acceleration data
         bool res = sensor.getAccel(acc);
         uint8_t direction = sensor.getDirection();
-        display.setFullWindow();
         display.fillScreen(GxEPD_BLACK);      
         display.setCursor(0, 30);
         if(res == false) {

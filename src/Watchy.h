@@ -33,6 +33,7 @@ class Watchy {
 
         void handleButtonPress();
         void showMenu(byte menuIndex, bool partialRefresh);
+        void showFastMenu(byte menuIndex);
         void showBattery();
         void showBuzz();
         void showAccelerometer();
