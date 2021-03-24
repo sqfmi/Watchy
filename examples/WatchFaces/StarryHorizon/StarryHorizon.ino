@@ -116,7 +116,7 @@ class StarryHorizon : public Watchy {
           display.setTextColor(GxEPD_WHITE);
           display.setTextWrap(false);
           char* dateStr;
-          asprintf(&dateStr, "%s %s %d", dayOfWeek, monthStr, currentTime.Day);
+          asprintf(&dateStr, "%s %s %d", dayOfWeek.c_str(), monthStr.c_str(), currentTime.Day);
           drawCenteredString(dateStr, 100, 140, true);
           free(dateStr);
         }
