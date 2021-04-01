@@ -95,6 +95,7 @@ void Watchy7SEG::drawBattery(){
 void Watchy7SEG::drawWeather(){
 
     weatherData currentWeather = getWeatherData();
+
     int8_t temperature = currentWeather.temperature;
     int16_t weatherConditionCode = currentWeather.weatherConditionCode;   
 

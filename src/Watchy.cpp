@@ -8,6 +8,8 @@ RTC_DATA_ATTR int menuIndex;
 RTC_DATA_ATTR BMA423 sensor;
 RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
+RTC_DATA_ATTR weatherData currentWeather;
+RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
 
 String getValue(String data, char separator, int index)
 {
@@ -484,35 +486,37 @@ void Watchy::drawWatchFace(){
 }
 
 weatherData Watchy::getWeatherData(){
-
-    weatherData currentWeather;
-
-    if(connectWiFi()){//Use Weather API for live data if WiFi is connected
-        HTTPClient http;
-        http.setConnectTimeout(3000);//3 second max timeout
-        String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(CITY_NAME) + String(",") + String(COUNTRY_CODE) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
-        http.begin(weatherQueryURL.c_str());
-        int httpResponseCode = http.GET();
-        if(httpResponseCode == 200) {
-            String payload = http.getString();
-            JSONVar responseObject = JSON.parse(payload);
-            currentWeather.temperature = int(responseObject["main"]["temp"]);
-            currentWeather.weatherConditionCode = int(responseObject["weather"][0]["id"]);            
-        }else{
-            //http error
+    if(weatherIntervalCounter >= WEATHER_UPDATE_INTERVAL){ //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
+        if(connectWiFi()){//Use Weather API for live data if WiFi is connected
+            HTTPClient http;
+            http.setConnectTimeout(3000);//3 second max timeout
+            String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(CITY_NAME) + String(",") + String(COUNTRY_CODE) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
+            http.begin(weatherQueryURL.c_str());
+            int httpResponseCode = http.GET();
+            if(httpResponseCode == 200) {
+                String payload = http.getString();
+                JSONVar responseObject = JSON.parse(payload);
+                currentWeather.temperature = int(responseObject["main"]["temp"]);
+                currentWeather.weatherConditionCode = int(responseObject["weather"][0]["id"]);            
+            }else{
+                //http error
+            }
+            http.end();
+            //turn off radios
+            WiFi.mode(WIFI_OFF);
+            btStop();
+        }else{//No WiFi, use RTC Temperature
+            uint8_t temperature = RTC.temperature() / 4; //celsius
+            if(strcmp(TEMP_UNIT, "imperial") == 0){
+                temperature = temperature * 9. / 5. + 32.; //fahrenheit
+            }
+            currentWeather.temperature = temperature;
+            currentWeather.weatherConditionCode = 800;
         }
-        http.end();
-        //turn off radios
-        WiFi.mode(WIFI_OFF);
-        btStop();
-    }else{//No WiFi, use RTC Temperature
-        uint8_t temperature = RTC.temperature() / 4; //celsius
-        if(strcmp(TEMP_UNIT, "imperial") == 0){
-            temperature = temperature * 9. / 5. + 32.; //fahrenheit
-        }
-        currentWeather.temperature = temperature;
-        currentWeather.weatherConditionCode = 800;
-    } 
+        weatherIntervalCounter = 0;
+    }else{
+        weatherIntervalCounter++;
+    }
     return currentWeather;
 }
 
