@@ -37,20 +37,39 @@ void Watchy::init(String datetime){
 
     switch (wakeup_reason)
     {
+        #ifdef ESP_RTC
+        case ESP_SLEEP_WAKEUP_TIMER: //ESP Internal RTC
+            if(guiState == WATCHFACE_STATE){
+                RTC.read(currentTime);
+                currentTime.Minute++;
+                tmElements_t tm;
+                tm.Month = currentTime.Month;
+                tm.Day = currentTime.Day;
+                tm.Year = currentTime.Year;
+                tm.Hour = currentTime.Hour;
+                tm.Minute = currentTime.Minute;
+                tm.Second = 0;
+                time_t t = makeTime(tm);
+                RTC.set(t);
+                RTC.read(currentTime);           
+                showWatchFace(true); //partial updates on tick
+            }
+            break;        
+        #endif
         case ESP_SLEEP_WAKEUP_EXT0: //RTC Alarm
             RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
             if(guiState == WATCHFACE_STATE){
                 RTC.read(currentTime);
                 showWatchFace(true); //partial updates on tick
-            }else{
-            //
             }
             break;
         case ESP_SLEEP_WAKEUP_EXT1: //button Press
             handleButtonPress();
             break;
         default: //reset
+            #ifndef ESP_RTC
             _rtcConfig(datetime);
+            #endif
             _bmaConfig();
             showWatchFace(false); //full update on reset
             break;
@@ -59,7 +78,12 @@ void Watchy::init(String datetime){
 }
 
 void Watchy::deepSleep(){
+  #ifndef ESP_RTC
   esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
+  #endif  
+  #ifdef ESP_RTC
+  esp_sleep_enable_timer_wakeup(60000000);
+  #endif 
   esp_sleep_enable_ext1_wakeup(BTN_PIN_MASK, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
   esp_deep_sleep_start();
 }
