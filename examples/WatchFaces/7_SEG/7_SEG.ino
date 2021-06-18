@@ -2,7 +2,11 @@
 
 Watchy7SEG watchy;
 
-void setup(){
+void setup() {
+  // City names with spaces require a +
+  // temp units must be either metric or imperial
+  watchy.setWeatherLocation("New+York", "US", "metric");
+
   watchy.init();
 }
 

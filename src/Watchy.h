@@ -17,6 +17,9 @@
 typedef struct weatherData{
     int8_t temperature;
     int16_t weatherConditionCode;
+    String city = CITY_NAME;
+    String countryCode = COUNTRY_CODE;
+    String tempUnit = TEMP_UNIT;
 }weatherData;
 
 class Watchy {
@@ -41,6 +44,7 @@ class Watchy {
         void setTime();
         void setupWifi();
         bool connectWiFi();
+        void setWeatherLocation(String city, String country, String units);
         weatherData getWeatherData();
         void updateFWBegin();
 

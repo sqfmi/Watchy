@@ -612,12 +612,19 @@ void Watchy::drawWatchFace(){
     display.println(currentTime.Minute);    
 }
 
+void Watchy::setWeatherLocation(String city, String countryCode, String tempUnit){
+    currentWeather.city = city;
+    currentWeather.countryCode = countryCode;
+    currentWeather.tempUnit = tempUnit;
+}
+
 weatherData Watchy::getWeatherData(){
     if(weatherIntervalCounter >= WEATHER_UPDATE_INTERVAL){ //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
         if(connectWiFi()){//Use Weather API for live data if WiFi is connected
             HTTPClient http;
             http.setConnectTimeout(3000);//3 second max timeout
-            String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(CITY_NAME) + String(",") + String(COUNTRY_CODE) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
+            String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(currentWeather.city) + String(",") + String(currentWeather.countryCode) +
+                    String("&units=") + String(currentWeather.tempUnit) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
             http.begin(weatherQueryURL.c_str());
             int httpResponseCode = http.GET();
             if(httpResponseCode == 200) {
@@ -634,7 +641,7 @@ weatherData Watchy::getWeatherData(){
             btStop();
         }else{//No WiFi, use RTC Temperature
             uint8_t temperature = RTC.temperature() / 4; //celsius
-            if(strcmp(TEMP_UNIT, "imperial") == 0){
+            if(currentWeather.tempUnit.equals("imperial")){
                 temperature = temperature * 9. / 5. + 32.; //fahrenheit
             }
             currentWeather.temperature = temperature;
