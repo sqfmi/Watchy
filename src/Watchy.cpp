@@ -10,6 +10,7 @@ RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
+RTC_DATA_ATTR int ntpTimeSyncInterval = NTP_TIME_SYNC_INTERVAL;
 
 String getValue(String data, char separator, int index)
 {
@@ -28,7 +29,7 @@ String getValue(String data, char separator, int index)
   return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
-Watchy::Watchy(){} //constructor
+Watchy::Watchy(){} //
 
 void Watchy::init(String datetime){
     esp_sleep_wakeup_cause_t wakeup_reason;
@@ -74,8 +75,50 @@ void Watchy::init(String datetime){
             showWatchFace(false); //full update on reset
             break;
     }
+    syncNtpTime();
     deepSleep();
 }
+
+void Watchy::syncNtpTime(){
+    const char* ntpServer = "pool.ntp.org";
+    const long gmtOffset_sec = -21600; // set time zone to central standard time
+                                        // ie UTC -6 * 60 * 60 = -21600
+    const int daylightOffset_sec = 3600;// if observing Daylight saving time 3600 otherwise 0
+    struct tm timeinfo;
+
+    // Watchy updates every minute but we really only need to sync a few times a day
+    if(currentTime.Hour % ntpTimeSyncInterval == 0 && currentTime.Minute == 0 && ntpTimeSyncInterval != 0){
+      //only run this at midnight,8am and 4pm
+      // three times a day to correct time drift.
+
+      //make sure WiFi is connected
+      if(connectWiFi()){
+          // wifi connected so proceed to get NTP time
+
+          //get NTP Time
+          configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+          getLocalTime(&timeinfo);
+
+          // convert NTP time into proper format
+          tmElements_t tm;
+          tm.Month = timeinfo.tm_mon + 1;// 0-11 based month so we have to add 1
+          tm.Day = timeinfo.tm_mday;
+          tm.Year = timeinfo.tm_year + 1900 - YEAR_OFFSET;//offset from 1970, since year is stored in uint8_t
+          tm.Hour = timeinfo.tm_hour;
+          tm.Minute = timeinfo.tm_min;
+          tm.Second = timeinfo.tm_sec;
+          time_t t = makeTime(tm);
+
+          //set the RTC time to the NTP time
+          RTC.set(t);
+
+          // shut down the radio to save power
+          WiFi.mode(WIFI_OFF);
+          btStop();
+      }
+    }
+}
+
 
 void Watchy::deepSleep(){
   #ifndef ESP_RTC

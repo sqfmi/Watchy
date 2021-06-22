@@ -43,6 +43,7 @@ class Watchy {
         bool connectWiFi();
         weatherData getWeatherData();
         void updateFWBegin();
+        void syncNtpTime();
 
         void showWatchFace(bool partialRefresh);
         virtual void drawWatchFace(); //override this method for different watch faces

@@ -48,6 +48,7 @@
 #define SET_MONTH 3
 #define SET_DAY 4
 #define YEAR_OFFSET 1970
+#define NTP_TIME_SYNC_INTERVAL 8 //hours    0 = update never
 //BLE OTA
 #define BLE_DEVICE_NAME "Watchy BLE OTA"
 #define WATCHFACE_NAME "Watchy 7 Segment"
