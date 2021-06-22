@@ -12,6 +12,7 @@ class Watchy7SEG : public Watchy{
     public:
         Watchy7SEG();
         void drawWatchFace();
+        void syncNtpTime();
         void drawTime();
         void drawDate();
         void drawSteps();

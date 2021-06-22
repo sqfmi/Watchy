@@ -8,6 +8,7 @@ class WatchyPokemon : public Watchy{
     public:
         WatchyPokemon();
         void drawWatchFace();
+        void syncNtpTime();
 };
 
 #endif

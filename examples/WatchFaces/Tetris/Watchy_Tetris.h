@@ -8,6 +8,7 @@ class WatchyTetris : public Watchy{
     public:
         WatchyTetris();
         void drawWatchFace();
+        void syncNtpTime();
 };
 
 #endif

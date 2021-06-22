@@ -8,6 +8,7 @@ class WatchyMacPaint : public Watchy{
     public:
         WatchyMacPaint();
         void drawWatchFace();
+        void syncNtpTime();
 };
 
 #endif

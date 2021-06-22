@@ -8,6 +8,7 @@ class WatchyDOS : public Watchy{
     public:
         WatchyDOS();
         void drawWatchFace();
+        void syncNtpTime();
 };
 
 #endif
