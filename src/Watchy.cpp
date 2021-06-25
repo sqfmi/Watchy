@@ -675,6 +675,8 @@ void  Watchy::syncNTPTime(){
 void Watchy::initTimeAndLocation(){
     if(connectWiFi()){
         syncNTPTime();
+        WiFi.mode(WIFI_OFF);
+        btStop();
     }
 }
 
@@ -873,6 +875,7 @@ void Watchy::setupWifi(){
     display.setTextColor(GxEPD_WHITE);
     display.println("Connected to");
     display.println(WiFi.SSID());
+    initTimeAndLocation();
     display.display(false);//full refresh
     display.hibernate();
   }
