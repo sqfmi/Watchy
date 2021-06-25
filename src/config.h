@@ -48,7 +48,11 @@
 #define SET_MONTH 3
 #define SET_DAY 4
 #define YEAR_OFFSET 1970
-#define NTP_TIME_SYNC_INTERVAL 8 //hours    0 = update never
+#define NTP_TIME_SYNC_INTERVAL 480 // minutes, will have no effect if it's lower than WEATHER_UPDATE_INTERVAL     0 = update never
+#define GMT_OFFSET_SEC -21600 // set time zone to central standard time
+                                // ie UTC -6 * 60 * 60 = -21600
+#define DAYLIGHT_OFFSET_SEC 3600 // if observing Daylight saving time 3600 otherwise 0
+#define NTP_SERVER "pool.ntp.org"
 //BLE OTA
 #define BLE_DEVICE_NAME "Watchy BLE OTA"
 #define WATCHFACE_NAME "Watchy 7 Segment"
