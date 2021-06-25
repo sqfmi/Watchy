@@ -41,6 +41,9 @@ class Watchy {
         void setTime();
         void setupWifi();
         bool connectWiFi();
+        void syncIPLocation();
+        void syncNTPTime();
+        void initTimeAndLocation();
         weatherData getWeatherData();
         void updateFWBegin();
 

@@ -11,6 +11,11 @@ RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
 
+bool ntpSet = false;
+String countryCode;
+String city;
+int offset;
+
 String getValue(String data, char separator, int index)
 {
   int found = 0;
@@ -70,6 +75,7 @@ void Watchy::init(String datetime){
             #ifndef ESP_RTC
             _rtcConfig(datetime);
             #endif
+            initTimeAndLocation();
             _bmaConfig();
             showWatchFace(false); //full update on reset
             break;
@@ -612,12 +618,87 @@ void Watchy::drawWatchFace(){
     display.println(currentTime.Minute);    
 }
 
+// must call connectWifi() before calling this function
+void  Watchy::syncIPLocation(){
+    HTTPClient http;
+    http.setConnectTimeout(3000);//3 second max timeout
+
+    // Get Time offset, city, countrycode from ip-api.com
+    http.begin(String(IP_API_URL));
+    int ipRespnseCode = http.GET();
+    if(ipRespnseCode != 200) {
+        Serial.println("Failed to obtain ip-api");
+        return;
+    }
+    String payload = http.getString();
+    JSONVar responseObject = JSON.parse(payload);
+    countryCode = (const char*) responseObject["countryCode"];
+    city = (const char*) responseObject["city"];
+    offset = int(responseObject["offset"]);
+    // url encode city
+    city.replace(" ", "+");
+}
+
+// must call connectWifi() before calling this function
+void  Watchy::syncNTPTime(){
+    if (city.length() < 1) {
+        syncIPLocation();
+        if (city.length() < 1) {
+            // if we don't have our city name, we don't know how to offset time...
+            return;
+        }
+    }
+    if (!ntpSet) {
+        configTime(offset, 0, NTP_SERVER);
+        ntpSet = true;
+    }
+    struct tm timeinfo;
+    if(!getLocalTime(&timeinfo)){
+        Serial.println("Failed to obtain time");
+    } else {
+        // map the struct tm into the tmElements_t struct
+        tmElements_t tm0;
+        tm0.Month = timeinfo.tm_mon + 1; //convert from months starting on 0 to 1
+        tm0.Day = timeinfo.tm_mday;
+        tm0.Year = timeinfo.tm_year - 70; //convert between 1900 and 1970 year offset
+        tm0.Hour = timeinfo.tm_hour;
+        tm0.Minute = timeinfo.tm_min;
+        tm0.Second = timeinfo.tm_sec;
+
+        time_t t = makeTime(tm0);
+        RTC.set(t);
+
+        Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+    }
+}
+
+void Watchy::initTimeAndLocation(){
+    if(connectWiFi()){
+        syncNTPTime();
+    }
+}
+
 weatherData Watchy::getWeatherData(){
     if(weatherIntervalCounter >= WEATHER_UPDATE_INTERVAL){ //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
         if(connectWiFi()){//Use Weather API for live data if WiFi is connected
             HTTPClient http;
             http.setConnectTimeout(3000);//3 second max timeout
-            String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(CITY_NAME) + String(",") + String(COUNTRY_CODE) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
+
+            syncIPLocation();
+            syncNTPTime();
+
+            // if city is set by ip address, use it.  else fall back to compile time choice from config.h.
+            String chosenCity;
+            String chosenCountryCode;
+            if (city.length() > 0) {
+                chosenCity = city;
+                chosenCountryCode = countryCode;
+            } else {
+                chosenCity = CITY_NAME;
+                chosenCountryCode = COUNTRY_CODE;
+            }
+
+            String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(chosenCity) + String(",") + String(chosenCountryCode) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
             http.begin(weatherQueryURL.c_str());
             int httpResponseCode = http.GET();
             if(httpResponseCode == 200) {
