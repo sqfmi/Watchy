@@ -10,7 +10,7 @@ RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
-RTC_DARA_ATTR int ntpSyncTimeCounter = NTP_TIME_SYNC_INTERVAL;
+RTC_DATA_ATTR int ntpSyncTimeCounter = NTP_TIME_SYNC_INTERVAL;
 
 String getValue(String data, char separator, int index)
 {
@@ -108,8 +108,6 @@ void Watchy::syncNtpTime(){
         // shut down the radio to save power
         WiFi.mode(WIFI_OFF);
         btStop();
-    } else {
-        ntpSyncTimeCounter = ntpSyncTimeCounter + WEATHER_UPDATE_INTERVAL;
     }
 }
 
@@ -684,6 +682,7 @@ weatherData Watchy::getWeatherData(){
         weatherIntervalCounter = 0;
     }else{
         weatherIntervalCounter++;
+        ntpSyncTimeCounter = ntpSyncTimeCounter + WEATHER_UPDATE_INTERVAL;
     }
     return currentWeather;
 }
