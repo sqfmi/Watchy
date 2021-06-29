@@ -88,6 +88,7 @@ void Watchy::syncNtpTime(){
 
         //get NTP Time
         configTime(GMT_OFFSET_SEC, DAYLIGHT_OFFSET_SEC, NTP_SERVER);
+        delay(4000); //delay 4 secods so configTime can finish recieving the time from the internet
         getLocalTime(&timeinfo);
 
         // convert NTP time into proper format
