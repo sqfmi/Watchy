@@ -841,7 +841,7 @@ void Watchy::showUpdateFW(){
     display.setFont(&FreeMonoBold9pt7b);
     display.setTextColor(GxEPD_WHITE);
     display.setCursor(0, 30);
-    display.println("Please Visit");
+    display.println("Please visit");
     display.println("watchy.sqfmi.com");
     display.println("with a Bluetooth");
     display.println("enabled device");
