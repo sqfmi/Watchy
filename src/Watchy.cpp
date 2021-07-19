@@ -683,7 +683,7 @@ weatherData Watchy::getWeatherData(){
         weatherIntervalCounter = 0;
     }else{
         weatherIntervalCounter++;
-        ntpSyncTimeCounter = ntpSyncTimeCounter + WEATHER_UPDATE_INTERVAL;
+        ntpSyncTimeCounter++;
     }
     return currentWeather;
 }
