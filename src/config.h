@@ -40,7 +40,7 @@
 #define APP_STATE 1
 #define FW_UPDATE_STATE 2
 #define MENU_HEIGHT 30
-#define MENU_LENGTH 6
+#define MENU_LENGTH 7
 //set time
 #define SET_HOUR 0
 #define SET_MINUTE 1
@@ -48,6 +48,9 @@
 #define SET_MONTH 3
 #define SET_DAY 4
 #define YEAR_OFFSET 1970
+//sleep mode
+#define SLEEP_HOUR          0
+#define SLEEP_MINUTE        20
 //BLE OTA
 #define BLE_DEVICE_NAME "Watchy BLE OTA"
 #define WATCHFACE_NAME "Watchy 7 Segment"

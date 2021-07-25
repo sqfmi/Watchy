@@ -8,7 +8,8 @@ RTC_DATA_ATTR int menuIndex;
 RTC_DATA_ATTR BMA423 sensor;
 RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
-RTC_DATA_ATTR bool sleep_mode = false;
+RTC_DATA_ATTR bool RTC_WAKE_IGNORE_ACTIVE;
+RTC_DATA_ATTR bool RTC_WAKE_IGNORE_REQUESTED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
 
@@ -61,16 +62,16 @@ void Watchy::init(String datetime){
             RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
             if(guiState == WATCHFACE_STATE){
                 RTC.read(currentTime);
-                if(currentTime.Hour == 1 && currentTime.Minute == 0){
-                     sleep_mode = true;
+                if(RTC_WAKE_IGNORE_REQUESTED == true && currentTime.Hour == SLEEP_HOUR && currentTime.Minute == SLEEP_MINUTE){
+                     RTC_WAKE_IGNORE_ACTIVE = true;
                      RTC.alarmInterrupt(ALARM_2, false);
                  }
                 showWatchFace(true); //partial updates on tick
             }
             break;
         case ESP_SLEEP_WAKEUP_EXT1: //button Press + no handling if wakeup
-            if(sleep_mode){
-                sleep_mode = false;
+            if(RTC_WAKE_IGNORE_ACTIVE){
+                RTC_WAKE_IGNORE_ACTIVE = false;
                 RTC.alarmInterrupt(ALARM_2, true);
                 RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
                 RTC.read(currentTime);
@@ -90,8 +91,8 @@ void Watchy::init(String datetime){
     deepSleep();
 }
 
-bool WatchyBase::watchFaceDisabled(){
-    return sleep_mode;
+bool Watchy::watchFaceDisabled(){
+    return RTC_WAKE_IGNORE_ACTIVE;
 }
 
 void Watchy::deepSleep(){
@@ -150,9 +151,12 @@ void Watchy::handleButtonPress(){
           setTime();
           break;
         case 4:
-          setupWifi();
-          break;                    
+          toggleSleepMode();
+          break;
         case 5:
+          setupWifi();
+          break;
+        case 6:
           showUpdateFW();
           break;
         default:
@@ -224,9 +228,12 @@ void Watchy::handleButtonPress(){
                     setTime();
                     break;
                     case 4:
-                    setupWifi();
-                    break;                    
+                    toggleSleepMode();
+                    break;
                     case 5:
+                    setupWifi();
+                    break; 
+                    case 6:
                     showUpdateFW();
                     break;
                     default:
@@ -281,9 +288,9 @@ void Watchy::showMenu(byte menuIndex, bool partialRefresh){
     uint16_t w, h;
     int16_t yPos;
 
-    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware"};
+    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Sleep Mode", "Setup WiFi", "Update Firmware"};
     for(int i=0; i<MENU_LENGTH; i++){
-    yPos = 30+(MENU_HEIGHT*i);
+    yPos = 15+(MENU_HEIGHT*i);
     display.setCursor(0, yPos);
     if(i == menuIndex){
         display.getTextBounds(menuItems[i], 0, yPos, &x1, &y1, &w, &h);
@@ -311,9 +318,9 @@ void Watchy::showFastMenu(byte menuIndex){
     uint16_t w, h;
     int16_t yPos;
 
-    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware"};
+    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Sleep Mode", "Setup WiFi", "Update Firmware"};
     for(int i=0; i<MENU_LENGTH; i++){
-    yPos = 30+(MENU_HEIGHT*i);
+    yPos = 15+(MENU_HEIGHT*i);
     display.setCursor(0, yPos);
     if(i == menuIndex){
         display.getTextBounds(menuItems[i], 0, yPos, &x1, &y1, &w, &h);
@@ -958,6 +965,45 @@ void Watchy::updateFWBegin(){
     WiFi.mode(WIFI_OFF);
     btStop();
     showMenu(menuIndex, false);
+}
+
+void Watchy::toggleSleepMode(){
+    guiState = APP_STATE;
+
+    pinMode(DOWN_BTN_PIN, INPUT);
+    pinMode(UP_BTN_PIN, INPUT);
+    pinMode(BACK_BTN_PIN, INPUT);
+
+    while(1){
+        if(digitalRead(UP_BTN_PIN) == 1){
+            RTC_WAKE_IGNORE_REQUESTED = true;
+        }
+        if(digitalRead(DOWN_BTN_PIN) == 1){
+            RTC_WAKE_IGNORE_REQUESTED = false;
+        }
+        if(digitalRead(BACK_BTN_PIN) == 1){
+            break;
+        }
+        display.init(0, false); //_initial_refresh to false to prevent full update on init
+        display.setFullWindow();
+        display.fillScreen(GxEPD_BLACK);
+        display.setFont(&FreeMonoBold9pt7b);
+        display.setTextColor(GxEPD_WHITE);
+        display.setCursor(35, 90);
+        display.println("Sleep Mode");
+        display.setCursor(35, 110);
+        display.print("set to:");
+        display.setCursor(115, 110);
+        if(RTC_WAKE_IGNORE_REQUESTED == true){
+          display.print("ON");
+        }
+        if(RTC_WAKE_IGNORE_REQUESTED == false){
+          display.print("OFF");
+        }
+        display.display(true);
+    }
+
+    display.hibernate();
 }
 
 // time_t compileTime()

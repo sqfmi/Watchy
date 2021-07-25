@@ -13,7 +13,6 @@
 #include "BLE.h"
 #include "bma.h"
 #include "config.h"
-#include "sleep.h"
 
 typedef struct weatherData{
     int8_t temperature;
@@ -44,6 +43,7 @@ class Watchy {
         bool connectWiFi();
         weatherData getWeatherData();
         void updateFWBegin();
+        void toggleSleepMode();
 
         void showWatchFace(bool partialRefresh);
         bool watchFaceDisabled();
@@ -62,5 +62,7 @@ extern RTC_DATA_ATTR int menuIndex;
 extern RTC_DATA_ATTR BMA423 sensor;
 extern RTC_DATA_ATTR bool WIFI_CONFIGURED;
 extern RTC_DATA_ATTR bool BLE_CONFIGURED;
+extern RTC_DATA_ATTR bool RTC_WAKE_IGNORE_ACTIVE;
+extern RTC_DATA_ATTR bool RTC_WAKE_IGNORE_REQUESTED;
 
 #endif
