@@ -8,6 +8,7 @@ RTC_DATA_ATTR int menuIndex;
 RTC_DATA_ATTR BMA423 sensor;
 RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
+RTC_DATA_ATTR bool sleep_mode = false;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
 
@@ -60,10 +61,22 @@ void Watchy::init(String datetime){
             RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
             if(guiState == WATCHFACE_STATE){
                 RTC.read(currentTime);
+                if(currentTime.Hour == 1 && currentTime.Minute == 0){
+                     sleep_mode = true;
+                     RTC.alarmInterrupt(ALARM_2, false);
+                 }
                 showWatchFace(true); //partial updates on tick
             }
             break;
-        case ESP_SLEEP_WAKEUP_EXT1: //button Press
+        case ESP_SLEEP_WAKEUP_EXT1: //button Press + no handling if wakeup
+            if(sleep_mode){
+                sleep_mode = false;
+                RTC.alarmInterrupt(ALARM_2, true);
+                RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
+                RTC.read(currentTime);
+                showWatchFace(false); //full update on wakeup from sleep mode
+                break;
+            }
             handleButtonPress();
             break;
         default: //reset
@@ -75,6 +88,10 @@ void Watchy::init(String datetime){
             break;
     }
     deepSleep();
+}
+
+bool WatchyBase::watchFaceDisabled(){
+    return sleep_mode;
 }
 
 void Watchy::deepSleep(){

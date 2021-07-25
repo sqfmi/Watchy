@@ -12,7 +12,8 @@
 #include "DSEG7_Classic_Bold_53.h"
 #include "BLE.h"
 #include "bma.h"
-#include "config.h"    
+#include "config.h"
+#include "sleep.h"
 
 typedef struct weatherData{
     int8_t temperature;
@@ -45,6 +46,7 @@ class Watchy {
         void updateFWBegin();
 
         void showWatchFace(bool partialRefresh);
+        bool watchFaceDisabled();
         virtual void drawWatchFace(); //override this method for different watch faces
 
     private:
