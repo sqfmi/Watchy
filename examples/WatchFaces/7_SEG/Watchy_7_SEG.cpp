@@ -13,6 +13,12 @@ Watchy7SEG::Watchy7SEG(){} //constructor
 void Watchy7SEG::drawWatchFace(){
     display.fillScreen(DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);
     display.setTextColor(DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+    if(RTC_WAKE_IGNORE_ACTIVE){
+         display.setFont(&Seven_Segment10pt7b);
+         display.setCursor(53, 182);
+         display.print("SLEEP MODE");
+         return;
+    }
     drawTime();
     drawDate();
     drawSteps();
