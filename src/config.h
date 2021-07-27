@@ -49,8 +49,8 @@
 #define SET_DAY 4
 #define YEAR_OFFSET 1970
 //sleep mode
-#define SLEEP_HOUR          0
-#define SLEEP_MINUTE        20
+#define SLEEP_HOUR 0
+#define SLEEP_MINUTE 20
 //BLE OTA
 #define BLE_DEVICE_NAME "Watchy BLE OTA"
 #define WATCHFACE_NAME "Watchy 7 Segment"
