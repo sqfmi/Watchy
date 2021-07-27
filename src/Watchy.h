@@ -46,7 +46,6 @@ class Watchy {
         void toggleSleepMode();
 
         void showWatchFace(bool partialRefresh);
-        bool watchFaceDisabled();
         virtual void drawWatchFace(); //override this method for different watch faces
 
     private:

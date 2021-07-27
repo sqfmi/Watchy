@@ -65,7 +65,7 @@ void Watchy::init(String datetime){
                 if(RTC_WAKE_IGNORE_REQUESTED == true && currentTime.Hour == SLEEP_HOUR && currentTime.Minute == SLEEP_MINUTE){
                      RTC_WAKE_IGNORE_ACTIVE = true;
                      RTC.alarmInterrupt(ALARM_2, false);
-                 }
+                }
                 showWatchFace(true); //partial updates on tick
             }
             break;
@@ -89,10 +89,6 @@ void Watchy::init(String datetime){
             break;
     }
     deepSleep();
-}
-
-bool Watchy::watchFaceDisabled(){
-    return RTC_WAKE_IGNORE_ACTIVE;
 }
 
 void Watchy::deepSleep(){
@@ -989,11 +985,12 @@ void Watchy::toggleSleepMode(){
         display.fillScreen(GxEPD_BLACK);
         display.setFont(&FreeMonoBold9pt7b);
         display.setTextColor(GxEPD_WHITE);
-        display.setCursor(35, 90);
+        display.drawRect(25, 65, 151, 60, GxEPD_WHITE);
+        display.setCursor(45, 90);
         display.println("Sleep Mode");
-        display.setCursor(35, 110);
+        display.setCursor(45, 110);
         display.print("set to:");
-        display.setCursor(115, 110);
+        display.setCursor(125, 110);
         if(RTC_WAKE_IGNORE_REQUESTED == true){
           display.print("ON");
         }
