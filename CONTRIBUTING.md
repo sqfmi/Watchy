@@ -9,3 +9,7 @@ Search through [Issue tracker](https://github.com/sqfmi/Watchy/issues) for match
 1. Fork this repo and branch out from `dev`.
 2. Push commits.
 3. Issue pull request.
+
+## Community
+
+- [Discord](https://discord.gg/ZXDegGV8E7)
