@@ -6,6 +6,6 @@ Search through [Issue tracker](https://github.com/sqfmi/Watchy/issues) for match
 
 ### Issue Pull Request
 
-- Fork this repo and branch out from `dev`.
-- Push commits.
-- Issue pull request.
+1. Fork this repo and branch out from `dev`.
+2. Push commits.
+3. Issue pull request.
