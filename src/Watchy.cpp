@@ -113,71 +113,13 @@ void Watchy::_rtcConfig(String datetime){
 
 void Watchy::handleButtonPress(){
     uint64_t wakeupBit = esp_sleep_get_ext1_wakeup_status();
-    //Menu Button
-    if (wakeupBit & MENU_BTN_MASK) {
-        if (guiState == WATCHFACE_STATE) {//enter menu state if coming from watch face
-            showMenu(menuIndex, false);
-        } else if (guiState == MAIN_MENU_STATE) {//if already in menu, then select menu item
-            switch(menuIndex) {
-                case 0:
-                  showBattery();
-                    break;
-                case 1:
-                    showBuzz();
-                    break;
-                case 2:
-                    showAccelerometer();
-                    break;
-                case 3:
-                    setTime();
-                    break;
-                case 4:
-                    setupWifi();
-                    break;
-                case 5:
-                    showUpdateFW();
-                    break;
-                default:
-                    break;
-            }
-        } else if(guiState == FW_UPDATE_STATE) {
-            updateFWBegin();
-        }
-    }
-    //Back Button
-    else if (wakeupBit & BACK_BTN_MASK) {
-        if (guiState == MAIN_MENU_STATE) {//exit to watch face if already in menu
-            RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
-            RTC.read(currentTime);
-            showWatchFace(false);
-        } else if (guiState == APP_STATE) {
-            showMenu(menuIndex, false);//exit to menu if already in app
-        } else if (guiState == FW_UPDATE_STATE) {
-            showMenu(menuIndex, false);//exit to menu if already in app
-        }
-    }
-    //Up Button
-    else if (wakeupBit & UP_BTN_MASK) {
-        if(guiState == MAIN_MENU_STATE) {//increment menu index
-            menuIndex--;
-            if(menuIndex < 0){
-                menuIndex = MENU_LENGTH - 1;
-            }
-            showMenu(menuIndex, true);
-        }
-    }
-    //Down Button
-    else if (wakeupBit & DOWN_BTN_MASK) {
-        if(guiState == MAIN_MENU_STATE){//decrement menu index
-            menuIndex++;
-            if(menuIndex > MENU_LENGTH - 1) {
-                menuIndex = 0;
-            }
-            showMenu(menuIndex, true);
-        }
-    }
 
-    /***************** fast menu *****************/
+    // Initially button press state is populated by the wakup
+    bool menu_pressed = wakeupBit & MENU_BTN_MASK;
+    bool back_pressed = wakeupBit & BACK_BTN_MASK;
+    bool up_pressed   = wakeupBit & UP_BTN_MASK;
+    bool down_pressed = wakeupBit & DOWN_BTN_MASK;
+
     bool timeout = false;
     long lastTimeout = millis();
     pinMode(MENU_BTN_PIN, INPUT);
@@ -185,69 +127,79 @@ void Watchy::handleButtonPress(){
     pinMode(UP_BTN_PIN, INPUT);
     pinMode(DOWN_BTN_PIN, INPUT);
     while(!timeout) {
-        if (millis() - lastTimeout > 5000) {
-            timeout = true;
-        } else {
-            if (digitalRead(MENU_BTN_PIN) == 1) {
-                lastTimeout = millis();
-                if (guiState == MAIN_MENU_STATE) {//if already in menu, then select menu item
-                    switch(menuIndex) {
-                        case 0:
-                            showBattery();
-                            break;
-                        case 1:
-                            showBuzz();
-                            break;
-                        case 2:
-                            showAccelerometer();
-                            break;
-                        case 3:
-                            setTime();
-                            break;
-                        case 4:
-                            setupWifi();
-                            break;
-                        case 5:
-                            showUpdateFW();
-                            break;
-                        default:
-                            break;
-                    }
-                } else if (guiState == FW_UPDATE_STATE) {
-                    updateFWBegin();
+        if (menu_pressed) {
+            if (guiState == WATCHFACE_STATE) {
+                showMenu(menuIndex, false);
+            } else if (guiState == MAIN_MENU_STATE) {
+                switch(menuIndex) {
+                    case 0:
+                        showBattery();
+                        break;
+                    case 1:
+                        showBuzz();
+                        break;
+                    case 2:
+                        showAccelerometer();
+                        break;
+                    case 3:
+                        setTime();
+                        break;
+                    case 4:
+                        setupWifi();
+                        break;
+                    case 5:
+                        showUpdateFW();
+                        break;
+                    default:
+                        break;
                 }
-            } else if (digitalRead(BACK_BTN_PIN) == 1) {
-                lastTimeout = millis();
-                if (guiState == MAIN_MENU_STATE) {//exit to watch face if already in menu
-                    RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
-                    RTC.read(currentTime);
-                    showWatchFace(false);
-                    break; //leave loop
-                } else if (guiState == APP_STATE) {
-                    showMenu(menuIndex, false);//exit to menu if already in app
-                } else if (guiState == FW_UPDATE_STATE) {
-                    showMenu(menuIndex, false);//exit to menu if already in app
+            } else if (guiState == FW_UPDATE_STATE) {
+                updateFWBegin();
+            }
+        } else if (back_pressed) {
+            if (guiState == MAIN_MENU_STATE) {//exit to watch face if already in menu
+                RTC.alarm(ALARM_2); //resets the alarm flag in the RTC
+                RTC.read(currentTime);
+                showWatchFace(false);
+                break; // leave menu, go back to sleep
+            } else if (guiState == APP_STATE) {
+                showMenu(menuIndex, false);//exit to menu if already in app
+            } else if (guiState == FW_UPDATE_STATE) {
+                showMenu(menuIndex, false);//exit to menu if already in app
+            }
+        } else if (up_pressed) {
+            if (guiState == MAIN_MENU_STATE) {//increment menu index
+                menuIndex--;
+                if (menuIndex < 0) {
+                    menuIndex = MENU_LENGTH - 1;
                 }
-            } else if (digitalRead(UP_BTN_PIN) == 1) {
-                lastTimeout = millis();
-                if (guiState == MAIN_MENU_STATE) {//increment menu index
-                    menuIndex--;
-                    if(menuIndex < 0){
-                        menuIndex = MENU_LENGTH - 1;
-                    }
-                    showFastMenu(menuIndex);
+                showMenu(menuIndex, true);
+            }
+        } else if (down_pressed) {
+            if(guiState == MAIN_MENU_STATE){//decrement menu index
+                menuIndex++;
+                if (menuIndex > MENU_LENGTH - 1) {
+                    menuIndex = 0;
                 }
-            } else if (digitalRead(DOWN_BTN_PIN) == 1) {
-                lastTimeout = millis();
-                if (guiState == MAIN_MENU_STATE) {//decrement menu index
-                    menuIndex++;
-                    if (menuIndex > MENU_LENGTH - 1) {
-                        menuIndex = 0;
-                    }
-                    showFastMenu(menuIndex);
-                }
+                showMenu(menuIndex, true);
             }
         }
+
+        // If any button is pressed, reset the timeout
+        // Go back to sleep after 5 seconds if no button is pressed
+        if (menu_pressed || back_pressed || up_pressed || down_pressed) {
+            lastTimeout = millis();
+        } else {
+            if (millis() - lastTimeout > 5000) {
+                timeout = true;
+            }
+        }
+
+        // Query new button state
+        menu_pressed = digitalRead(MENU_BTN_PIN);
+        back_pressed = digitalRead(BACK_BTN_PIN);
+        up_pressed   = digitalRead(UP_BTN_PIN);
+        down_pressed = digitalRead(DOWN_BTN_PIN);
     }
     display.hibernate();
 }
