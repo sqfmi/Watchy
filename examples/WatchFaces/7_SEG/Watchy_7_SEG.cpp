@@ -27,10 +27,16 @@ void Watchy7SEG::drawWatchFace(){
 void Watchy7SEG::drawTime(){
     display.setFont(&DSEG7_Classic_Bold_53);
     display.setCursor(5, 53+5);
-    if(currentTime.Hour < 10){
+    int displayHour;
+    if(HOUR_12_24==12){
+      displayHour = ((currentTime.Hour+11)%12)+1;
+    } else {
+      displayHour = currentTime.Hour;
+    }
+    if(displayHour < 10){
         display.print("0");
     }
-    display.print(currentTime.Hour);
+    display.print(displayHour);
     display.print(":");
     if(currentTime.Minute < 10){
         display.print("0");
