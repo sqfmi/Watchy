@@ -648,7 +648,8 @@ weatherData Watchy::getWeatherData(){
 }
 
 float Watchy::getBatteryVoltage(){
-    return analogRead(ADC_PIN) / 4096.0 * 7.23;
+    // Battery voltage goes through a 1/2 divider.
+    return analogReadMilliVolts(ADC_PIN) / 1000.0f * 2.0f;
 }
 
 uint16_t Watchy::_readRegister(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len)
