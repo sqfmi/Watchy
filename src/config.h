@@ -4,7 +4,7 @@
 //pins
 #define SDA 21
 #define SCL 22
-#define ADC_PIN 33
+#define ADC_PIN 35
 #define RTC_PIN GPIO_NUM_27
 #define CS 5
 #define DC 10
@@ -47,7 +47,7 @@
 #define SET_YEAR 2
 #define SET_MONTH 3
 #define SET_DAY 4
-#define YEAR_OFFSET 1970
+#define YEAR_OFFSET 2000
 #define HOUR_12_24 24
 //BLE OTA
 #define BLE_DEVICE_NAME "Watchy BLE OTA"

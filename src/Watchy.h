@@ -6,6 +6,7 @@
 #include <HTTPClient.h>
 #include <Arduino_JSON.h>
 #include <DS3232RTC.h>
+#include <Rtc_Pcf8563.h>
 #include <GxEPD2_BW.h>
 #include <Wire.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
@@ -21,7 +22,7 @@ typedef struct weatherData{
 
 class Watchy {
     public:
-        static DS3232RTC RTC;
+        static Rtc_Pcf8563 RTC;
         static GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> display;
         tmElements_t currentTime;
     public:
@@ -43,6 +44,7 @@ class Watchy {
         bool connectWiFi();
         weatherData getWeatherData();
         void updateFWBegin();
+        int getDayOfWeek(int d, int m, int y);
 
         void showWatchFace(bool partialRefresh);
         virtual void drawWatchFace(); //override this method for different watch faces
