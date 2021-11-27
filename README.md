@@ -21,3 +21,6 @@ You may also have to install the [CP2104 USB to Serial drivers](https://www.sila
 ### Have Fun! :)
     
     
+New Watchy owners READ ME
+There is a new Real-Time Clock chip in the lastest batch of Watchys.
+This chip is not compatible with the older one. This repo has a branch 
