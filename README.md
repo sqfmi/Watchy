@@ -21,6 +21,7 @@ You may also have to install the [CP2104 USB to Serial drivers](https://www.sila
 ### Have Fun! :)
     
     
-New Watchy owners READ ME
-There is a new Real-Time Clock chip in the lastest batch of Watchys.
-This chip is not compatible with the older one. This repo has a branch 
+# New Watchy owners READ ME
+As of late 2021 there is a new Real-Time Clock chip in the lastest batch of Watchys.
+This chip is *not* compatible with the older chip and the code has changed to accomdate this. This repository has a branch 'pfc8563'. Use that branch as the basis for *all* watch updates like clock faces. Current clock faces (other than the default face in the branch) needs to be updated to use the new RTC code if used in a new watchy. If you flash a face and all you see is 0's you know you flashed code based on the OLD chip. Switching chips was needed because of issues with the old chip.
+
