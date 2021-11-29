@@ -18,7 +18,7 @@
   "dependencies": [
     { "name": "Adafruit GFX Library" },
     { "name": "Arduino_JSON" },
-    { "name": "DS3232RTC" },
+    { "name": "Rtc_Pcf8563" },
     { "name": "GxEPD2" },
     {
       "name": "WiFiManager",
