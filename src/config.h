@@ -4,8 +4,8 @@
 //pins
 #define SDA 21
 #define SCL 22
-//#define ADC_PIN 33
-#define ADC_PIN 35
+#define V10_ADC_PIN 33 //OG v1.0 Watchy
+#define V15_ADC_PIN 35 //v1.5 Watchy with PCF8563 RTC
 #define RTC_PIN GPIO_NUM_27
 #define CS 5
 #define DC 10
