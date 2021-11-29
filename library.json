@@ -1,6 +1,6 @@
 {
   "name": "Watchy",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Watchy - An Open Source E-Paper Watch by SQFMI",
   "authors": [
     {
@@ -19,6 +19,7 @@
     { "name": "Adafruit GFX Library" },
     { "name": "Arduino_JSON" },
     { "name": "DS3232RTC" },
+    { "name": "Rtc_Pcf8563" },
     { "name": "GxEPD2" },
     {
       "name": "WiFiManager",
