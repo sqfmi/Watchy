@@ -132,15 +132,15 @@ void Watchy7SEG::drawWeather(){
     }else if(weatherConditionCode == 800){//Clear
     weatherIcon = sunny;  
     }else if(weatherConditionCode >=700){//Atmosphere
-    weatherIcon = cloudy; 
+    weatherIcon = atmosphere; 
     }else if(weatherConditionCode >=600){//Snow
     weatherIcon = snow;
     }else if(weatherConditionCode >=500){//Rain
     weatherIcon = rain;  
     }else if(weatherConditionCode >=300){//Drizzle
-    weatherIcon = rain;
+    weatherIcon = drizzle;
     }else if(weatherConditionCode >=200){//Thunderstorm
-    weatherIcon = rain; 
+    weatherIcon = thunderstorm; 
     }else
     return;
     display.drawBitmap(145, 158, weatherIcon, WEATHER_ICON_WIDTH, WEATHER_ICON_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
