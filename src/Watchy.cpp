@@ -565,8 +565,8 @@ weatherData Watchy::getWeatherData(){
             //turn off radios
             WiFi.mode(WIFI_OFF);
             btStop();
-        }else{//No WiFi, use RTC Temperature
-            uint8_t temperature = RTC.temperature() / 4; //celsius
+        }else{//No WiFi, use internal temperature sensor
+            uint8_t temperature = sensor.readTemperature(); //celsius
             if(strcmp(TEMP_UNIT, "imperial") == 0){
                 temperature = temperature * 9. / 5. + 32.; //fahrenheit
             }

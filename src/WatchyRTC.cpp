@@ -62,7 +62,11 @@ void WatchyRTC::set(tmElements_t tm){
         rtc_ds.set(t);
     }else{
         rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year+YEAR_OFFSET_PCF), tm.Month, 0, tm.Year);
-        rtc_pcf.setTime(tm.Hour, tm.Minute, tm.Second);        
+        rtc_pcf.setTime(tm.Hour, tm.Minute, tm.Second);
+        rtc_pcf.clearAlarm();
+        int nextAlarmMinute = rtc_pcf.getMinute();
+        nextAlarmMinute = (nextAlarmMinute == 59) ? 0 : (nextAlarmMinute + 1);
+        rtc_pcf.setAlarm(nextAlarmMinute, 99, 99, 99);        
     }
 }
 
@@ -70,12 +74,12 @@ uint8_t WatchyRTC::temperature(){
     if(rtcType == DS3231){
         return rtc_ds.temperature();
     }else{
-        return 25;      
+        return 255; //error
     }
 }
 
 void WatchyRTC::_DSConfig(String datetime){
-    if(datetime != NULL){
+    if(datetime != ""){
         tmElements_t tm;
         tm.Year = _getValue(datetime, ':', 0).toInt() - YEAR_OFFSET_DS;//offset from 1970, since year is stored in uint8_t        
         tm.Month = _getValue(datetime, ':', 1).toInt();
@@ -93,7 +97,8 @@ void WatchyRTC::_DSConfig(String datetime){
 }
 
 void WatchyRTC::_PCFConfig(String datetime){
-    if(datetime != NULL){
+    rtc_pcf.initClock();
+    if(datetime != ""){
         tmElements_t tm;
         tm.Year = _getValue(datetime, ':', 0).toInt();   
         tm.Month = _getValue(datetime, ':', 1).toInt();
@@ -102,12 +107,10 @@ void WatchyRTC::_PCFConfig(String datetime){
         tm.Minute = _getValue(datetime, ':', 4).toInt();
         tm.Second = _getValue(datetime, ':', 5).toInt();
 
-        rtc_pcf.initClock();
         //day, weekday, month, century(1=1900, 0=2000), year(0-99)
         rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year), tm.Month, 0, tm.Year - YEAR_OFFSET_PCF);//offset from 2000, since year is stored in uint8_t
         //hr, min, sec
         rtc_pcf.setTime(tm.Hour, tm.Minute, tm.Second);
-
     }
     rtc_pcf.clearAlarm();
     int nextAlarmMinute = rtc_pcf.getMinute();
