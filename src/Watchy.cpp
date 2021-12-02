@@ -341,7 +341,7 @@ void Watchy::setTime(){
             minute == 59 ? (minute = 0) : minute++;
             break;
         case SET_YEAR:
-            year == 99 ? (year = 21) : year++;
+            year == 99 ? (year = 0) : year++;
             break;
         case SET_MONTH:
             month == 12 ? (month = 1) : month++;
@@ -364,7 +364,7 @@ void Watchy::setTime(){
             minute == 0 ? (minute = 59) : minute--;
             break;
         case SET_YEAR:
-            year == 21 ? (year = 99) : year--;
+            year == 0 ? (year = 99) : year--;
             break;
         case SET_MONTH:
             month == 1 ? (month = 12) : month--;
