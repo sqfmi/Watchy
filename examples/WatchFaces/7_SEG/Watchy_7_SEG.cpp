@@ -52,6 +52,9 @@ void Watchy7SEG::drawDate(){
 
     String dayOfWeek = dayStr(currentTime.Wday);
     display.getTextBounds(dayOfWeek, 5, 85, &x1, &y1, &w, &h);
+    if(currentTime.Wday == 4){
+        w = w - 5;
+    }    
     display.setCursor(85 - w, 85);
     display.println(dayOfWeek);
 
