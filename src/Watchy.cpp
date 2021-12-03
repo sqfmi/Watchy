@@ -90,6 +90,8 @@ void Watchy::handleButtonPress(){
         showMenu(menuIndex, false);//exit to menu if already in app
     }else if(guiState == FW_UPDATE_STATE){
         showMenu(menuIndex, false);//exit to menu if already in app
+    }else if(guiState == WATCHFACE_STATE){
+        return;
     }
   }
   //Up Button
@@ -100,6 +102,8 @@ void Watchy::handleButtonPress(){
         menuIndex = MENU_LENGTH - 1;
       }    
       showMenu(menuIndex, true);
+    }else if(guiState == WATCHFACE_STATE){
+        return;
     }
   }
   //Down Button
@@ -110,6 +114,8 @@ void Watchy::handleButtonPress(){
         menuIndex = 0;
       }
       showMenu(menuIndex, true);
+    }else if(guiState == WATCHFACE_STATE){
+        return;
     }
   }
   
