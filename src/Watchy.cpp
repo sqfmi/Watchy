@@ -27,7 +27,6 @@ void Watchy::init(String datetime){
     switch (wakeup_reason)
     {
         case ESP_SLEEP_WAKEUP_EXT0: //RTC Alarm
-            RTC.clearAlarm(); //resets the alarm flag in the RTC
             if(guiState == WATCHFACE_STATE){
                 RTC.read(currentTime);
                 showWatchFace(true); //partial updates on tick
@@ -47,17 +46,22 @@ void Watchy::init(String datetime){
 }
 
 void Watchy::displayBusyCallback(const void*){
-  gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
-  esp_sleep_enable_gpio_wakeup();
-  esp_light_sleep_start();
+    gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
+    esp_sleep_enable_gpio_wakeup();
+    esp_light_sleep_start();
 }
 
 void Watchy::deepSleep(){
-  display.hibernate();
-  displayFullInit = false; // Notify not to init it again
-  esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
-  esp_sleep_enable_ext1_wakeup(BTN_PIN_MASK, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
-  esp_deep_sleep_start();
+    display.hibernate();
+    displayFullInit = false; // Notify not to init it again    
+    RTC.clearAlarm(); //resets the alarm flag in the RTC
+     // Set pins 0-39 to input to avoid power leaking out
+    for(int i=0; i<40; i++) {
+        pinMode(i, INPUT);
+    }    
+    esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
+    esp_sleep_enable_ext1_wakeup(BTN_PIN_MASK, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
+    esp_deep_sleep_start();
 }
 
 void Watchy::handleButtonPress(){
@@ -97,7 +101,6 @@ void Watchy::handleButtonPress(){
   //Back Button
   else if (wakeupBit & BACK_BTN_MASK){
     if(guiState == MAIN_MENU_STATE){//exit to watch face if already in menu
-        RTC.clearAlarm(); //resets the alarm flag in the RTC
         RTC.read(currentTime);
         showWatchFace(false);
     }else if(guiState == APP_STATE){
@@ -176,7 +179,6 @@ void Watchy::handleButtonPress(){
           }else if(digitalRead(BACK_BTN_PIN) == 1){
             lastTimeout = millis();
             if(guiState == MAIN_MENU_STATE){//exit to watch face if already in menu
-            RTC.clearAlarm(); //resets the alarm flag in the RTC
             RTC.read(currentTime);
             showWatchFace(false);
             break; //leave loop
