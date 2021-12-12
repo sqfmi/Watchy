@@ -10,6 +10,7 @@ RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
+RTC_DATA_ATTR bool displayFullInit = true;
 
 Watchy::Watchy(){} //constructor
 
@@ -18,6 +19,11 @@ void Watchy::init(String datetime){
     wakeup_reason = esp_sleep_get_wakeup_cause(); //get wake up reason
     Wire.begin(SDA, SCL); //init i2c
     RTC.init();
+
+    // Init the display here for all cases, if unused, it will do nothing
+    display.init(0, displayFullInit, 10, true); // 10ms by spec, and fast pulldown reset
+    display.epd2.setBusyCallback(displayBusyCallback);
+
     switch (wakeup_reason)
     {
         case ESP_SLEEP_WAKEUP_EXT0: //RTC Alarm
@@ -39,7 +45,15 @@ void Watchy::init(String datetime){
     deepSleep();
 }
 
+void Watchy::displayBusyCallback(const void*){
+    gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
+    esp_sleep_enable_gpio_wakeup();
+    esp_light_sleep_start();
+}
+
 void Watchy::deepSleep(){
+    display.hibernate();
+    displayFullInit = false; // Notify not to init it again    
     RTC.clearAlarm(); //resets the alarm flag in the RTC
      // Set pins 0-39 to input to avoid power leaking out
     for(int i=0; i<40; i++) {
@@ -194,11 +208,9 @@ void Watchy::handleButtonPress(){
           }
       }
   }
-  display.hibernate();    
 }
 
 void Watchy::showMenu(byte menuIndex, bool partialRefresh){
-    display.init(0, false); //_initial_refresh to false to prevent full update on init
     display.setFullWindow();
     display.fillScreen(GxEPD_BLACK);
     display.setFont(&FreeMonoBold9pt7b);
@@ -223,7 +235,6 @@ void Watchy::showMenu(byte menuIndex, bool partialRefresh){
     }
 
     display.display(partialRefresh);
-    //display.hibernate();
 
     guiState = MAIN_MENU_STATE;    
 }
@@ -258,7 +269,6 @@ void Watchy::showFastMenu(byte menuIndex){
 }
 
 void Watchy::showBattery(){
-    display.init(0, false); //_initial_refresh to false to prevent full update on init
     display.setFullWindow();
     display.fillScreen(GxEPD_BLACK);
     display.setFont(&FreeMonoBold9pt7b);
@@ -270,13 +280,11 @@ void Watchy::showBattery(){
     display.print(voltage);
     display.println("V");
     display.display(false); //full refresh
-    display.hibernate();
 
     guiState = APP_STATE;      
 }
 
 void Watchy::showBuzz(){
-    display.init(0, false); //_initial_refresh to false to prevent full update on init
     display.setFullWindow();
     display.fillScreen(GxEPD_BLACK);
     display.setFont(&FreeMonoBold9pt7b);
@@ -284,7 +292,6 @@ void Watchy::showBuzz(){
     display.setCursor(70, 80);
     display.println("Buzz!");
     display.display(false); //full refresh
-    display.hibernate();
     vibMotor();
     showMenu(menuIndex, false);    
 }
@@ -320,7 +327,6 @@ void Watchy::setTime(){
     pinMode(MENU_BTN_PIN, INPUT);  
     pinMode(BACK_BTN_PIN, INPUT);  
 
-    display.init(0, true); //_initial_refresh to false to prevent full update on init
     display.setFullWindow();
 
     while(1){
@@ -443,8 +449,6 @@ void Watchy::setTime(){
     display.display(true); //partial refresh
     }
 
-    display.hibernate();
-
     tmElements_t tm;
     tm.Month = month;
     tm.Day = day;
@@ -460,7 +464,6 @@ void Watchy::setTime(){
 }
 
 void Watchy::showAccelerometer(){
-    display.init(0, true); //_initial_refresh to false to prevent full update on init
     display.setFullWindow();
     display.fillScreen(GxEPD_BLACK);
     display.setFont(&FreeMonoBold9pt7b);
@@ -531,11 +534,9 @@ void Watchy::showAccelerometer(){
 }
 
 void Watchy::showWatchFace(bool partialRefresh){
-  display.init(0, false); //_initial_refresh to false to prevent full update on init
   display.setFullWindow();
   drawWatchFace();
   display.display(partialRefresh); //partial refresh
-  display.hibernate();
   guiState = WATCHFACE_STATE;
 }
 
@@ -718,28 +719,19 @@ void Watchy::setupWifi(){
   wifiManager.resetSettings();
   wifiManager.setTimeout(WIFI_AP_TIMEOUT);
   wifiManager.setAPCallback(_configModeCallback);
+  display.setFullWindow();
+  display.fillScreen(GxEPD_BLACK);
+  display.setFont(&FreeMonoBold9pt7b);
+  display.setTextColor(GxEPD_WHITE);
   if(!wifiManager.autoConnect(WIFI_AP_SSID)) {//WiFi setup failed
-    display.init(0, false); //_initial_refresh to false to prevent full update on init
-    display.setFullWindow();
-    display.fillScreen(GxEPD_BLACK);
-    display.setFont(&FreeMonoBold9pt7b);
-    display.setTextColor(GxEPD_WHITE);
     display.setCursor(0, 30);
     display.println("Setup failed &");
     display.println("timed out!");
-    display.display(false); //full refresh
-    display.hibernate();
   }else{
-    display.init(0, false);//_initial_refresh to false to prevent full update on init
-    display.setFullWindow();
-    display.fillScreen(GxEPD_BLACK);
-    display.setFont(&FreeMonoBold9pt7b);
-    display.setTextColor(GxEPD_WHITE);
     display.println("Connected to");
     display.println(WiFi.SSID());
-    display.display(false);//full refresh
-    display.hibernate();
   }
+  display.display(false); //full refresh
   //turn off radios
   WiFi.mode(WIFI_OFF);
   btStop();
@@ -748,7 +740,6 @@ void Watchy::setupWifi(){
 }
 
 void Watchy::_configModeCallback (WiFiManager *myWiFiManager) {
-  display.init(0, false); //_initial_refresh to false to prevent full update on init
   display.setFullWindow();
   display.fillScreen(GxEPD_BLACK);
   display.setFont(&FreeMonoBold9pt7b);
@@ -760,7 +751,6 @@ void Watchy::_configModeCallback (WiFiManager *myWiFiManager) {
   display.print("IP: ");
   display.println(WiFi.softAPIP());
   display.display(false); //full refresh
-  display.hibernate();
 }
 
 bool Watchy::connectWiFi(){
@@ -780,7 +770,6 @@ bool Watchy::connectWiFi(){
 }
 
 void Watchy::showUpdateFW(){
-    display.init(0, false); //_initial_refresh to false to prevent full update on init
     display.setFullWindow();
     display.fillScreen(GxEPD_BLACK);
     display.setFont(&FreeMonoBold9pt7b);
@@ -796,13 +785,11 @@ void Watchy::showUpdateFW(){
     display.println(" ");
     display.println("Keep USB powered");
     display.display(false); //full refresh
-    display.hibernate();
 
     guiState = FW_UPDATE_STATE;  
 }
 
 void Watchy::updateFWBegin(){
-    display.init(0, false); //_initial_refresh to false to prevent full update on init
     display.setFullWindow();
     display.fillScreen(GxEPD_BLACK);
     display.setFont(&FreeMonoBold9pt7b);
