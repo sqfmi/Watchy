@@ -19,7 +19,10 @@
     { "name": "Adafruit GFX Library" },
     { "name": "Arduino_JSON" },
     { "name": "DS3232RTC" },
-    { "name": "Rtc_Pcf8563" },
+    { 
+      "name": "Rtc_Pcf8563",
+      "version": "https://github.com/orbitalair/Rtc_Pcf8563#master"
+    },
     { "name": "GxEPD2" },
     {
       "name": "WiFiManager",
