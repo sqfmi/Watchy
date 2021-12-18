@@ -56,6 +56,7 @@ class DS3232 : public AbstractRTC {
 public:
     DS3232RTC rtc_ds; // TODO: We should not have public member variables
     ~DS3232() {}
+
     void config(String datetime) {
         if (datetime != "") {
             tmElements_t tm;
@@ -75,12 +76,23 @@ public:
         rtc_ds.setAlarm(ALM2_EVERY_MINUTE, 0, 0, 0, 0); //alarm wakes up Watchy every minute
         rtc_ds.alarmInterrupt(ALARM_2, true); //enable alarm interrupt
     }
+
+    void clearAlarm() {
+        rtc_ds.alarm(ALARM_2);
+    }
+
+    void set(tmElements_t tm) {
+        tm.Year = tm.Year + 2000 - YEAR_OFFSET_DS3232;
+        time_t t = makeTime(tm);
+        rtc_ds.set(t);
+    }
 };
 
 class PCF8563 : public AbstractRTC {
 public:
     Rtc_Pcf8563 rtc_pcf; // TODO: We should not have public member variables
     ~PCF8563() {}
+
     void config(String datetime) {
         if (datetime != "") {
             int Year = getValue(datetime, ':', 0).toInt();
@@ -90,19 +102,30 @@ public:
             int Minute = getValue(datetime, ':', 4).toInt();
             int Second = getValue(datetime, ':', 5).toInt();
             //day, weekday, month, century(1=1900, 0=2000), year(0-99)
-            rtc_pcf.setDate(Day, getDayOfWeek(Day, Month, Year), Month, 0, Year - YEAR_OFFSET_PCF);//offset from 2000
+            int dayOfWeek = getDayOfWeek(Day, Month, Year);
+
+            // offset from 2000
+            rtc_pcf.setDate(Day, dayOfWeek, Month, 0, Year - YEAR_OFFSET_PCF);
             //hr, min, sec
             rtc_pcf.setTime(Hour, Minute, Second);
         }
 
         clearAlarm();
     }
+
     void clearAlarm() {
         int nextAlarmMinute = 0;
         rtc_pcf.clearAlarm(); // resets the alarm flag in the RTC
         nextAlarmMinute = rtc_pcf.getMinute();
         nextAlarmMinute = (nextAlarmMinute == 59) ? 0 : (nextAlarmMinute + 1); //set alarm to trigger 1 minute from now
         rtc_pcf.setAlarm(nextAlarmMinute, 99, 99, 99);
+    }
+
+    void set(tmElements_t tm) {
+        int dayOfWeek = getDayOfWeek(tm.Day, tm.Month, tm.Year + YEAR_OFFSET_PCF);
+        rtc_pcf.setDate(tm.Day, dayOfWeek, tm.Month, 0, tm.Year);
+        rtc_pcf.setTime(tm.Hour, tm.Minute, tm.Second);
+        clearAlarm();
     }
 private:
     int getDayOfWeek(int d, int m, int y) {
@@ -127,7 +150,6 @@ class WatchyRTC {
         uint8_t temperature();
     private:
         bool _canConnectTo(int addr);
-        int _getDayOfWeek(int d, int m, int y);
         AbstractRTC* _rtc;
 };
 
