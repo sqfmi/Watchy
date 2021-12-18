@@ -46,8 +46,6 @@ public:
 
 class WatchyRTC {
     public:
-        DS3232RTC rtc_ds;
-        Rtc_Pcf8563 rtc_pcf;
         uint8_t rtcType;
     public:
         WatchyRTC();

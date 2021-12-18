@@ -1,7 +1,6 @@
 #include "WatchyRTC.h"
 
-WatchyRTC::WatchyRTC()
-    : rtc_ds(false) {}
+WatchyRTC::WatchyRTC() {}
 
 // TODO: We can probably put all of this logic into AbstractRTC as a class
 // function. It would simplify this class even more, which would be nice
