@@ -24,11 +24,11 @@
 
 class AbstractRTC {
 public:
-    virtual void config(String datetime);
-    virtual void clearAlarm();
-    virtual void read(tmElements_t &tm);
-    virtual void set(tmElements_t tm);
-    virtual uint8_t temperature();
+    virtual void config(String datetime) {}
+    virtual void clearAlarm() {}
+    virtual void read(tmElements_t &tm) {}
+    virtual void set(tmElements_t tm) {}
+    virtual uint8_t temperature() { return NO_TEMPERATURE_ERR; }
 };
 
 class WatchyRTC {
@@ -45,8 +45,11 @@ class WatchyRTC {
         void set(tmElements_t tm);
         uint8_t temperature();
     private:
+        void _DSConfig(String datetime);
+        void _PCFConfig(String datetime);
         int _getDayOfWeek(int d, int m, int y);
         String _getValue(String data, char separator, int index);
+        bool _canConnectTo(int addr);
         AbstractRTC _rtc;
 };
 

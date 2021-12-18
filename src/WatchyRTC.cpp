@@ -3,26 +3,26 @@
 WatchyRTC::WatchyRTC()
     : rtc_ds(false) {}
 
-void WatchyRTC::init(){
+
+bool WatchyRTC::_canConnectTo(int addr) {
     byte error;
-    Wire.beginTransmission(RTC_DS_ADDR);
-    error = Wire.endTransmission();
-    if (error == 0) {
+    Wire.beginTransmission(addr);
+    error = Wire.endTransmission(addr);
+    return error == 0;
+}
+
+void WatchyRTC::init(){
+    if (_canConnectTo(RTC_DS_ADDR)) {
         rtcType = DS3232_RTC_TYPE;
-        _rtc = DS3232();
         return;
     }
 
-    Wire.beginTransmission(RTC_PCF_ADDR);
-    error = Wire.endTransmission();
-    if (error == 0) {
+    if (_canConnectTo(RTC_PCF_ADDR)) {
         rtcType = PCF8563_RTC_TYPE;
-        _rtc = PCF8563();
         return;
     }
 
     rtcType = NO_RTC_TYPE;
-    _rtc = AbstractRTC();
 }
 
 void WatchyRTC::config(String datetime){
@@ -105,7 +105,6 @@ void WatchyRTC::_DSConfig(String datetime){
 
 void WatchyRTC::_PCFConfig(String datetime){
     if(datetime != ""){
-        tmElements_t tm;
         int Year = _getValue(datetime, ':', 0).toInt();
         int Month = _getValue(datetime, ':', 1).toInt();
         int Day = _getValue(datetime, ':', 2).toInt();
