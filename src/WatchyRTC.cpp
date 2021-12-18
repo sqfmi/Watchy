@@ -3,7 +3,8 @@
 WatchyRTC::WatchyRTC()
     : rtc_ds(false) {}
 
-
+// TODO: We can probably put all of this logic into AbstractRTC as a class
+// function. It would simplify this class even more, which would be nice
 bool WatchyRTC::_canConnectTo(int addr) {
     byte error;
     Wire.beginTransmission(addr);
@@ -14,18 +15,18 @@ bool WatchyRTC::_canConnectTo(int addr) {
 void WatchyRTC::init(){
     if (_canConnectTo(RTC_DS_ADDR)) {
         rtcType = DS3232_RTC_TYPE;
-        _rtc = DS3232();
+        _rtc = new DS3232();
         return;
     }
 
     if (_canConnectTo(RTC_PCF_ADDR)) {
         rtcType = PCF8563_RTC_TYPE;
-        _rtc = PCF8563();
+        _rtc = new PCF8563();
         return;
     }
 
     rtcType = NO_RTC_TYPE;
-    _rtc = AbstractRTC();
+    _rtc = new AbstractRTC();
 }
 
 void WatchyRTC::config(String datetime){

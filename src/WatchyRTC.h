@@ -63,7 +63,7 @@ class WatchyRTC {
         int _getDayOfWeek(int d, int m, int y);
         String _getValue(String data, char separator, int index);
         bool _canConnectTo(int addr);
-        AbstractRTC _rtc;
+        AbstractRTC* _rtc;
 };
 
 #endif
