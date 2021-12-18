@@ -37,23 +37,7 @@ void WatchyRTC::clearAlarm(){
 }
 
 void WatchyRTC::read(tmElements_t &tm){
-    if (rtcType == DS3232_RTC_TYPE) {
-        ((DS3232*) _rtc)->rtc_ds.read(tm);
-        tm.Year = tm.Year - 30; //reset to offset from 2000
-    } else if (rtcType == PCF8563_RTC_TYPE) {
-        tm.Month = ((PCF8563 *) _rtc)->rtc_pcf.getMonth();
-        if(tm.Month == 0){ //PCF8563 POR sets month = 0 for some reason
-            tm.Month = 1;
-            tm.Year = 21;
-        }else{
-            tm.Year = ((PCF8563 *) _rtc)->rtc_pcf.getYear();
-        }
-        tm.Day = ((PCF8563 *) _rtc)->rtc_pcf.getDay();
-        tm.Wday = ((PCF8563 *) _rtc)->rtc_pcf.getWeekday() + 1;
-        tm.Hour = ((PCF8563 *) _rtc)->rtc_pcf.getHour();
-        tm.Minute = ((PCF8563 *) _rtc)->rtc_pcf.getMinute();
-        tm.Second = ((PCF8563 *) _rtc)->rtc_pcf.getSecond();
-    }    
+    _rtc->read(tm);
 }
 
 void WatchyRTC::set(tmElements_t tm){
@@ -61,9 +45,5 @@ void WatchyRTC::set(tmElements_t tm){
 }
 
 uint8_t WatchyRTC::temperature(){
-    if (rtcType == DS3232_RTC_TYPE) {
-        return ((DS3232*) _rtc)->rtc_ds.temperature();
-    }
-
-    return NO_TEMPERATURE_ERR;
+    return _rtc->temperature();
 }

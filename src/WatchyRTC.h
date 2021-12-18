@@ -81,10 +81,19 @@ public:
         rtc_ds.alarm(ALARM_2);
     }
 
+    void read(tmElements_t &tm) {
+        rtc_ds.read(tm);
+        tm.Year = tm.Year - 30; //reset to offset from 2000
+    }
+
     void set(tmElements_t tm) {
         tm.Year = tm.Year + 2000 - YEAR_OFFSET_DS3232;
         time_t t = makeTime(tm);
         rtc_ds.set(t);
+    }
+
+    uint8_t temperature() {
+        return rtc_ds.temperature();
     }
 };
 
@@ -119,6 +128,21 @@ public:
         nextAlarmMinute = rtc_pcf.getMinute();
         nextAlarmMinute = (nextAlarmMinute == 59) ? 0 : (nextAlarmMinute + 1); //set alarm to trigger 1 minute from now
         rtc_pcf.setAlarm(nextAlarmMinute, 99, 99, 99);
+    }
+
+    void read(tmElements_t &tm) {
+        tm.Month = rtc_pcf.getMonth();
+        if (tm.Month == 0){ //PCF8563 POR sets month = 0 for some reason
+            tm.Month = 1;
+            tm.Year = 21; // TODO: I feel nervous about this--it's only 21 for a year, right?
+        } else {
+            tm.Year = rtc_pcf.getYear();
+        }
+        tm.Day = rtc_pcf.getDay();
+        tm.Wday = rtc_pcf.getWeekday() + 1;
+        tm.Hour = rtc_pcf.getHour();
+        tm.Minute = rtc_pcf.getMinute();
+        tm.Second = rtc_pcf.getSecond();
     }
 
     void set(tmElements_t tm) {
