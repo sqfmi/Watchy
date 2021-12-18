@@ -8,12 +8,12 @@ void WatchyRTC::init(){
     Wire.beginTransmission(RTC_DS_ADDR);
     error = Wire.endTransmission();
     if(error == 0){
-        rtcType = DS3231;
+        rtcType = DS3231_RTC_TYPE;
     }else{
         Wire.beginTransmission(RTC_PCF_ADDR);
         error = Wire.endTransmission();
         if(error == 0){
-            rtcType = PCF8563;
+            rtcType = PCF8563_RTC_TYPE;
         }else{
             //RTC Error
         }
@@ -21,7 +21,7 @@ void WatchyRTC::init(){
 }
 
 void WatchyRTC::config(String datetime){
-    if(rtcType == DS3231){
+    if(rtcType == DS3231_RTC_TYPE){
         _DSConfig(datetime);
     }else{
         _PCFConfig(datetime);
@@ -29,7 +29,7 @@ void WatchyRTC::config(String datetime){
 }
 
 void WatchyRTC::clearAlarm(){
-    if(rtcType == DS3231){
+    if(rtcType == DS3231_RTC_TYPE){
         rtc_ds.alarm(ALARM_2);
     }else{
         int nextAlarmMinute = 0;
@@ -41,7 +41,7 @@ void WatchyRTC::clearAlarm(){
 }
 
 void WatchyRTC::read(tmElements_t &tm){
-    if(rtcType == DS3231){
+    if(rtcType == DS3231_RTC_TYPE){
         rtc_ds.read(tm);
         tm.Year = tm.Year - 30; //reset to offset from 2000
     }else{
@@ -61,7 +61,7 @@ void WatchyRTC::read(tmElements_t &tm){
 }
 
 void WatchyRTC::set(tmElements_t tm){
-    if(rtcType == DS3231){
+    if(rtcType == DS3231_RTC_TYPE){
         tm.Year = tm.Year + 2000 - YEAR_OFFSET_DS;
         time_t t = makeTime(tm);
         rtc_ds.set(t);
@@ -73,7 +73,7 @@ void WatchyRTC::set(tmElements_t tm){
 }
 
 uint8_t WatchyRTC::temperature(){
-    if(rtcType == DS3231){
+    if(rtcType == DS3231_RTC_TYPE){
         return rtc_ds.temperature();
     }else{
         return 255; //error
