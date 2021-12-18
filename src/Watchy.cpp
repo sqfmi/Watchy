@@ -590,11 +590,13 @@ weatherData Watchy::getWeatherData(){
 }
 
 float Watchy::getBatteryVoltage(){
-    if(RTC.rtcType == DS3232_RTC_TYPE){
+    if (RTC.rtcType() == RTC_TYPE_DS3232){
         return analogReadMilliVolts(V10_ADC_PIN) / 1000.0f * 2.0f; // Battery voltage goes through a 1/2 divider.
-    }else{
+    } else if (RTC.rtcType() == RTC_TYPE_PCF8563) {
         return analogReadMilliVolts(V15_ADC_PIN) / 1000.0f * 2.0f;
     }
+
+    return 0.0f;
 }
 
 uint16_t Watchy::_readRegister(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len)
@@ -619,7 +621,6 @@ uint16_t Watchy::_writeRegister(uint8_t address, uint8_t reg, uint8_t *data, uin
 }
 
 void Watchy::_bmaConfig(){
- 
     if (sensor.begin(_readRegister, _writeRegister, delay) == false) {
         //fail to init BMA
         return;
@@ -723,11 +724,11 @@ void Watchy::setupWifi(){
   display.fillScreen(GxEPD_BLACK);
   display.setFont(&FreeMonoBold9pt7b);
   display.setTextColor(GxEPD_WHITE);
-  if(!wifiManager.autoConnect(WIFI_AP_SSID)) {//WiFi setup failed
+  if (!wifiManager.autoConnect(WIFI_AP_SSID)) {//WiFi setup failed
     display.setCursor(0, 30);
     display.println("Setup failed &");
     display.println("timed out!");
-  }else{
+  } else {
     display.println("Connected to");
     display.println(WiFi.SSID());
   }
@@ -754,12 +755,12 @@ void Watchy::_configModeCallback (WiFiManager *myWiFiManager) {
 }
 
 bool Watchy::connectWiFi(){
-    if(WL_CONNECT_FAILED == WiFi.begin()){//WiFi not setup, you can also use hard coded credentials with WiFi.begin(SSID,PASS);
+    if (WL_CONNECT_FAILED == WiFi.begin()){//WiFi not setup, you can also use hard coded credentials with WiFi.begin(SSID,PASS);
         WIFI_CONFIGURED = false;
-    }else{
-        if(WL_CONNECTED == WiFi.waitForConnectResult()){//attempt to connect for 10s
+    } else {
+        if (WL_CONNECTED == WiFi.waitForConnectResult()){//attempt to connect for 10s
             WIFI_CONFIGURED = true;
-        }else{//connection failed, time out
+        } else {//connection failed, time out
             WIFI_CONFIGURED = false;
             //turn off radios
             WiFi.mode(WIFI_OFF);
@@ -801,72 +802,72 @@ void Watchy::updateFWBegin(){
     display.println(" ");
     display.println("Waiting for");
     display.println("connection...");
-    display.display(false); //full refresh
+    display.display(false); // full refresh
 
     BLE BT;
     BT.begin("Watchy BLE OTA");
     int prevStatus = -1;
     int currentStatus;
 
-    while(1){
-    currentStatus = BT.updateStatus();
-    if(prevStatus != currentStatus || prevStatus == 1){
-        if(currentStatus == 0){
-        display.setFullWindow();
-        display.fillScreen(GxEPD_BLACK);
-        display.setFont(&FreeMonoBold9pt7b);
-        display.setTextColor(GxEPD_WHITE);
-        display.setCursor(0, 30);
-        display.println("BLE Connected!");
-        display.println(" ");
-        display.println("Waiting for");
-        display.println("upload...");
-        display.display(false); //full refresh
-        }
-        if(currentStatus == 1){
-        display.setFullWindow();
-        display.fillScreen(GxEPD_BLACK);
-        display.setFont(&FreeMonoBold9pt7b);
-        display.setTextColor(GxEPD_WHITE);
-        display.setCursor(0, 30);
-        display.println("Downloading");
-        display.println("firmware:");
-        display.println(" ");
-        display.print(BT.howManyBytes());
-        display.println(" bytes");
-        display.display(true); //partial refresh        
-        }
-        if(currentStatus == 2){
-        display.setFullWindow();
-        display.fillScreen(GxEPD_BLACK);
-        display.setFont(&FreeMonoBold9pt7b);
-        display.setTextColor(GxEPD_WHITE);
-        display.setCursor(0, 30);
-        display.println("Download");
-        display.println("completed!");
-        display.println(" ");
-        display.println("Rebooting...");
-        display.display(false); //full refresh
+    while (1) {
+        currentStatus = BT.updateStatus();
+        if (prevStatus != currentStatus || prevStatus == 1){
+            if (currentStatus == 0) {
+                display.setFullWindow();
+                display.fillScreen(GxEPD_BLACK);
+                display.setFont(&FreeMonoBold9pt7b);
+                display.setTextColor(GxEPD_WHITE);
+                display.setCursor(0, 30);
+                display.println("BLE Connected!");
+                display.println(" ");
+                display.println("Waiting for");
+                display.println("upload...");
+                display.display(false); //full refresh
+            }
+            if (currentStatus == 1) {
+                display.setFullWindow();
+                display.fillScreen(GxEPD_BLACK);
+                display.setFont(&FreeMonoBold9pt7b);
+                display.setTextColor(GxEPD_WHITE);
+                display.setCursor(0, 30);
+                display.println("Downloading");
+                display.println("firmware:");
+                display.println(" ");
+                display.print(BT.howManyBytes());
+                display.println(" bytes");
+                display.display(true); //partial refresh
+            }
+            if (currentStatus == 2) {
+                display.setFullWindow();
+                display.fillScreen(GxEPD_BLACK);
+                display.setFont(&FreeMonoBold9pt7b);
+                display.setTextColor(GxEPD_WHITE);
+                display.setCursor(0, 30);
+                display.println("Download");
+                display.println("completed!");
+                display.println(" ");
+                display.println("Rebooting...");
+                display.display(false); //full refresh
 
-        delay(2000);
-        esp_restart();           
+                delay(2000);
+                esp_restart();
+            }
+            if (currentStatus == 4) {
+                display.setFullWindow();
+                display.fillScreen(GxEPD_BLACK);
+                display.setFont(&FreeMonoBold9pt7b);
+                display.setTextColor(GxEPD_WHITE);
+                display.setCursor(0, 30);
+                display.println("BLE Disconnected!");
+                display.println(" ");
+                display.println("exiting...");
+                display.display(false); //full refresh
+                delay(1000);
+                break;
+            }
+            prevStatus = currentStatus;
         }
-        if(currentStatus == 4){
-        display.setFullWindow();
-        display.fillScreen(GxEPD_BLACK);
-        display.setFont(&FreeMonoBold9pt7b);
-        display.setTextColor(GxEPD_WHITE);
-        display.setCursor(0, 30);
-        display.println("BLE Disconnected!");
-        display.println(" ");
-        display.println("exiting...");
-        display.display(false); //full refresh
-        delay(1000);
-        break;
-        }
-        prevStatus = currentStatus;
-    }
-    delay(100);
+        delay(100);
     }
 
     //turn off radios
@@ -874,25 +875,3 @@ void Watchy::updateFWBegin(){
     btStop();
     showMenu(menuIndex, false);
 }
-
-// time_t compileTime()
-// {   
-//     const time_t FUDGE(10);    //fudge factor to allow for upload time, etc. (seconds, YMMV)
-//     const char *compDate = __DATE__, *compTime = __TIME__, *months = "JanFebMarAprMayJunJulAugSepOctNovDec";
-//     char compMon[3], *m;
-
-//     strncpy(compMon, compDate, 3);
-//     compMon[3] = '\0';
-//     m = strstr(months, compMon);
-
-//     tmElements_t tm;
-//     tm.Month = ((m - months) / 3 + 1);
-//     tm.Day = atoi(compDate + 4);
-//     tm.Year = atoi(compDate + 7) - YEAR_OFFSET; // offset from 1970, since year is stored in uint8_t
-//     tm.Hour = atoi(compTime);
-//     tm.Minute = atoi(compTime + 3);
-//     tm.Second = atoi(compTime + 6);
-
-//     time_t t = makeTime(tm);
-//     return t + FUDGE;        //add fudge factor to allow for compile time
-// }
