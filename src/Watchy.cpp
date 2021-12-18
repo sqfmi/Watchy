@@ -46,12 +46,14 @@ void Watchy::init(String datetime){
 }
 
 void Watchy::displayBusyCallback(const void*){
-  gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
-  esp_sleep_enable_gpio_wakeup();
-  esp_light_sleep_start();
+    gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
+    esp_sleep_enable_gpio_wakeup();
+    esp_light_sleep_start();
 }
 
 void Watchy::deepSleep(){
+    display.hibernate();
+    displayFullInit = false; // Notify not to init it again    
     RTC.clearAlarm(); //resets the alarm flag in the RTC
      // Set pins 0-39 to input to avoid power leaking out
     for(int i=0; i<40; i++) {
@@ -588,7 +590,7 @@ weatherData Watchy::getWeatherData(){
 }
 
 float Watchy::getBatteryVoltage(){
-    if(RTC.rtcType == DS3231){
+    if(RTC.rtcType == DS3232_RTC_TYPE){
         return analogReadMilliVolts(V10_ADC_PIN) / 1000.0f * 2.0f; // Battery voltage goes through a 1/2 divider.
     }else{
         return analogReadMilliVolts(V15_ADC_PIN) / 1000.0f * 2.0f;
