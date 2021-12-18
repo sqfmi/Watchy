@@ -24,11 +24,24 @@
 
 class AbstractRTC {
 public:
+    virtual ~AbstractRTC() {}
     virtual void config(String datetime) {}
     virtual void clearAlarm() {}
     virtual void read(tmElements_t &tm) {}
     virtual void set(tmElements_t tm) {}
     virtual uint8_t temperature() { return NO_TEMPERATURE_ERR; }
+};
+
+class DS3232 : public AbstractRTC {
+public:
+    DS3232RTC rtc_ds; // TODO: We should not have public member variables
+    ~DS3232() {}
+};
+
+class PCF8563 : public AbstractRTC {
+public:
+    Rtc_Pcf8563 rtc_pcf; // TODO: We should not have public member variables
+    ~PCF8563() {}
 };
 
 class WatchyRTC {

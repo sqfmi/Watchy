@@ -14,29 +14,32 @@ bool WatchyRTC::_canConnectTo(int addr) {
 void WatchyRTC::init(){
     if (_canConnectTo(RTC_DS_ADDR)) {
         rtcType = DS3232_RTC_TYPE;
+        _rtc = DS3232();
         return;
     }
 
     if (_canConnectTo(RTC_PCF_ADDR)) {
         rtcType = PCF8563_RTC_TYPE;
+        _rtc = PCF8563();
         return;
     }
 
     rtcType = NO_RTC_TYPE;
+    _rtc = AbstractRTC();
 }
 
 void WatchyRTC::config(String datetime){
-    if (rtcType == DS3232_RTC_TYPE) {
+    if (rtcType == DS3232_RTC_TYPE)  {
         _DSConfig(datetime);
-    } else {
+    } else if (rtcType == PCF8563_RTC_TYPE) {
         _PCFConfig(datetime);
     }
 }
 
 void WatchyRTC::clearAlarm(){
-    if(rtcType == DS3232_RTC_TYPE){
+    if (rtcType == DS3232_RTC_TYPE) {
         rtc_ds.alarm(ALARM_2);
-    }else{
+    } else if (rtcType == PCF8563_RTC_TYPE) {
         int nextAlarmMinute = 0;
         rtc_pcf.clearAlarm(); //resets the alarm flag in the RTC
         nextAlarmMinute = rtc_pcf.getMinute();
@@ -46,10 +49,10 @@ void WatchyRTC::clearAlarm(){
 }
 
 void WatchyRTC::read(tmElements_t &tm){
-    if(rtcType == DS3232_RTC_TYPE){
+    if (rtcType == DS3232_RTC_TYPE) {
         rtc_ds.read(tm);
         tm.Year = tm.Year - 30; //reset to offset from 2000
-    }else{
+    } else if (rtcType == PCF8563_RTC_TYPE) {
         tm.Month = rtc_pcf.getMonth();
         if(tm.Month == 0){ //PCF8563 POR sets month = 0 for some reason
             tm.Month = 1;
@@ -66,11 +69,11 @@ void WatchyRTC::read(tmElements_t &tm){
 }
 
 void WatchyRTC::set(tmElements_t tm){
-    if(rtcType == DS3232_RTC_TYPE){
+    if (rtcType == DS3232_RTC_TYPE) {
         tm.Year = tm.Year + 2000 - YEAR_OFFSET_DS;
         time_t t = makeTime(tm);
         rtc_ds.set(t);
-    }else{
+    } else if (rtcType == PCF8563_RTC_TYPE) {
         rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year+YEAR_OFFSET_PCF), tm.Month, 0, tm.Year);
         rtc_pcf.setTime(tm.Hour, tm.Minute, tm.Second);
         clearAlarm();      
@@ -78,15 +81,15 @@ void WatchyRTC::set(tmElements_t tm){
 }
 
 uint8_t WatchyRTC::temperature(){
-    if(rtcType == DS3232_RTC_TYPE){
+    if (rtcType == DS3232_RTC_TYPE) {
         return rtc_ds.temperature();
-    }else{
-        return 255; //error
     }
+
+    return NO_TEMPERATURE_ERR;
 }
 
 void WatchyRTC::_DSConfig(String datetime){
-    if(datetime != ""){
+    if (datetime != "") {
         tmElements_t tm;
         tm.Year = _getValue(datetime, ':', 0).toInt() - YEAR_OFFSET_DS;//offset from 1970, since year is stored in uint8_t        
         tm.Month = _getValue(datetime, ':', 1).toInt();
@@ -104,7 +107,7 @@ void WatchyRTC::_DSConfig(String datetime){
 }
 
 void WatchyRTC::_PCFConfig(String datetime){
-    if(datetime != ""){
+    if (datetime != "") {
         int Year = _getValue(datetime, ':', 0).toInt();
         int Month = _getValue(datetime, ':', 1).toInt();
         int Day = _getValue(datetime, ':', 2).toInt();
@@ -116,6 +119,7 @@ void WatchyRTC::_PCFConfig(String datetime){
         //hr, min, sec
         rtc_pcf.setTime(Hour, Minute, Second);     
     }
+
     clearAlarm();
 }
 
