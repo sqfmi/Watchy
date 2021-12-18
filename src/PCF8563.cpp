@@ -32,7 +32,7 @@ void PCF8563::read(tmElements_t &tm) {
 	tm.Month = rtc_pcf.getMonth();
   if (tm.Month == 0){ //PCF8563 POR sets month = 0 for some reason
     tm.Month = 1;
-    tm.Year = 21; // TODO: I feel nervous about this--it's only 21 for a year, right?
+    tm.Year = 21;
   } else {
     tm.Year = rtc_pcf.getYear();
   }
