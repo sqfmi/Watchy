@@ -63,7 +63,7 @@ void WatchyRTC::set(tmElements_t tm){
     if(rtcType == DS3231){
         rtc_ds.set(makeTime(tm));
     }else{
-        rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year), tm.Month, 1, tm.Year);
+        rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year), tm.Month, 0, tm.Year);
         rtc_pcf.setTime(tm.Hour, tm.Minute, tm.Second);
         clearAlarm();      
     }
@@ -105,7 +105,7 @@ void WatchyRTC::_PCFConfig(String datetime){
         int Minute = _getValue(datetime, ':', 4).toInt();
         int Second = _getValue(datetime, ':', 5).toInt();
         //day, weekday, month, century(1=1900, 0=2000), year(0-99)
-        rtc_pcf.setDate(Day, _getDayOfWeek(Day, Month, Year), Month, 1, Year);//offset from 1900
+        rtc_pcf.setDate(Day, _getDayOfWeek(Day, Month, Year), Month, 0, Year);//offset from 2000
         //hr, min, sec
         rtc_pcf.setTime(Hour, Minute, Second);
     }
@@ -137,3 +137,6 @@ String WatchyRTC::_getValue(String data, char separator, int index)
 
   return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
+
+// Correct time from 1970 to 2000 when recieved from an NTP server, so the PCF8563 isn't 30 years off.
+time_t NTPCorrection(time_t FromNTP) { return FromNTP + (rtcType == PCF8563 ? 946684800UL : 0UL); }
