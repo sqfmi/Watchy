@@ -43,7 +43,6 @@ void WatchyRTC::clearAlarm(){
 void WatchyRTC::read(tmElements_t &tm){
     if(rtcType == DS3231){
         rtc_ds.read(tm);
-        tm.Year = tm.Year - 30; //reset to offset from 2000
     }else{
         tm.Month = rtc_pcf.getMonth();
         if(tm.Month == 0){ //PCF8563 POR sets month = 0 for some reason
@@ -53,7 +52,7 @@ void WatchyRTC::read(tmElements_t &tm){
             tm.Year = rtc_pcf.getYear();
         }
         tm.Day = rtc_pcf.getDay();
-        tm.Wday = rtc_pcf.getWeekday() + 1;
+        tm.Wday = rtc_pcf.getWeekday();
         tm.Hour = rtc_pcf.getHour();
         tm.Minute = rtc_pcf.getMinute();
         tm.Second = rtc_pcf.getSecond();
@@ -62,11 +61,9 @@ void WatchyRTC::read(tmElements_t &tm){
 
 void WatchyRTC::set(tmElements_t tm){
     if(rtcType == DS3231){
-        tm.Year = tm.Year + 2000 - YEAR_OFFSET_DS;
-        time_t t = makeTime(tm);
-        rtc_ds.set(t);
+        rtc_ds.set(makeTime(tm));
     }else{
-        rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year+YEAR_OFFSET_PCF), tm.Month, 0, tm.Year);
+        rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year), tm.Month, 1, tm.Year);
         rtc_pcf.setTime(tm.Hour, tm.Minute, tm.Second);
         clearAlarm();      
     }
@@ -83,7 +80,7 @@ uint8_t WatchyRTC::temperature(){
 void WatchyRTC::_DSConfig(String datetime){
     if(datetime != ""){
         tmElements_t tm;
-        tm.Year = _getValue(datetime, ':', 0).toInt() - YEAR_OFFSET_DS;//offset from 1970, since year is stored in uint8_t        
+        tm.Year = _getValue(datetime, ':', 0).toInt();
         tm.Month = _getValue(datetime, ':', 1).toInt();
         tm.Day = _getValue(datetime, ':', 2).toInt();
         tm.Hour = _getValue(datetime, ':', 3).toInt();
@@ -108,9 +105,9 @@ void WatchyRTC::_PCFConfig(String datetime){
         int Minute = _getValue(datetime, ':', 4).toInt();
         int Second = _getValue(datetime, ':', 5).toInt();
         //day, weekday, month, century(1=1900, 0=2000), year(0-99)
-        rtc_pcf.setDate(Day, _getDayOfWeek(Day, Month, Year), Month, 0, Year - YEAR_OFFSET_PCF);//offset from 2000
+        rtc_pcf.setDate(Day, _getDayOfWeek(Day, Month, Year), Month, 1, Year);//offset from 1900
         //hr, min, sec
-        rtc_pcf.setTime(Hour, Minute, Second);     
+        rtc_pcf.setTime(Hour, Minute, Second);
     }
     clearAlarm();
 }
