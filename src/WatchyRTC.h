@@ -22,6 +22,7 @@ class WatchyRTC {
         void read(tmElements_t &tm);
         void set(tmElements_t tm);
         uint8_t temperature();
+        time_t NTPCorrection(time_t FromNTP);
     private:
         void _DSConfig(String datetime);
         void _PCFConfig(String datetime);
