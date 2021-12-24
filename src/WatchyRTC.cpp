@@ -105,7 +105,7 @@ void WatchyRTC::_PCFConfig(String datetime){
         int Minute = _getValue(datetime, ':', 4).toInt();
         int Second = _getValue(datetime, ':', 5).toInt();
         //day, weekday, month, century(1=1900, 0=2000), year(0-99)
-        rtc_pcf.setDate(Day, _getDayOfWeek(Day, Month, Year), Month, 0, Year);//offset from 2000
+        rtc_pcf.setDate(Day, _getDayOfWeek(Day, Month, Year), Month, 0, Year - 2000);//offset from 2000 only for the year set.
         //hr, min, sec
         rtc_pcf.setTime(Hour, Minute, Second);
     }
