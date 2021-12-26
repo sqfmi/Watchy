@@ -724,7 +724,6 @@ void Watchy::setupWifi(){
   display.setFont(&FreeMonoBold9pt7b);
   display.setTextColor(GxEPD_WHITE);
   if(!wifiManager.autoConnect(WIFI_AP_SSID)) {//WiFi setup failed
-    display.setCursor(0, 30);
     display.println("Setup failed &");
     display.println("timed out!");
   }else{
