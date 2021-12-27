@@ -1,5 +1,7 @@
 #include "WatchyRTC.h"
 
+RTC_DATA_ATTR bool UsedCentury = false;
+
 WatchyRTC::WatchyRTC()
     : rtc_ds(false) {}
 
@@ -32,24 +34,22 @@ void WatchyRTC::clearAlarm(){
     if(rtcType == DS3231){
         rtc_ds.alarm(ALARM_2);
     }else{
-        int nextAlarmMinute = 0;
+        int nextAlarmMinute = constrain(rtc_pcf.getMinute() + 1, 0, 59); //set alarm to trigger 1 minute from now
         rtc_pcf.clearAlarm(); //resets the alarm flag in the RTC
-        nextAlarmMinute = rtc_pcf.getMinute();
-        nextAlarmMinute = (nextAlarmMinute == 59) ? 0 : (nextAlarmMinute + 1); //set alarm to trigger 1 minute from now
         rtc_pcf.setAlarm(nextAlarmMinute, 99, 99, 99);
     }    
 }
 
-void WatchyRTC::read(tmElements_t &tm){
+void WatchyRTC::read(tmElements_t &tm){	// Returns year from 1900 and beyond.
     if(rtcType == DS3231){
         rtc_ds.read(tm);
     }else{
         tm.Month = rtc_pcf.getMonth();
         if(tm.Month == 0){ //PCF8563 POR sets month = 0 for some reason
             tm.Month = 1;
-            tm.Year = 21;
+            tm.Year = 121;	// From Epoch.
         }else{
-            tm.Year = rtc_pcf.getYear();
+            tm.Year = rtc_pcf.getYear() + (UsedCentury ? RTC_CENTURY_OFFSET : 0);	// Put 1900 year back on if used prior.
         }
         tm.Day = rtc_pcf.getDay();
         tm.Wday = rtc_pcf.getWeekday();
@@ -59,13 +59,15 @@ void WatchyRTC::read(tmElements_t &tm){
     }    
 }
 
-void WatchyRTC::set(tmElements_t tm){
+void WatchyRTC::set(tmElements_t tm){	// Requires dates from year 1900 and beyond.
     if(rtcType == DS3231){
-        rtc_ds.set(makeTime(tm));
+        rtc_ds.write(tm);
     }else{
-        rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year), tm.Month, 0, tm.Year);
+		UsedCentury = false;
+		if (tm.Year > 99) {UsedCentury = true; tm.Year -= RTC_CENTURY_OFFSET; }
+        rtc_pcf.setDate(tm.Day, _getDayOfWeek(tm.Day, tm.Month, tm.Year), tm.Month, (UsedCentury ? 0 : 1), tm.Year);
         rtc_pcf.setTime(tm.Hour, tm.Minute, tm.Second);
-        clearAlarm();      
+        clearAlarm();
     }
 }
 
@@ -77,15 +79,17 @@ uint8_t WatchyRTC::temperature(){
     }
 }
 
-void WatchyRTC::_DSConfig(String datetime){
+void WatchyRTC::_DSConfig(String datetime){	// Requires dates from year 1900 and beyond.
     if(datetime != ""){
         tmElements_t tm;
-        tm.Year = _getValue(datetime, ':', 0).toInt();
+        int Year = _getValue(datetime, ':', 0).toInt();
+		if (Year >= RTC_YEAR_OFFSET) Year -= RTC_YEAR_OFFSET;
         tm.Month = _getValue(datetime, ':', 1).toInt();
         tm.Day = _getValue(datetime, ':', 2).toInt();
         tm.Hour = _getValue(datetime, ':', 3).toInt();
         tm.Minute = _getValue(datetime, ':', 4).toInt();
         tm.Second = _getValue(datetime, ':', 5).toInt();
+		tm.Year = Year;
         time_t t = makeTime(tm);
         rtc_ds.set(t);
     }
@@ -95,17 +99,21 @@ void WatchyRTC::_DSConfig(String datetime){
     rtc_ds.alarmInterrupt(ALARM_2, true); //enable alarm interrupt  
 }
 
-void WatchyRTC::_PCFConfig(String datetime){
+void WatchyRTC::_PCFConfig(String datetime){	// Requires dates from year 1900 and beyond.
     if(datetime != ""){
         tmElements_t tm;
+		UsedCentury = false;
         int Year = _getValue(datetime, ':', 0).toInt();
+		int Y = Year;
+		if (Year >= RTC_YEAR_OFFSET) Year -= RTC_YEAR_OFFSET;
+		if (Year > 99) {UsedCentury = true; Year -= RTC_CENTURY_OFFSET; }
         int Month = _getValue(datetime, ':', 1).toInt();
         int Day = _getValue(datetime, ':', 2).toInt();
         int Hour = _getValue(datetime, ':', 3).toInt();
         int Minute = _getValue(datetime, ':', 4).toInt();
         int Second = _getValue(datetime, ':', 5).toInt();
         //day, weekday, month, century(1=1900, 0=2000), year(0-99)
-        rtc_pcf.setDate(Day, _getDayOfWeek(Day, Month, Year), Month, 0, Year - 2000);//offset from 2000 only for the year set.
+        rtc_pcf.setDate(Day, _getDayOfWeek(Day, Month, Y), Month, (UsedCentury ? 0 : 1), Year);
         //hr, min, sec
         rtc_pcf.setTime(Hour, Minute, Second);
     }
@@ -137,6 +145,3 @@ String WatchyRTC::_getValue(String data, char separator, int index)
 
   return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
-
-// Correct time from 1970 to 2000 when recieved from an NTP server, so the PCF8563 isn't 30 years off.
-time_t NTPCorrection(time_t FromNTP) { return FromNTP + (rtcType == PCF8563 ? 946684800UL : 0UL); }
