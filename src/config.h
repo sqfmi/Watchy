@@ -48,8 +48,10 @@
 #define SET_YEAR 2
 #define SET_MONTH 3
 #define SET_DAY 4
-#define YEAR_OFFSET 2000
 #define HOUR_12_24 24
+#define NTP_SERVER "pool.ntp.org"
+#define GMT_OFFSET_SEC 3600 * -5 //New York is UTC -5
+#define DST_OFFSET_SEC 3600
 //BLE OTA
 #define BLE_DEVICE_NAME "Watchy BLE OTA"
 #define WATCHFACE_NAME "Watchy 7 Segment"

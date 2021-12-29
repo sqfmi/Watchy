@@ -316,7 +316,7 @@ void Watchy::setTime(){
     int8_t hour = currentTime.Hour;
     int8_t day = currentTime.Day;
     int8_t month = currentTime.Month;
-    int8_t year = currentTime.Year;
+    int8_t year = tmYearToY2k(currentTime.Year);
 
     int8_t setIndex = SET_HOUR;
 
@@ -452,7 +452,7 @@ void Watchy::setTime(){
     tmElements_t tm;
     tm.Month = month;
     tm.Day = day;
-    tm.Year = year;
+    tm.Year = y2kYearToTm(year);
     tm.Hour = hour;
     tm.Minute = minute;
     tm.Second = 0;
@@ -556,8 +556,9 @@ void Watchy::drawWatchFace(){
 
 weatherData Watchy::getWeatherData(){
     if(weatherIntervalCounter >= WEATHER_UPDATE_INTERVAL){ //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
-        if(connectWiFi()){//Use Weather API for live data if WiFi is connected
-            HTTPClient http;
+        if(connectWiFi()){
+            RTC.syncNtpTime(); //Sync NTP
+            HTTPClient http; //Use Weather API for live data if WiFi is connected
             http.setConnectTimeout(3000);//3 second max timeout
             String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(CITY_NAME) + String(",") + String(COUNTRY_CODE) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
             http.begin(weatherQueryURL.c_str());
@@ -715,41 +716,43 @@ void Watchy::_bmaConfig(){
 }
 
 void Watchy::setupWifi(){
-  WiFiManager wifiManager;
-  wifiManager.resetSettings();
-  wifiManager.setTimeout(WIFI_AP_TIMEOUT);
-  wifiManager.setAPCallback(_configModeCallback);
-  display.setFullWindow();
-  display.fillScreen(GxEPD_BLACK);
-  display.setFont(&FreeMonoBold9pt7b);
-  display.setTextColor(GxEPD_WHITE);
-  if(!wifiManager.autoConnect(WIFI_AP_SSID)) {//WiFi setup failed
-    display.println("Setup failed &");
-    display.println("timed out!");
-  }else{
-    display.println("Connected to");
-    display.println(WiFi.SSID());
-  }
-  display.display(false); //full refresh
-  //turn off radios
-  WiFi.mode(WIFI_OFF);
-  btStop();
-
-  guiState = APP_STATE;  
+    display.epd2.setBusyCallback(0); //temporarily disable lightsleep on busy
+    WiFiManager wifiManager;
+    wifiManager.resetSettings();
+    wifiManager.setTimeout(WIFI_AP_TIMEOUT);
+    wifiManager.setAPCallback(_configModeCallback);
+    display.setFullWindow();
+    display.fillScreen(GxEPD_BLACK);
+    display.setFont(&FreeMonoBold9pt7b);
+    display.setTextColor(GxEPD_WHITE);
+    if(!wifiManager.autoConnect(WIFI_AP_SSID)) {//WiFi setup failed
+        display.println("Setup failed &");
+        display.println("timed out!");
+    }else{
+        RTC.syncNtpTime(); //sync ntp
+        display.println("Connected to");
+        display.println(WiFi.SSID());
+    }
+    display.display(false); //full refresh
+    //turn off radios
+    WiFi.mode(WIFI_OFF);
+    btStop();
+    display.epd2.setBusyCallback(displayBusyCallback); //enable lightsleep on busy
+    guiState = APP_STATE;  
 }
 
 void Watchy::_configModeCallback (WiFiManager *myWiFiManager) {
-  display.setFullWindow();
-  display.fillScreen(GxEPD_BLACK);
-  display.setFont(&FreeMonoBold9pt7b);
-  display.setTextColor(GxEPD_WHITE);
-  display.setCursor(0, 30);
-  display.println("Connect to");
-  display.print("SSID: ");
-  display.println(WIFI_AP_SSID);
-  display.print("IP: ");
-  display.println(WiFi.softAPIP());
-  display.display(false); //full refresh
+    display.setFullWindow();
+    display.fillScreen(GxEPD_BLACK);
+    display.setFont(&FreeMonoBold9pt7b);
+    display.setTextColor(GxEPD_WHITE);
+    display.setCursor(0, 30);
+    display.println("Connect to");
+    display.print("SSID: ");
+    display.println(WIFI_AP_SSID);
+    display.print("IP: ");
+    display.println(WiFi.softAPIP());
+    display.display(false); //full refresh
 }
 
 bool Watchy::connectWiFi(){
