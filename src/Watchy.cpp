@@ -9,7 +9,6 @@ RTC_DATA_ATTR BMA423 sensor;
 RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
-RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
 RTC_DATA_ATTR bool displayFullInit = true;
 
 Watchy::Watchy(){} //constructor
@@ -43,6 +42,43 @@ void Watchy::init(String datetime){
             break;
     }
     deepSleep();
+}
+
+//! Initialise the weather subsystem with city, refresh rate, language, units, API Key
+/*!
+    City is an integer, which you can get by looking up your city on openweathermap.org. You'll
+    get a URL like this https://openweathermap.org/city/5128581 (which is New York City). The number
+    you want is the city number (NYC is 5128581).
+
+    Celsius is a boolean. True means use Celsius temperature. False means use Fahrenheit.
+
+    updateInterval is how often, in minutes, the weather should update. Minimum 5, max 65536 (about 45 days)
+    Note: Weather and NTP clock sync are done in the same function, so this also controls how frequently
+    the Watchy attempts to synchronise its clock with NTP.
+
+    lang is a 2-letter string (e.g., "en" or "de" or "nl"). Weather text will be returned in
+    the selected language. See here: https://openweathermap.org/current#multi Defaults to "en"
+
+    API Key is an openweathermap API key. Find out more about it here: https://openweathermap.org/api
+
+*/
+void Watchy::setupWeather( uint32_t city,
+    bool celsius,
+    uint16_t updateInterval,
+    String lang,
+    String apikey ) {
+
+    if( updateInterval < 5 ) {
+        updateInterval = 5;
+    }
+    weatherInterval = updateInterval;
+    weatherCity     = city;
+    weatherCelsius  = celsius;
+    weatherAPIKey   = apikey;
+    weatherLang     = lang;
+    weatherInit     = true; // record the fact that we initialised
+    // indicates that weather needs to be fetched
+    weatherIntervalCounter = weatherInterval; 
 }
 
 void Watchy::displayBusyCallback(const void*){
@@ -554,40 +590,72 @@ void Watchy::drawWatchFace(){
     display.println(currentTime.Minute);    
 }
 
+
+#define OPENWEATHERMAP_URL "http://api.openweathermap.org/data/2.5/weather?id="
+//! return a weatherData structure with current weather, if available.
+/*! 
+    uses weatherInterval, weatherAPIKey, weatherCity, and weatherCelsius
+*/
 weatherData Watchy::getWeatherData(){
-    if(weatherIntervalCounter >= WEATHER_UPDATE_INTERVAL){ //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
+    String units = String("metric");
+    if( weatherInit == false ) {
+        // Change this to use your own API key!
+        String      APIkey   = String("f058fe1cad2afe8e2ddc5d063a64cecb");
+        // Initialise to defaults (NYC, metric, 30 minutes, SQFMI's API key)
+        setupWeather( 5128581, true, 30, String("en"), APIkey );
+    }
+
+    if(weatherIntervalCounter >= weatherInterval){ //only update if weatherInterval has elapsed i.e. 30 minutes
         if(connectWiFi()){
             RTC.syncNtpTime(); //Sync NTP
             HTTPClient http; //Use Weather API for live data if WiFi is connected
             http.setConnectTimeout(3000);//3 second max timeout
-            String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(CITY_NAME) + String(",") + String(COUNTRY_CODE) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
+            
+            if( weatherCelsius == false ) {
+                units = String("imperial");
+            }
+            String weatherQueryURL = 
+                String(OPENWEATHERMAP_URL) + String(weatherCity) + 
+                String("&units=") + String(units) +
+                String("&lang=")  + String(weatherLang) +
+                String("&appid=") + weatherAPIKey;
             http.begin(weatherQueryURL.c_str());
             int httpResponseCode = http.GET();
             if(httpResponseCode == 200) {
                 String payload = http.getString();
                 JSONVar responseObject = JSON.parse(payload);
                 currentWeather.temperature = int(responseObject["main"]["temp"]);
-                currentWeather.weatherConditionCode = int(responseObject["weather"][0]["id"]);            
+                currentWeather.weatherConditionCode = int(responseObject["weather"][0]["id"]);
+                currentWeather.weatherDescription = responseObject["weather"][0]["main"];
             }else{
-                //http error
+                // http error, so use sensor temperature
+                currentWeather.temperature = getAmbientTemp();
+                currentWeather.weatherConditionCode = 100;
+                currentWeather.weatherDescription = String("Ambient");
             }
             http.end();
             //turn off radios
             WiFi.mode(WIFI_OFF);
             btStop();
-        }else{//No WiFi, use internal temperature sensor
-            uint8_t temperature = sensor.readTemperature(); //celsius
-            if(strcmp(TEMP_UNIT, "imperial") == 0){
-                temperature = temperature * 9. / 5. + 32.; //fahrenheit
-            }
-            currentWeather.temperature = temperature;
-            currentWeather.weatherConditionCode = 800;
+        }else{// No WiFi, so use internal temperature sensor
+            currentWeather.temperature = getAmbientTemp();
+            currentWeather.weatherConditionCode = 100;
+            currentWeather.weatherDescription = String("Ambient");
         }
         weatherIntervalCounter = 0;
     }else{
         weatherIntervalCounter++;
     }
     return currentWeather;
+}
+
+//! Returns ambient temperature from sensors
+uint8_t Watchy::getAmbientTemp() {
+    uint8_t temperature = sensor.readTemperature() / 4; //celsius
+    if(weatherCelsius == false ){
+       temperature = temperature * 9. / 5. + 32.; //fahrenheit
+    }
+    return temperature;
 }
 
 float Watchy::getBatteryVoltage(){
