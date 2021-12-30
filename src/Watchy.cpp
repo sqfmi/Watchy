@@ -11,6 +11,18 @@ RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR bool displayFullInit = true;
 
+// Weather related variables. Explained in comment at setupWeather() below.
+RTC_DATA_ATTR bool     weatherCelsius = true;
+RTC_DATA_ATTR uint32_t weatherCity    = 5128581; // New York City, USA
+RTC_DATA_ATTR String   weatherLang    = "en";
+// Change this to use your own API key!
+RTC_DATA_ATTR String   weatherAPIKey  = "f058fe1cad2afe8e2ddc5d063a64cecb";
+
+// Initialise these both to the SAME value, so the weather will
+// be fetched the first time getWeatherData() is called.
+RTC_DATA_ATTR uint16_t weatherIntervalCounter = 30;
+RTC_DATA_ATTR uint16_t weatherInterval        = 30;
+
 Watchy::Watchy(){} //constructor
 
 void Watchy::init(String datetime){
@@ -76,7 +88,7 @@ void Watchy::setupWeather( uint32_t city,
     weatherCelsius  = celsius;
     weatherAPIKey   = apikey;
     weatherLang     = lang;
-    weatherInit     = true; // record the fact that we initialised
+
     // indicates that weather needs to be fetched
     weatherIntervalCounter = weatherInterval; 
 }
@@ -595,15 +607,12 @@ void Watchy::drawWatchFace(){
 //! return a weatherData structure with current weather, if available.
 /*! 
     uses weatherInterval, weatherAPIKey, weatherCity, and weatherCelsius
+
+    If weather is not available by WiFi/internet, it reads the sensor's temperature
+    and sets the description to "Ambient".
 */
 weatherData Watchy::getWeatherData(){
-    String units = String("metric");
-    if( weatherInit == false ) {
-        // Change this to use your own API key!
-        String      APIkey   = String("f058fe1cad2afe8e2ddc5d063a64cecb");
-        // Initialise to defaults (NYC, metric, 30 minutes, SQFMI's API key)
-        setupWeather( 5128581, true, 30, String("en"), APIkey );
-    }
+    String units;
 
     if(weatherIntervalCounter >= weatherInterval){ //only update if weatherInterval has elapsed i.e. 30 minutes
         if(connectWiFi()){
@@ -613,6 +622,8 @@ weatherData Watchy::getWeatherData(){
             
             if( weatherCelsius == false ) {
                 units = String("imperial");
+            } else {
+                units = String("metric");
             }
             String weatherQueryURL = 
                 String(OPENWEATHERMAP_URL) + String(weatherCity) + 
