@@ -15,6 +15,6 @@ void WatchyPokemon::drawWatchFace(){
     display.print(':');
     if(currentTime.Minute < 10){
         display.print('0');
-    }    
+    }
     display.print(currentTime.Minute);
 }

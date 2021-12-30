@@ -82,14 +82,14 @@ class StarryHorizon : public Watchy {
           int minute = (int)currentTime.Minute;
           double minuteAngle = ((2.0 * M_PI) / 60.0) * (double)minute;
 //          printf("Minute %d, angle %f\n", (int)currentTime.Minute, minuteAngle);
-            
+
           for(int starI = 0; starI < STAR_COUNT; starI++) {
             int starX = stars[starI].x;
             int starY = stars[starI].y;
             int starR = stars[starI].r;
 
             struct xyPoint rotated = rotatePointAround(starX, starY, 100, 100, minuteAngle);
-            if(rotated.x < 0 || rotated.y < 0 || rotated.x > 200 || rotated.y > horizonY) { 
+            if(rotated.x < 0 || rotated.y < 0 || rotated.x > 200 || rotated.y > horizonY) {
               continue;
             }
             if(starR == 0) {
