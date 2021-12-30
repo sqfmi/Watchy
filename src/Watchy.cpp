@@ -92,7 +92,7 @@ void Watchy::handleButtonPress(){
           showUpdateFW();
           break;
         case 6:
-          syncNTP();
+          showSyncNTP();
           break;          
         default:
           break;                              
@@ -174,7 +174,7 @@ void Watchy::handleButtonPress(){
                     showUpdateFW();
                     break;
                     case 6:
-                    syncNTP();
+                    showSyncNTP();
                     break;                    
                     default:
                     break;                              
@@ -881,7 +881,7 @@ void Watchy::updateFWBegin(){
     showMenu(menuIndex, false);
 }
 
-void Watchy::syncNTP(){
+void Watchy::showSyncNTP(){
     display.setFullWindow();
     display.fillScreen(GxEPD_BLACK);
     display.setFont(&FreeMonoBold9pt7b);
@@ -890,7 +890,7 @@ void Watchy::syncNTP(){
     display.println("Syncing NTP... ");
     display.display(false); //full refresh
     if(connectWiFi()){
-        if(RTC.syncNtpTime()){
+        if(syncNTP()){
             display.println("NTP Sync Success");
         }else{
             display.println("NTP Sync Failed");
@@ -900,7 +900,38 @@ void Watchy::syncNTP(){
     }
     display.display(true); //full refresh
     delay(1000);
-    showMenu(menuIndex, false);    
+    showMenu(menuIndex, false);
+}
+
+bool Watchy::syncNTP(){ //NTP sync - call after connecting to WiFi and remember to turn it back off
+    configTime(GMT_OFFSET_SEC, DST_OFFSET_SEC, NTP_SERVER);
+    struct tm timeinfo;
+    if(!getLocalTime(&timeinfo)){
+        return false; //NTP sync failed
+    }
+    /****************************************************
+    struct tm
+    {
+        int    tm_sec;   //   Seconds [0,60]. 
+        int    tm_min;   //   Minutes [0,59]. 
+        int    tm_hour;  //   Hour [0,23]. 
+        int    tm_mday;  //   Day of month [1,31]. 
+        int    tm_mon;   //   Month of year [0,11]. 
+        int    tm_year;  //   Years since 1900. 
+        int    tm_wday;  //   Day of week [0,6] (Sunday =0). 
+        int    tm_yday;  //   Day of year [0,365]. 
+        int    tm_isdst; //   Daylight Savings flag. 
+    }
+    ****************************************************/      
+    tmElements_t tm;
+    tm.Year = CalendarYrToTm(timeinfo.tm_year + 1900);
+    tm.Month = timeinfo.tm_mon + 1; //tm.Month 1 - 12
+    tm.Day = timeinfo.tm_mday;
+    tm.Hour = timeinfo.tm_hour;
+    tm.Minute = timeinfo.tm_min;
+    tm.Second = timeinfo.tm_sec;
+    RTC.set(tm);
+    return true;
 }
 
 // time_t compileTime()

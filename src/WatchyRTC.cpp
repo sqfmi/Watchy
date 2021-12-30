@@ -115,37 +115,6 @@ void WatchyRTC::_PCFConfig(String datetime){ //String datetime is YYYY:MM:DD:HH:
     clearAlarm();
 }
 
-bool WatchyRTC::syncNtpTime(){ //NTP sync - call after connecting to WiFi and remember to turn it back off
-    configTime(GMT_OFFSET_SEC, DST_OFFSET_SEC, NTP_SERVER);
-    struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)){
-        return false; //NTP sync failed
-    }
-    /****************************************************
-    struct tm
-    {
-        int    tm_sec;   //   Seconds [0,60]. 
-        int    tm_min;   //   Minutes [0,59]. 
-        int    tm_hour;  //   Hour [0,23]. 
-        int    tm_mday;  //   Day of month [1,31]. 
-        int    tm_mon;   //   Month of year [0,11]. 
-        int    tm_year;  //   Years since 1900. 
-        int    tm_wday;  //   Day of week [0,6] (Sunday =0). 
-        int    tm_yday;  //   Day of year [0,365]. 
-        int    tm_isdst; //   Daylight Savings flag. 
-    }
-    ****************************************************/      
-    tmElements_t tm;
-    tm.Year = CalendarYrToTm(timeinfo.tm_year + 1900);
-    tm.Month = timeinfo.tm_mon + 1; //tm.Month 1 - 12
-    tm.Day = timeinfo.tm_mday;
-    tm.Hour = timeinfo.tm_hour;
-    tm.Minute = timeinfo.tm_min;
-    tm.Second = timeinfo.tm_sec;
-    set(tm);
-    return true;
-}
-
 String WatchyRTC::_getValue(String data, char separator, int index)
 {
   int found = 0;

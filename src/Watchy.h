@@ -39,8 +39,9 @@ class Watchy {
         void showBuzz();
         void showAccelerometer();
         void showUpdateFW();
+        void showSyncNTP();
+        bool syncNTP();
         void setTime();
-        void syncNTP();
         void setupWifi();
         bool connectWiFi();
         weatherData getWeatherData();
