@@ -50,18 +50,11 @@ class Watchy {
         virtual void drawWatchFace(); //override this method for different watch faces
         void setupWeather( uint32_t city, bool celsius, uint16_t updateInterval, String lang, String apikey );
         uint8_t  getAmbientTemp();
-        bool     weatherCelsius = true;
     private:
         void _bmaConfig();
         static void _configModeCallback(WiFiManager *myWiFiManager);
         static uint16_t _readRegister(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
         static uint16_t _writeRegister(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
-        uint16_t weatherInterval;
-        uint32_t weatherCity;
-        String   weatherAPIKey;
-        String   weatherLang;
-        bool     weatherInit = false;
-        uint16_t weatherIntervalCounter = 0;
 };
 
 extern RTC_DATA_ATTR int guiState;
@@ -69,5 +62,11 @@ extern RTC_DATA_ATTR int menuIndex;
 extern RTC_DATA_ATTR BMA423 sensor;
 extern RTC_DATA_ATTR bool WIFI_CONFIGURED;
 extern RTC_DATA_ATTR bool BLE_CONFIGURED;
+extern RTC_DATA_ATTR bool weatherCelsius;
+extern RTC_DATA_ATTR String weatherLang;
+extern RTC_DATA_ATTR String weatherAPIKey;
+extern RTC_DATA_ATTR uint16_t weatherIntervalCounter;
+extern RTC_DATA_ATTR uint32_t weatherCity;
+extern RTC_DATA_ATTR uint16_t weatherInterval;
 
 #endif
