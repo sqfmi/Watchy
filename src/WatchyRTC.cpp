@@ -115,11 +115,11 @@ void WatchyRTC::_PCFConfig(String datetime){ //String datetime is YYYY:MM:DD:HH:
     clearAlarm();
 }
 
-void WatchyRTC::syncNtpTime(){ //NTP sync - call after connecting to WiFi and remember to turn it back off
+bool WatchyRTC::syncNtpTime(){ //NTP sync - call after connecting to WiFi and remember to turn it back off
     configTime(GMT_OFFSET_SEC, DST_OFFSET_SEC, NTP_SERVER);
     struct tm timeinfo;
     if(!getLocalTime(&timeinfo)){
-        return; //NTP sync failed
+        return false; //NTP sync failed
     }
     /****************************************************
     struct tm
@@ -143,6 +143,7 @@ void WatchyRTC::syncNtpTime(){ //NTP sync - call after connecting to WiFi and re
     tm.Minute = timeinfo.tm_min;
     tm.Second = timeinfo.tm_sec;
     set(tm);
+    return true;
 }
 
 String WatchyRTC::_getValue(String data, char separator, int index)

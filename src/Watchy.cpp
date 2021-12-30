@@ -91,6 +91,9 @@ void Watchy::handleButtonPress(){
         case 5:
           showUpdateFW();
           break;
+        case 6:
+          syncNTP();
+          break;          
         default:
           break;                              
       }
@@ -170,6 +173,9 @@ void Watchy::handleButtonPress(){
                     case 5:
                     showUpdateFW();
                     break;
+                    case 6:
+                    syncNTP();
+                    break;                    
                     default:
                     break;                              
                 }
@@ -219,9 +225,9 @@ void Watchy::showMenu(byte menuIndex, bool partialRefresh){
     uint16_t w, h;
     int16_t yPos;
 
-    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware"};
+    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware", "Sync NTP"};
     for(int i=0; i<MENU_LENGTH; i++){
-    yPos = 30+(MENU_HEIGHT*i);
+    yPos = MENU_HEIGHT+(MENU_HEIGHT*i);
     display.setCursor(0, yPos);
     if(i == menuIndex){
         display.getTextBounds(menuItems[i], 0, yPos, &x1, &y1, &w, &h);
@@ -248,9 +254,9 @@ void Watchy::showFastMenu(byte menuIndex){
     uint16_t w, h;
     int16_t yPos;
 
-    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware"};
+    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware", "Sync NTP"};
     for(int i=0; i<MENU_LENGTH; i++){
-    yPos = 30+(MENU_HEIGHT*i);
+    yPos = MENU_HEIGHT+(MENU_HEIGHT*i);
     display.setCursor(0, yPos);
     if(i == menuIndex){
         display.getTextBounds(menuItems[i], 0, yPos, &x1, &y1, &w, &h);
@@ -557,7 +563,6 @@ void Watchy::drawWatchFace(){
 weatherData Watchy::getWeatherData(){
     if(weatherIntervalCounter >= WEATHER_UPDATE_INTERVAL){ //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
         if(connectWiFi()){
-            RTC.syncNtpTime(); //Sync NTP
             HTTPClient http; //Use Weather API for live data if WiFi is connected
             http.setConnectTimeout(3000);//3 second max timeout
             String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(CITY_NAME) + String(",") + String(COUNTRY_CODE) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
@@ -729,7 +734,6 @@ void Watchy::setupWifi(){
         display.println("Setup failed &");
         display.println("timed out!");
     }else{
-        RTC.syncNtpTime(); //sync ntp
         display.println("Connected to");
         display.println(WiFi.SSID());
     }
@@ -875,6 +879,28 @@ void Watchy::updateFWBegin(){
     WiFi.mode(WIFI_OFF);
     btStop();
     showMenu(menuIndex, false);
+}
+
+void Watchy::syncNTP(){
+    display.setFullWindow();
+    display.fillScreen(GxEPD_BLACK);
+    display.setFont(&FreeMonoBold9pt7b);
+    display.setTextColor(GxEPD_WHITE);
+    display.setCursor(0, 30);
+    display.println("Syncing NTP... ");
+    display.display(false); //full refresh
+    if(connectWiFi()){
+        if(RTC.syncNtpTime()){
+            display.println("NTP Sync Success");
+        }else{
+            display.println("NTP Sync Failed");
+        }
+    }else{
+        display.println("WiFi Not Configured");
+    }
+    display.display(true); //full refresh
+    delay(1000);
+    showMenu(menuIndex, false);    
 }
 
 // time_t compileTime()

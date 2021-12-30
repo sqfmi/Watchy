@@ -25,7 +25,7 @@ class WatchyRTC {
         void clearAlarm();
         void read(tmElements_t &tm);
         void set(tmElements_t tm);
-        void syncNtpTime();
+        bool syncNtpTime();
         uint8_t temperature();
     private:
         void _DSConfig(String datetime);

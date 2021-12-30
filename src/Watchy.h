@@ -40,6 +40,7 @@ class Watchy {
         void showAccelerometer();
         void showUpdateFW();
         void setTime();
+        void syncNTP();
         void setupWifi();
         bool connectWiFi();
         weatherData getWeatherData();
