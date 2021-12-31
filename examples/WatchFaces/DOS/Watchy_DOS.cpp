@@ -3,10 +3,10 @@
 void WatchyDOS::drawWatchFace(){
     char time[6];
     time[0] = '0' + ((currentTime.Hour/10)%10);
-    time[1] = '0' + (currentTime.Hour%10); 
+    time[1] = '0' + (currentTime.Hour%10);
     time[2] = ':';
     time[3] = '0' + ((currentTime.Minute/10)%10);
-    time[4] = '0' + (currentTime.Minute%10); 
+    time[4] = '0' + (currentTime.Minute%10);
     time[5] = 0;
     display.fillScreen(GxEPD_BLACK);
     display.setTextColor(GxEPD_WHITE);
