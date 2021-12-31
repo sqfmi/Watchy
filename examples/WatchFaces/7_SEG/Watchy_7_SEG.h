@@ -9,8 +9,8 @@
 #include "icons.h"
 
 class Watchy7SEG : public Watchy{
+    using Watchy::Watchy;
     public:
-        Watchy7SEG();
         void drawWatchFace();
         void drawTime();
         void drawDate();

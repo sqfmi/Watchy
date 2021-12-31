@@ -6,6 +6,7 @@
 #include <Fonts/FreeSansBold9pt7b.h> //include any fonts you want to use
 #include "MadeSunflower39pt7b.h"
 #include "stars.h"
+#include "settings.h"
 
 #define STAR_COUNT 900
 
@@ -50,9 +51,9 @@ struct xyPoint rotatePointAround(int x, int y, int ox, int oy, double angle) {
 
 class StarryHorizon : public Watchy {
     public:
-        StarryHorizon() {
+        StarryHorizon(const watchySettings& s) : Watchy(s) {
           // uncomment to re-generate stars
-//          initStars();
+          // initStars();
         }
         void drawWatchFace(){
           display.fillScreen(GxEPD_BLACK);
@@ -139,7 +140,7 @@ class StarryHorizon : public Watchy {
         }
 };
 
-StarryHorizon face; //instantiate watchface
+StarryHorizon face(settings); //instantiate watchface
 
 void setup() {
   face.init(); //call init in setup

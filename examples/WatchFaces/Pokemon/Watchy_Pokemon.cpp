@@ -1,7 +1,5 @@
 #include "Watchy_Pokemon.h"
 
-WatchyPokemon::WatchyPokemon(){} //constructor
-
 void WatchyPokemon::drawWatchFace(){
     display.fillScreen(GxEPD_WHITE);
     display.drawBitmap(0, 0, pokemon, DISPLAY_WIDTH, DISPLAY_HEIGHT, GxEPD_BLACK);

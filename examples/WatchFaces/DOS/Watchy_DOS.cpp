@@ -1,7 +1,5 @@
 #include "Watchy_DOS.h"
 
-WatchyDOS::WatchyDOS(){} //constructor
-
 void WatchyDOS::drawWatchFace(){
     char time[6];
     time[0] = '0' + ((currentTime.Hour/10)%10);

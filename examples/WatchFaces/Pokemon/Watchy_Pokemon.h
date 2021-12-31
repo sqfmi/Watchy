@@ -5,8 +5,8 @@
 #include "pokemon.h"
 
 class WatchyPokemon : public Watchy{
+    using Watchy::Watchy;
     public:
-        WatchyPokemon();
         void drawWatchFace();
 };
 

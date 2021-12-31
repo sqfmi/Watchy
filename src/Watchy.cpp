@@ -9,10 +9,8 @@ RTC_DATA_ATTR BMA423 sensor;
 RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
-RTC_DATA_ATTR int weatherIntervalCounter = WEATHER_UPDATE_INTERVAL;
+RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR bool displayFullInit = true;
-
-Watchy::Watchy(){} //constructor
 
 void Watchy::init(String datetime){
     esp_sleep_wakeup_cause_t wakeup_reason;
@@ -561,18 +559,27 @@ void Watchy::drawWatchFace(){
 }
 
 weatherData Watchy::getWeatherData(){
-    if(weatherIntervalCounter >= WEATHER_UPDATE_INTERVAL){ //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
+    return getWeatherData(settings.cityID, settings.weatherUnit, settings.weatherLang, settings.weatherURL, settings.weatherAPIKey, settings.weatherUpdateInterval);
+}
+
+weatherData Watchy::getWeatherData(String cityID, String units, String lang, String url, String apiKey, uint8_t updateInterval){
+    if(weatherIntervalCounter < 0){ //-1 on first run, set to updateInterval
+        weatherIntervalCounter = updateInterval;
+    }
+    if(weatherIntervalCounter >= updateInterval){ //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
         if(connectWiFi()){
             HTTPClient http; //Use Weather API for live data if WiFi is connected
             http.setConnectTimeout(3000);//3 second max timeout
-            String weatherQueryURL = String(OPENWEATHERMAP_URL) + String(CITY_NAME) + String(",") + String(COUNTRY_CODE) + String("&units=") + String(TEMP_UNIT) + String("&appid=") + String(OPENWEATHERMAP_APIKEY);
+            String weatherQueryURL = url + cityID + String("&units=") + units + String("&lang=") + lang + String("&appid=") + apiKey;
             http.begin(weatherQueryURL.c_str());
             int httpResponseCode = http.GET();
             if(httpResponseCode == 200) {
                 String payload = http.getString();
                 JSONVar responseObject = JSON.parse(payload);
                 currentWeather.temperature = int(responseObject["main"]["temp"]);
-                currentWeather.weatherConditionCode = int(responseObject["weather"][0]["id"]);            
+                currentWeather.isMetric = settings.weatherUnit == String("metric");
+                currentWeather.weatherConditionCode = int(responseObject["weather"][0]["id"]);
+                currentWeather.weatherDescription = responseObject["weather"][0]["main"];
             }else{
                 //http error
             }
@@ -582,7 +589,7 @@ weatherData Watchy::getWeatherData(){
             btStop();
         }else{//No WiFi, use internal temperature sensor
             uint8_t temperature = sensor.readTemperature(); //celsius
-            if(strcmp(TEMP_UNIT, "imperial") == 0){
+            if(units != String("metric")){
                 temperature = temperature * 9. / 5. + 32.; //fahrenheit
             }
             currentWeather.temperature = temperature;
@@ -904,7 +911,11 @@ void Watchy::showSyncNTP(){
 }
 
 bool Watchy::syncNTP(){ //NTP sync - call after connecting to WiFi and remember to turn it back off
-    configTime(GMT_OFFSET_SEC, DST_OFFSET_SEC, NTP_SERVER);
+    return syncNTP(settings.gmtOffset, settings.dstOffset, settings.ntpServer.c_str());
+}
+
+bool Watchy::syncNTP(long gmt, int dst, String ntpServer){ //NTP sync - call after connecting to WiFi and remember to turn it back off
+    configTime(gmt, dst, ntpServer.c_str());
     struct tm timeinfo;
     if(!getLocalTime(&timeinfo)){
         return false; //NTP sync failed

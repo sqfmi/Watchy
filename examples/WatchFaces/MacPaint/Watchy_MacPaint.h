@@ -5,8 +5,8 @@
 #include "macpaint.h"
 
 class WatchyMacPaint : public Watchy{
+    using Watchy::Watchy;
     public:
-        WatchyMacPaint();
         void drawWatchFace();
 };
 
