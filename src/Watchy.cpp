@@ -898,7 +898,27 @@ void Watchy::showSyncNTP(){
     display.display(false); //full refresh
     if(connectWiFi()){
         if(syncNTP()){
-            display.println("NTP Sync Success");
+            display.println("NTP Sync Success\n");
+            display.println("Current Time Is:");
+            
+            RTC.read(currentTime);
+            
+            display.print(tmYearToCalendar(currentTime.Year));
+            display.print("/");
+            display.print(currentTime.Month);
+            display.print("/");
+            display.print(currentTime.Day);
+            display.print(" - ");
+
+            if(currentTime.Hour < 10){
+                display.print("0");
+            }
+            display.print(currentTime.Hour);
+            display.print(":");
+            if(currentTime.Minute < 10){
+                display.print("0");
+            }  
+            display.println(currentTime.Minute);
         }else{
             display.println("NTP Sync Failed");
         }
@@ -906,7 +926,7 @@ void Watchy::showSyncNTP(){
         display.println("WiFi Not Configured");
     }
     display.display(true); //full refresh
-    delay(1000);
+    delay(3000);
     showMenu(menuIndex, false);
 }
 
@@ -915,54 +935,14 @@ bool Watchy::syncNTP(){ //NTP sync - call after connecting to WiFi and remember 
 }
 
 bool Watchy::syncNTP(long gmt, int dst, String ntpServer){ //NTP sync - call after connecting to WiFi and remember to turn it back off
-    configTime(gmt, dst, ntpServer.c_str());
-    struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)){
+    WiFiUDP ntpUDP;
+    NTPClient timeClient(ntpUDP, ntpServer.c_str(), gmt);
+    timeClient.begin();
+    if(!timeClient.forceUpdate()){
         return false; //NTP sync failed
     }
-    /****************************************************
-    struct tm
-    {
-        int    tm_sec;   //   Seconds [0,60].
-        int    tm_min;   //   Minutes [0,59].
-        int    tm_hour;  //   Hour [0,23].
-        int    tm_mday;  //   Day of month [1,31].
-        int    tm_mon;   //   Month of year [0,11].
-        int    tm_year;  //   Years since 1900.
-        int    tm_wday;  //   Day of week [0,6] (Sunday =0).
-        int    tm_yday;  //   Day of year [0,365].
-        int    tm_isdst; //   Daylight Savings flag.
-    }
-    ****************************************************/
     tmElements_t tm;
-    tm.Year = CalendarYrToTm(timeinfo.tm_year + 1900);
-    tm.Month = timeinfo.tm_mon + 1; //tm.Month 1 - 12
-    tm.Day = timeinfo.tm_mday;
-    tm.Hour = timeinfo.tm_hour;
-    tm.Minute = timeinfo.tm_min;
-    tm.Second = timeinfo.tm_sec;
+    breakTime((time_t)timeClient.getEpochTime(), tm);              
     RTC.set(tm);
     return true;
 }
-
-// time_t compileTime()
-// {
-//     const time_t FUDGE(10);    //fudge factor to allow for upload time, etc. (seconds, YMMV)
-//     const char *compDate = __DATE__, *compTime = __TIME__, *months = "JanFebMarAprMayJunJulAugSepOctNovDec";
-//     char compMon[3], *m;
-
-//     strncpy(compMon, compDate, 3);
-//     compMon[3] = '\0';
-//     m = strstr(months, compMon);
-
-//     tmElements_t tm;
-//     tm.Month = ((m - months) / 3 + 1);
-//     tm.Day = atoi(compDate + 4);
-//     tm.Year = atoi(compDate + 7) - YEAR_OFFSET; // offset from 1970, since year is stored in uint8_t
-//     tm.Hour = atoi(compTime);
-//     tm.Minute = atoi(compTime + 3);
-//     tm.Second = atoi(compTime + 6);
-
-//     time_t t = makeTime(tm);
-//     return t + FUDGE;        //add fudge factor to allow for compile time
-// }

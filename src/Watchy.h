@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <WiFiManager.h>
 #include <HTTPClient.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 #include <Arduino_JSON.h>
 #include <GxEPD2_BW.h>
 #include <Wire.h>
