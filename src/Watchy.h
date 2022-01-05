@@ -16,6 +16,8 @@
 #include "bma.h"
 #include "config.h"
 
+#define Watchy_Version "1.3.1"
+
 typedef struct weatherData{
     int8_t temperature;
     int16_t weatherConditionCode;
@@ -54,7 +56,7 @@ class Watchy {
         void handleButtonPress();
         void showMenu(byte menuIndex, bool partialRefresh);
         void showFastMenu(byte menuIndex);
-        void showBattery();
+        void showAbout();
         void showBuzz();
         void showAccelerometer();
         void showUpdateFW();

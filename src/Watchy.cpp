@@ -72,7 +72,7 @@ void Watchy::handleButtonPress(){
       switch(menuIndex)
       {
         case 0:
-          showBattery();
+          showAbout();
           break;
         case 1:
           showBuzz();
@@ -154,7 +154,7 @@ void Watchy::handleButtonPress(){
                 switch(menuIndex)
                 {
                     case 0:
-                    showBattery();
+                    showAbout();
                     break;
                     case 1:
                     showBuzz();
@@ -223,7 +223,7 @@ void Watchy::showMenu(byte menuIndex, bool partialRefresh){
     uint16_t w, h;
     int16_t yPos;
 
-    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware", "Sync NTP"};
+    const char *menuItems[] = {"About Watchy", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware", "Sync NTP"};
     for(int i=0; i<MENU_LENGTH; i++){
     yPos = MENU_HEIGHT+(MENU_HEIGHT*i);
     display.setCursor(0, yPos);
@@ -252,7 +252,7 @@ void Watchy::showFastMenu(byte menuIndex){
     uint16_t w, h;
     int16_t yPos;
 
-    const char *menuItems[] = {"Check Battery", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware", "Sync NTP"};
+    const char *menuItems[] = {"About Watchy", "Vibrate Motor", "Show Accelerometer", "Set Time", "Setup WiFi", "Update Firmware", "Sync NTP"};
     for(int i=0; i<MENU_LENGTH; i++){
     yPos = MENU_HEIGHT+(MENU_HEIGHT*i);
     display.setCursor(0, yPos);
@@ -272,17 +272,30 @@ void Watchy::showFastMenu(byte menuIndex){
     guiState = MAIN_MENU_STATE;
 }
 
-void Watchy::showBattery(){
+void Watchy::showAbout(){
     display.setFullWindow();
     display.fillScreen(GxEPD_BLACK);
     display.setFont(&FreeMonoBold9pt7b);
     display.setTextColor(GxEPD_WHITE);
-    display.setCursor(20, 30);
-    display.println("Battery Voltage:");
+    display.setCursor(0, 20);
+
+    display.print("FW Ver: ");
+    display.println(Watchy_Version);
+
+    const char *rtc_hw_type;
+    switch (RTC.rtcType) {
+      case 0: rtc_hw_type = "DS3231";  break;
+      case 1: rtc_hw_type = "PCF8563"; break;
+      default: rtc_hw_type = "<unknown>";
+    }
+    display.print("RTC: ");
+    display.println(rtc_hw_type);
+
+    display.print("Batt: ");
     float voltage = getBatteryVoltage();
-    display.setCursor(70, 80);
     display.print(voltage);
     display.println("V");
+
     display.display(false); //full refresh
 
     guiState = APP_STATE;
