@@ -16,8 +16,6 @@
 #include "bma.h"
 #include "config.h"
 
-#define Watchy_Version "1.3.1"
-
 typedef struct weatherData{
     int8_t temperature;
     int16_t weatherConditionCode;

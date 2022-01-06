@@ -279,17 +279,12 @@ void Watchy::showAbout(){
     display.setTextColor(GxEPD_WHITE);
     display.setCursor(0, 20);
 
-    display.print("FW Ver: ");
-    display.println(Watchy_Version);
+    display.print("Lib Ver: v");
+    display.println(WATCHY_LIB_VER);
 
-    const char *rtc_hw_type;
-    switch (RTC.rtcType) {
-      case 0: rtc_hw_type = "DS3231";  break;
-      case 1: rtc_hw_type = "PCF8563"; break;
-      default: rtc_hw_type = "<unknown>";
-    }
+    const char *RTC_HW[3] = { "<UNKNOWN>", "DS3231", "PCF8563" };
     display.print("RTC: ");
-    display.println(rtc_hw_type);
+    display.println(RTC_HW[RTC.rtcType]); //0 = UNKNOWN, 1 = DS3231, 2 = PCF8563
 
     display.print("Batt: ");
     float voltage = getBatteryVoltage();
