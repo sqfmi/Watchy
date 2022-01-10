@@ -571,6 +571,7 @@ weatherData Watchy::getWeatherData(){
 }
 
 weatherData Watchy::getWeatherData(String cityID, String units, String lang, String url, String apiKey, uint8_t updateInterval){
+    currentWeather.isMetric = settings.weatherUnit == String("metric");
     if(weatherIntervalCounter < 0){ //-1 on first run, set to updateInterval
         weatherIntervalCounter = updateInterval;
     }
@@ -585,7 +586,6 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang, Str
                 String payload = http.getString();
                 JSONVar responseObject = JSON.parse(payload);
                 currentWeather.temperature = int(responseObject["main"]["temp"]);
-                currentWeather.isMetric = settings.weatherUnit == String("metric");
                 currentWeather.weatherConditionCode = int(responseObject["weather"][0]["id"]);
                 currentWeather.weatherDescription = responseObject["weather"][0]["main"];
             }else{
@@ -597,7 +597,7 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang, Str
             btStop();
         }else{//No WiFi, use internal temperature sensor
             uint8_t temperature = sensor.readTemperature(); //celsius
-            if(units != String("metric")){
+            if(!currentWeather.isMetric){
                 temperature = temperature * 9. / 5. + 32.; //fahrenheit
             }
             currentWeather.temperature = temperature;
