@@ -571,7 +571,7 @@ weatherData Watchy::getWeatherData(){
 }
 
 weatherData Watchy::getWeatherData(String cityID, String units, String lang, String url, String apiKey, uint8_t updateInterval){
-    currentWeather.isMetric = settings.weatherUnit == String("metric");
+    currentWeather.isMetric = units == String("metric");
     if(weatherIntervalCounter < 0){ //-1 on first run, set to updateInterval
         weatherIntervalCounter = updateInterval;
     }
