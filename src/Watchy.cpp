@@ -279,7 +279,7 @@ void Watchy::showAbout(){
     display.setTextColor(GxEPD_WHITE);
     display.setCursor(0, 20);
 
-    display.print("Lib Ver: v");
+    display.print("LibVer: ");
     display.println(WATCHY_LIB_VER);
 
     const char *RTC_HW[3] = { "<UNKNOWN>", "DS3231", "PCF8563" };
