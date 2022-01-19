@@ -51,5 +51,5 @@
 #define HARDWARE_VERSION_MAJOR 1
 #define HARDWARE_VERSION_MINOR 0
 //Versioning
-#define WATCHY_LIB_VER "1.3.3"
+#define WATCHY_LIB_VER "1.3.3dev"
 #endif
