@@ -1,27 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-//pins
-#define SDA 21
-#define SCL 22
-#define V10_ADC_PIN 33 //OG v1.0 Watchy
-#define V15_ADC_PIN 35 //v1.5 Watchy with PCF8563 RTC
-#define RTC_PIN GPIO_NUM_27
-#define CS 5
-#define DC 10
-#define RESET 9
-#define BUSY 19
-#define VIB_MOTOR_PIN 13
-#define MENU_BTN_PIN 26
-#define BACK_BTN_PIN 25
-#define UP_BTN_PIN 32
-#define DOWN_BTN_PIN 4
-#define MENU_BTN_MASK GPIO_SEL_26
-#define BACK_BTN_MASK GPIO_SEL_25
-#define UP_BTN_MASK GPIO_SEL_32
-#define DOWN_BTN_MASK GPIO_SEL_4
-#define ACC_INT_MASK GPIO_SEL_14
-#define BTN_PIN_MASK MENU_BTN_MASK|BACK_BTN_MASK|UP_BTN_MASK|DOWN_BTN_MASK
 //display
 #define DISPLAY_WIDTH 200
 #define DISPLAY_HEIGHT 200
@@ -51,5 +30,5 @@
 #define HARDWARE_VERSION_MAJOR 1
 #define HARDWARE_VERSION_MINOR 0
 //Versioning
-#define WATCHY_LIB_VER "1.3.3dev"
+#define WATCHY_LIB_VER "1.4.0dev"
 #endif

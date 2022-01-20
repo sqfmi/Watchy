@@ -1,7 +1,7 @@
 #include "Watchy.h"
 
 WatchyRTC Watchy::RTC;
-GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> Watchy::display(GxEPD2_154_D67(CS, DC, RESET, BUSY));
+GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> Watchy::display(GxEPD2_154_D67(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY));
 
 RTC_DATA_ATTR int guiState;
 RTC_DATA_ATTR int menuIndex;
@@ -44,7 +44,7 @@ void Watchy::init(String datetime){
 }
 
 void Watchy::displayBusyCallback(const void*){
-    gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
+    gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
     esp_sleep_enable_gpio_wakeup();
     esp_light_sleep_start();
 }
@@ -57,7 +57,7 @@ void Watchy::deepSleep(){
     for(int i=0; i<40; i++) {
         pinMode(i, INPUT);
     }
-    esp_sleep_enable_ext0_wakeup(RTC_PIN, 0); //enable deep sleep wake on RTC interrupt
+    esp_sleep_enable_ext0_wakeup((gpio_num_t)RTC_INT_PIN, 0); //enable deep sleep wake on RTC interrupt
     esp_sleep_enable_ext1_wakeup(BTN_PIN_MASK, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
     esp_deep_sleep_start();
 }
@@ -612,9 +612,9 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang, Str
 
 float Watchy::getBatteryVoltage(){
     if(RTC.rtcType == DS3231){
-        return analogReadMilliVolts(V10_ADC_PIN) / 1000.0f * 2.0f; // Battery voltage goes through a 1/2 divider.
+        return analogReadMilliVolts(BATT_ADC_PIN) / 1000.0f * 2.0f; // Battery voltage goes through a 1/2 divider.
     }else{
-        return analogReadMilliVolts(V15_ADC_PIN) / 1000.0f * 2.0f;
+        return analogReadMilliVolts(BATT_ADC_PIN) / 1000.0f * 2.0f;
     }
 }
 
