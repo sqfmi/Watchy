@@ -17,7 +17,7 @@
   "platforms": ["espressif32"],
   "dependencies": [
     { "name": "Adafruit GFX Library" },
-    { "name": "Arduino_JSON" },
+    { "name": "ArduinoJSON" },
     { "name": "DS3232RTC" },
     { "name": "NTPClient" },
     {
@@ -26,7 +26,7 @@
     },
     {
       "name": "GxEPD2",
-      "version": "https://github.com/ZinggJM/GxEPD2.git#master"
+      "version": "https://github.com/DarkZeros/GxEPD2.git#watchy"
     },
     {
       "name": "WiFiManager",

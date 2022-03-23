@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "arduino_pins.h"
+
 //display
 #define DISPLAY_WIDTH 200
 #define DISPLAY_HEIGHT 200
@@ -31,4 +33,5 @@
 #define HARDWARE_VERSION_MINOR 0
 //Versioning
 #define WATCHY_LIB_VER "1.4.0"
+
 #endif
