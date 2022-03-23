@@ -955,7 +955,7 @@ bool Watchy::syncNTP(long gmt, int dst, String ntpServer){ //NTP sync - call aft
         return false; //NTP sync failed
     }
     tmElements_t tm;
-    breakTime((time_t)timeClient.getEpochTime(), tm);              
+    breakTime((time_t)timeClient.getEpochTime(), tm);
     RTC.set(tm);
     return true;
 }
