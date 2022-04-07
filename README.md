@@ -6,14 +6,12 @@
 
  **⸢ [Website] ⸥**
  **⸢ [Shop] ⸥**
+ **⸢ [Setup] ⸥**
+ **⸢ [Contribute] ⸥**
 
 ---
 
 ![Preview]
-
-
-
-### Have Fun! :)
 
 <!----------------------------------------------------------------------------->
 
@@ -24,14 +22,15 @@
 
 [CrowdSupply]: https://www.crowdsupply.com/sqfmi/watchy
 [Discord]: https://discord.gg/ZXDegGV8E7
-[License]: LICENSE
+[Website]: https://watchy.sqfmi.com
 [Mouser]: https://www.mouser.com/ProductDetail/SQFMI/SQFMI-WATCHY-10?qs=DRkmTr78QARN9VSJRzqRxw%3D%3D
+[Shop]: https://shop.sqfmi.com
 
 [Preview]: https://watchy.sqfmi.com/img/watchy_render.png
 
-
-[Website]: https://watchy.sqfmi.com
-[Shop]: https://shop.sqfmi.com
+[Contribute]: Documentation/Contribute.md
+[Setup]: Documentation/Setup.md
+[License]: LICENSE
 
 [Drivers]: https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers
 [ESP32]: https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
