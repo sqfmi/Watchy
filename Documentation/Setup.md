@@ -1,14 +1,20 @@
 
 # Setup
 
+<br>
+
 ## Board
 
 In the **Arduino IDE Boards Manager** you will <br>
 need to **[Install Support][ESP32]** for the **ESP32** board.
 
+<br>
+
 ##### Navigate To
 
 <kbd>**Arduino**</kbd> **›** <kbd>**Preferences**</kbd> **›** <kbd>**Additional Board Manager URLs**</kbd>
+
+<br>
 
 ##### Insert
 
@@ -16,10 +22,26 @@ need to **[Install Support][ESP32]** for the **ESP32** board.
 https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 ```
 
+<br>
+<br>
+
+---
+
+<br>
+<br>
+
 ## Library
 
 In the **Library Manager**, search for `Watchy` <br>
 and install it and any of its dependencies.
+
+<br>
+<br>
+
+---
+
+<br>
+<br>
 
 ## Example
 
@@ -27,21 +49,40 @@ Check out the examples under
 
 <kbd>**Examples**</kbd> **›** <kbd>**Watchy**</kbd>
 
+<br>
+<br>
+
+---
+
+<br>
+<br>
+
 ## Compile / Upload
 
 Use the following settings when building <br>
 and leave any other ones at their default.
+
+<br>
 
 Setting |        |
 :------:|:------:|
 Board            | `ESP Dev Module`
 Partition Scheme | `Minimal SPIFFS`
 
+<br>
+<br>
+
+---
+
+<br>
+<br>
+
 ## Port
 
 In case your port isn't automatically detected, you may <br>
 also need to install the [CP2104 USB To Serial Drivers][Drivers].
 
+<br>
 
 <!----------------------------------------------------------------------------->
 
