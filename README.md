@@ -8,10 +8,10 @@
 
 <div align = 'center'>
 
- **⸢ [Website] ⸥**
- **⸢ [Shop] ⸥**
- **⸢ [Setup] ⸥**
- **⸢ [Contribute] ⸥**
+  **⸢ [Website] ⸥**
+  **⸢ [Shop] ⸥**
+  **⸢ [Setup] ⸥**
+  **⸢ [Contribute] ⸥**
   
  </div>
 
