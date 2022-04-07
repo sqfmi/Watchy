@@ -81,7 +81,7 @@ Partition Scheme | `Minimal SPIFFS`
 ## Port
 
 In case your port isn't automatically detected, you may <br>
-also need to install the [CP2104 USB To Serial Drivers][Drivers].
+also need to install the **[CP2104 USB To Serial Drivers][Drivers]**.
 
 <br>
 
