@@ -3,10 +3,14 @@
 
 You might want to check out our [![Badge Discord]][Discord]
 
+<br>
+
 ## Topics
 
 It is recommended to first search for **[Issues]** as well as <br>
 **[Pull Requests]** that match your topic before you start.
+
+<br>
 
 ## Steps
 
