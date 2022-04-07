@@ -1,4 +1,6 @@
-# Watchy - Fully Open Source E-Paper Watch
+# Watchy
+
+***A Fully Open Source E-Paper Watch***
 
 ![Preview]
 
