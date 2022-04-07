@@ -40,6 +40,3 @@
 [Setup]: Documentation/Setup.md
 [License]: LICENSE
 
-[Drivers]: https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers
-[ESP32]: https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
-
