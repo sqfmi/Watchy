@@ -1,15 +1,28 @@
-# How to contribute
 
-### Check out the issue tracker
+# How To Contribute
 
-Search through [Issue tracker](https://github.com/sqfmi/Watchy/issues) for matching topics. It is also recommended to check with current [Pull requests](https://github.com/sqfmi/Watchy/pulls).
+You might want to check out our [![Badge Discord]][Discord]
 
-### Issue Pull Request
+## Topics
 
-1. Fork this repo and branch out from `dev`.
-2. Push commits.
-3. Issue pull request.
+It is recommended to first search for **[Issues]** as well as <br>
+**[Pull Requests]** that match your topic before you start.
 
-## Community
+## Steps
 
-- [Discord](https://discord.gg/ZXDegGV8E7)
+1. Fork the repository.
+
+2. Branch out from `dev`.
+
+3. Push your commits.
+
+4. Open a pull request.
+
+
+<!----------------------------------------------------------------------------->
+
+[Pull Requests]: https://github.com/sqfmi/Watchy/pulls
+[Issues]: https://github.com/sqfmi/Watchy/issues
+
+[Badge Discord]: https://img.shields.io/badge/Discord-7289DA?style=flat&logo=discord&logoColor=white
+[Discord]: https://discord.gg/ZXDegGV8E7
