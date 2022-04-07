@@ -2,11 +2,14 @@
 
 ***A Fully Open Source E-Paper Watch***
 
+---
+
+ **⸢ [Website] ⸥**
+ **⸢ [Shop] ⸥**
+
+---
+
 ![Preview]
-
-[**Watchy Case & Accessories**][Shop]
-
-Visit [**https://watchy.sqfmi.com**][Website] for documentation, hardware design files, and more!
 
 ## Setup
 1. In the Arduino IDE Boards Manager, [install support for the ESP32][ESP32].
