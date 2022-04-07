@@ -2,14 +2,22 @@
 
 ***A Fully Open Source E-Paper Watch***
 
+<br>
+
 ---
+
+<div align = 'center'>
 
  **⸢ [Website] ⸥**
  **⸢ [Shop] ⸥**
  **⸢ [Setup] ⸥**
  **⸢ [Contribute] ⸥**
+  
+ </div>
 
 ---
+
+<br>
 
 ![Preview]
 
