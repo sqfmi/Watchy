@@ -1,6 +1,7 @@
 
-# Setup
+<h1 align = 'center'>Setup</h1>
 
+<br>
 <br>
 
 ## Board
