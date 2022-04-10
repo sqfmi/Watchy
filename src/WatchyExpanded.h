@@ -1,7 +1,7 @@
 #pragma once
 
 // STL
-#include <vector.h>
+#include <vector>
 
 // Defs
 class CWatchFace;
