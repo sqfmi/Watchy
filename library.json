@@ -21,6 +21,7 @@
     { "name": "DS3232RTC" },
     { "name": "NTPClient" },
     { "name": "Wire" },
+    { "name": "WiFi" },
     {
       "name": "Rtc_Pcf8563",
       "version": "https://github.com/orbitalair/Rtc_Pcf8563.git#master"
