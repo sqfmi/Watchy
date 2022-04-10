@@ -43,7 +43,7 @@ void CWatchyExpanded::Init()
 	//deepSleep();
 }
 
-void Watchy::displayBusyCallback(const void*)
+void Watchy::DisplayBusyCallback(const void*)
 {
 	gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
 	esp_sleep_enable_gpio_wakeup();
@@ -74,4 +74,17 @@ void UpdateScreen()
 
 	m_display.display(true); //partial refresh
 	guiState = kWatchFace_State;
+}
+
+void CWatchyExpanded::DeepSleep()
+{
+	display.hibernate();
+	RTC.clearAlarm(); //resets the alarm flag in the RTC
+
+	for(int i=0; i<40; i++) // Set pins 0-39 to input to avoid power leaking out
+		pinMode(i, INPUT);
+
+	esp_sleep_enable_ext0_wakeup((gpio_num_t)RTC_INT_PIN, 0); //enable deep sleep wake on RTC interrupt
+	esp_sleep_enable_ext1_wakeup(BTN_PIN_MASK, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
+	esp_deep_sleep_start();
 }

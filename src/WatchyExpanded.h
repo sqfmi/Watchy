@@ -16,8 +16,9 @@ class CWatchyExpanded
 		void Init();
 
 	private:
-		void displayBusyCallback(const void*);
+		void DisplayBusyCallback(const void*);
 		void UpdateScreen();
+		void DeepSleep();
 
 		std::vector<CWatchFace*> m_faces;
 		std::int8_t m_face = 0;
