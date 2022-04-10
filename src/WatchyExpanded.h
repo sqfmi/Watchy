@@ -3,6 +3,12 @@
 // STL
 #include <vector>
 
+// GxEPD2
+#include <GxEPD2_BW.h>
+
+// Time
+#include <TimeLib.h>
+
 // Defs
 class CWatchFace;
 
