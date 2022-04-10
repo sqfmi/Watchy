@@ -1,6 +1,6 @@
 {
   "name": "WatchyExpanded",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Watchy - An Open Source E-Paper Watch by SQFMI",
   "authors": [
     {
@@ -11,7 +11,7 @@
   "homepage": "https://watchy.sqfmi.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sqfmi/Watchy.git"
+    "url": "https://github.com/Z02X/Watchy.git"
   },
   "frameworks": "arduino",
   "platforms": ["espressif32"],
@@ -30,7 +30,7 @@
     },
     {
       "name": "WiFiManager",
-      "version": "https://github.com/tzapu/WiFiManager.git#2.0.3-alpha"
+      "version": "https://github.com/tzapu/WiFiManager.git"
     }
   ]
 }
