@@ -65,6 +65,7 @@ void CWatchyExpanded::DrawBasicClock()
 	m_display.setFullWindow();
 	m_display.fillScreen(GxEPD_BLACK);
 	m_display.setFont(&FreeMonoBold9pt7b);
+	m_display.setCursor(0, 17);
 
 	tm currentLocalTime;
 	currentLocalTime.tm_wday = m_currentTime.Wday - 1;
