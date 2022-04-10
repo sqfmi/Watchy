@@ -1,7 +1,7 @@
 #include <Watchy.h>
 #include "settings.h"
 
-Watchy watchy(settings);
+WatchyExpanded watchy(settings);
 
 void setup(){
   watchy.init();

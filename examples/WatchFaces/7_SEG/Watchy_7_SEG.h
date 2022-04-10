@@ -8,8 +8,8 @@
 #include "DSEG7_Classic_Regular_39.h"
 #include "icons.h"
 
-class Watchy7SEG : public Watchy{
-    using Watchy::Watchy;
+class Watchy7SEG : public WatchyExpanded{
+    using WatchyExpanded::WatchyExpanded;
     public:
         void drawWatchFace();
         void drawTime();
