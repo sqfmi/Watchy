@@ -66,44 +66,44 @@ void WatchyExpanded::deepSleep()
 }
 
 void WatchyExpanded::handleButtonPress(){
-  uint64_t wakeupBit = esp_sleep_get_ext1_wakeup_status();
-  //Menu Button
-  if (wakeupBit & MENU_BTN_MASK){
+	uint64_t wakeupBit = esp_sleep_get_ext1_wakeup_status();
+	//Menu Button
+	if (wakeupBit & MENU_BTN_MASK){
 	if(guiState == WATCHFACE_STATE){//enter menu state if coming from watch face
-	  showMenu(menuIndex, false);
+		showMenu(menuIndex, false);
 	}else if(guiState == MAIN_MENU_STATE){//if already in menu, then select menu item
-	  switch(menuIndex)
-	  {
+		switch(menuIndex)
+		{
 		case 0:
-		  showAbout();
-		  break;
+			showAbout();
+			break;
 		case 1:
-		  showBuzz();
-		  break;
+			showBuzz();
+			break;
 		case 2:
-		  showAccelerometer();
-		  break;
+			showAccelerometer();
+			break;
 		case 3:
-		  setTime();
-		  break;
+			setTime();
+			break;
 		case 4:
-		  setupWifi();
-		  break;
+			setupWifi();
+			break;
 		case 5:
-		  showUpdateFW();
-		  break;
+			showUpdateFW();
+			break;
 		case 6:
-		  showSyncNTP();
-		  break;
+			showSyncNTP();
+			break;
 		default:
-		  break;
-	  }
+			break;
+		}
 	}else if(guiState == FW_UPDATE_STATE){
-	  updateFWBegin();
+		updateFWBegin();
 	}
-  }
-  //Back Button
-  else if (wakeupBit & BACK_BTN_MASK){
+	}
+	//Back Button
+	else if (wakeupBit & BACK_BTN_MASK){
 	if(guiState == MAIN_MENU_STATE){//exit to watch face if already in menu
 		RTC.read(currentTime);
 		showWatchFace(false);
@@ -114,44 +114,44 @@ void WatchyExpanded::handleButtonPress(){
 	}else if(guiState == WATCHFACE_STATE){
 		return;
 	}
-  }
-  //Up Button
-  else if (wakeupBit & UP_BTN_MASK){
+	}
+	//Up Button
+	else if (wakeupBit & UP_BTN_MASK){
 	if(guiState == MAIN_MENU_STATE){//increment menu index
-	  menuIndex--;
-	  if(menuIndex < 0){
+		menuIndex--;
+		if(menuIndex < 0){
 		menuIndex = MENU_LENGTH - 1;
-	  }
-	  showMenu(menuIndex, true);
+		}
+		showMenu(menuIndex, true);
 	}else if(guiState == WATCHFACE_STATE){
 		return;
 	}
-  }
-  //Down Button
-  else if (wakeupBit & DOWN_BTN_MASK){
+	}
+	//Down Button
+	else if (wakeupBit & DOWN_BTN_MASK){
 	if(guiState == MAIN_MENU_STATE){//decrement menu index
-	  menuIndex++;
-	  if(menuIndex > MENU_LENGTH - 1){
+		menuIndex++;
+		if(menuIndex > MENU_LENGTH - 1){
 		menuIndex = 0;
-	  }
-	  showMenu(menuIndex, true);
+		}
+		showMenu(menuIndex, true);
 	}else if(guiState == WATCHFACE_STATE){
 		return;
 	}
-  }
+	}
 
-  /***************** fast menu *****************/
-  bool timeout = false;
-  long lastTimeout = millis();
-  pinMode(MENU_BTN_PIN, INPUT);
-  pinMode(BACK_BTN_PIN, INPUT);
-  pinMode(UP_BTN_PIN, INPUT);
-  pinMode(DOWN_BTN_PIN, INPUT);
-  while(!timeout){
-	  if(millis() - lastTimeout > 5000){
-		  timeout = true;
-	  }else{
-		  if(digitalRead(MENU_BTN_PIN) == 1){
+	/***************** fast menu *****************/
+	bool timeout = false;
+	long lastTimeout = millis();
+	pinMode(MENU_BTN_PIN, INPUT);
+	pinMode(BACK_BTN_PIN, INPUT);
+	pinMode(UP_BTN_PIN, INPUT);
+	pinMode(DOWN_BTN_PIN, INPUT);
+	while(!timeout){
+		if(millis() - lastTimeout > 5000){
+			timeout = true;
+		}else{
+			if(digitalRead(MENU_BTN_PIN) == 1){
 			lastTimeout = millis();
 			if(guiState == MAIN_MENU_STATE){//if already in menu, then select menu item
 				switch(menuIndex)
@@ -183,7 +183,7 @@ void WatchyExpanded::handleButtonPress(){
 			}else if(guiState == FW_UPDATE_STATE){
 				updateFWBegin();
 			}
-		  }else if(digitalRead(BACK_BTN_PIN) == 1){
+			}else if(digitalRead(BACK_BTN_PIN) == 1){
 			lastTimeout = millis();
 			if(guiState == MAIN_MENU_STATE){//exit to watch face if already in menu
 			RTC.read(currentTime);
@@ -194,7 +194,7 @@ void WatchyExpanded::handleButtonPress(){
 			}else if(guiState == FW_UPDATE_STATE){
 			showMenu(menuIndex, false);//exit to menu if already in app
 			}
-		  }else if(digitalRead(UP_BTN_PIN) == 1){
+			}else if(digitalRead(UP_BTN_PIN) == 1){
 			lastTimeout = millis();
 			if(guiState == MAIN_MENU_STATE){//increment menu index
 			menuIndex--;
@@ -203,7 +203,7 @@ void WatchyExpanded::handleButtonPress(){
 			}
 			showFastMenu(menuIndex);
 			}
-		  }else if(digitalRead(DOWN_BTN_PIN) == 1){
+			}else if(digitalRead(DOWN_BTN_PIN) == 1){
 			lastTimeout = millis();
 			if(guiState == MAIN_MENU_STATE){//decrement menu index
 			menuIndex++;
@@ -212,9 +212,9 @@ void WatchyExpanded::handleButtonPress(){
 			}
 			showFastMenu(menuIndex);
 			}
-		  }
-	  }
-  }
+			}
+		}
+	}
 }
 
 void WatchyExpanded::showMenu(byte menuIndex, bool partialRefresh){
@@ -549,10 +549,10 @@ void WatchyExpanded::showAccelerometer(){
 }
 
 void WatchyExpanded::showWatchFace(bool partialRefresh){
-  display.setFullWindow();
-  drawWatchFace();
-  display.display(partialRefresh); //partial refresh
-  guiState = WATCHFACE_STATE;
+	display.setFullWindow();
+	drawWatchFace();
+	display.display(partialRefresh); //partial refresh
+	guiState = WATCHFACE_STATE;
 }
 
 void WatchyExpanded::drawWatchFace(){
@@ -956,4 +956,55 @@ bool WatchyExpanded::syncNTP(long gmt, int dst, String ntpServer){ //NTP sync - 
 	breakTime((time_t)timeClient.getEpochTime(), tm);              
 	RTC.set(tm);
 	return true;
+}
+
+
+JSONVar& WatchyExpanded::getWeatherJSON()
+{
+		getWeatherJSON(settings.cityID, settings.weatherUnit, settings.weatherLang, settings.weatherURL,
+									 settings.weatherAPIKey, settings.weatherUpdateInterval);
+		return m_responseObject;
+}
+
+JSONVar& WatchyExpanded::getWeatherJSON(String cityID, String units, String lang, String url, String apiKey, uint8_t updateInterval)
+{
+	if(weatherIntervalCounter < 0) //-1 on first run, set to updateInterval
+		weatherIntervalCounter = updateInterval;
+
+	if(weatherIntervalCounter >= updateInterval) //only update if WEATHER_UPDATE_INTERVAL has elapsed i.e. 30 minutes
+	{
+		if(connectWiFi())
+		{
+			HTTPClient http; //Use Weather API for live data if WiFi is connected
+			http.setConnectTimeout(3000);//3 second max timeout
+			const String& weatherQueryURL = url + cityID + String("&units=") + units + String("&lang=") + lang + String("&appid=") + apiKey;
+			http.begin(weatherQueryURL.c_str());
+			int httpResponseCode = http.GET();
+			if(httpResponseCode == 200)
+			{
+				String payload = http.getString();
+				const JSONVar& jsonNew = JSON.parse(payload);
+				const JSONVar jsonOld = m_responseObject;
+				m_responseObject = jsonNew;
+				if (!json.hasOwnProperty("weather"))
+					m_responseObject["weather"] = jsonOld["weather"];
+			}
+			else
+			{
+				//http error
+			}
+
+			http.end();
+			//turn off radios
+			WiFi.mode(WIFI_OFF);
+			btStop();
+		}
+		weatherIntervalCounter = 0;
+	}
+	else
+	{
+		++weatherIntervalCounter;
+	}
+
+	return m_responseObject;
 }

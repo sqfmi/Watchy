@@ -71,6 +71,11 @@ class WatchyExpanded
 		void showWatchFace(bool partialRefresh);
 		virtual void drawWatchFace(); //override this method for different watch faces
 
+		// Expanded
+		JSONVar& getWeatherJSON();
+		JSONVar& getWeatherJSON(String cityID, String units, String lang, String url, String apiKey,
+		                        uint8_t updateInterval);
+
 	private:
 		void _bmaConfig();
 		static void _configModeCallback(WiFiManager *myWiFiManager);
