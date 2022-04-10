@@ -1,6 +1,6 @@
 {
   "name": "WatchyExpanded",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Watchy - An Open Source E-Paper Watch by SQFMI",
   "authors": [
     {
@@ -20,6 +20,7 @@
     { "name": "Arduino_JSON" },
     { "name": "DS3232RTC" },
     { "name": "NTPClient" },
+    { "name": "Wire" },
     {
       "name": "Rtc_Pcf8563",
       "version": "https://github.com/orbitalair/Rtc_Pcf8563.git#master"

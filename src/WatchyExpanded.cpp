@@ -3,6 +3,9 @@
 // ESP
 #include <esp_sleep.h>
 
+// Wire
+#include <Wire.h>
+
 CWatchyExpanded::CWatchyExpanded() : m_display(GxEPD2_154_D67(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY))
 {
 }
