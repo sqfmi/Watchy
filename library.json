@@ -1,6 +1,6 @@
 {
   "name": "WatchyExpanded",
-  "version": "2022.4.10",
+  "version": "2022.4.10a",
   "description": "Watchy - An Open Source E-Paper Watch by SQFMI",
   "authors": [
     {
@@ -22,6 +22,7 @@
     { "name": "NTPClient" },
     { "name": "Wire" },
     { "name": "WiFi" },
+    { "name": "ESP32 BLE Arduino" }
     {
       "name": "Rtc_Pcf8563",
       "version": "https://github.com/orbitalair/Rtc_Pcf8563.git#master"
