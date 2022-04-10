@@ -54,6 +54,17 @@ void UpdateScreen()
 {
 	m_display.setFullWindow();
 	//drawWatchFace();
+	DrawBasicClock(); // Temp
+
+	m_display.display(true); //partial refresh
+	guiState = kWatchFace_State;
+}
+
+void CWatchyExpanded::DrawBasicClock()
+{
+	m_display.setFullWindow();
+	m_display.fillScreen(GxEPD_BLACK);
+	m_display.setFont(&FreeMonoBold9pt7b);
 
 	tm currentLocalTime;
 	currentLocalTime.tm_wday = m_currentTime.Wday - 1;
@@ -64,16 +75,13 @@ void UpdateScreen()
 	currentLocalTime.tm_min  = m_currentTime.Minute;
 	currentLocalTime.tm_sec  = m_currentTime.Second;
 
-	display.print("Time: ");
+	m_display.print("Time: ");
 	char buffer[20];
 	strftime(buffer, sizeof(buffer), " %I:%M %p", &currentLocalTime);
-	display.println(buffer);
+	m_display.println(buffer);
 
 	strftime(buffer, sizeof(buffer), "%a %b %d, %Y", &currentLocalTime);
-	display.print(buffer);
-
-	m_display.display(true); //partial refresh
-	guiState = kWatchFace_State;
+	m_display.print(buffer);
 }
 
 void CWatchyExpanded::DeepSleep()

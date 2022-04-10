@@ -1,5 +1,7 @@
 #include "Watchy.h"
 
+#include "DSEG7_Classic_Bold_53.h"
+
 WatchyRTC Watchy::RTC;
 GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> Watchy::display(GxEPD2_154_D67(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY));
 

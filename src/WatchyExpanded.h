@@ -20,6 +20,8 @@ class CWatchyExpanded
 		void UpdateScreen();
 		void DeepSleep();
 
+		void DrawBasicClock();
+
 		std::vector<CWatchFace*> m_faces;
 		std::int8_t m_face = 0;
 
