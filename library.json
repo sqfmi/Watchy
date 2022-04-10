@@ -22,7 +22,8 @@
     { "name": "NTPClient" },
     { "name": "Wire" },
     { "name": "WiFi" },
-    { "name": "ESP32 BLE Arduino" }
+    { "name": "ESP32 BLE Arduino" },
+    { "name": "espressif32" },
     {
       "name": "Rtc_Pcf8563",
       "version": "https://github.com/orbitalair/Rtc_Pcf8563.git#master"
