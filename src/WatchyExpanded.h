@@ -13,7 +13,6 @@
 #include "WatchyRTC.h"
 
 // Expanded
-#include "WatchFace.h"
 #include "watchy_config.h"
 
 // Defs
@@ -25,21 +24,20 @@ class CWatchyExpanded
 		CWatchyExpanded();
 
 		void AddWatchFace(CWatchFace* pFace);
-
 		void Init();
+
+		using ADisplay = GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT>;
 
 	private:
 		static void DisplayBusyCallback(const void*);
 
-		void UpdateScreen();
+		void UpdateScreen(const bool fullUpdate);
 		void DeepSleep();
-
-		void DrawBasicClock();
 
 		std::vector<CWatchFace*> m_faces;
 		std::int8_t m_face = 0;
 
-		GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> m_display;
+		ADisplay m_display;
 		tmElements_t m_currentTime;
 		std::int8_t m_guiState = wc::kWatchFace_State;
 		WatchyRTC m_rtc;
