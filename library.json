@@ -20,14 +20,6 @@
     { "name": "Arduino_JSON" },
     { "name": "DS3232RTC" },
     { "name": "NTPClient" },
-    { "name": "Wire" },
-    { "name": "WiFi" },
-    { "name": "ESP32 BLE Arduino" },
-    { "name": "Update" },
-    {
-      "name": "WiFiSelector",
-      "version": "oatssss/WiFiSelector"
-    },
     {
       "name": "Rtc_Pcf8563",
       "version": "https://github.com/orbitalair/Rtc_Pcf8563.git#master"
@@ -38,7 +30,7 @@
     },
     {
       "name": "WiFiManager",
-      "version": "https://github.com/tzapu/WiFiManager.git"
+      "version": "https://github.com/tzapu/WiFiManager.git#2.0.3-alpha"
     }
   ]
 }

@@ -8,7 +8,7 @@
 #define WIFI_AP_TIMEOUT 60
 #define WIFI_AP_SSID "Watchy AP"
 //menu
-constexpr std::int8_t kWatchFace_State{-1}
+constexpr std::int8_t kWatchFace_State{-1};
 #define MAIN_MENU_STATE 0
 #define APP_STATE 1
 #define FW_UPDATE_STATE 2
