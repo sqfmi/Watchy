@@ -10,10 +10,11 @@
 #include <TimeLib.h>
 
 // Watchy
-#include "config.h"
+#include "WatchyRTC.h"
 
 // Expanded
 #include "WatchFace.h"
+#include "watchy_config.h"
 
 // Defs
 class CWatchFace;
@@ -40,5 +41,6 @@ class CWatchyExpanded
 
 		GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> m_display;
 		tmElements_t m_currentTime;
-		std::int8_t m_guiState = kWatchFace_State;
+		std::int8_t m_guiState = wc::kWatchFace_State;
+		WatchyRTC m_rtc;
 };

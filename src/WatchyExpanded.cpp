@@ -9,10 +9,7 @@
 // Fonts
 #include <Fonts/FreeMonoBold9pt7b.h>
 
-// Watchy
-#include "WatchyRTC.h"
-
-CWatchyExpanded::CWatchyExpanded() : m_display(GxEPD2_154_D67(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY))
+CWatchyExpanded::CWatchyExpanded() : m_display(GxEPD2_154_D67(wcd::cs, wcd::dc, wcd::reset, wcd::busy))
 {
 }
 
@@ -25,7 +22,7 @@ void CWatchyExpanded::Init()
 {
 	const esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause(); //get wake up reason
 	Wire.begin(SDA, SCL); //init i2c
-	RTC.init();
+	m_rtc.init();
 
 	// Init the display here for all cases, if unused, it will do nothing
 	m_display.init(0, true, 10, true); // 10ms by spec, and fast pulldown reset
@@ -34,9 +31,9 @@ void CWatchyExpanded::Init()
 	switch (wakeup_reason)
 	{
 		case ESP_SLEEP_WAKEUP_EXT0: //RTC Alarm
-			if(m_guiState == kWatchFace_State)
+			if(m_guiState == wc::kWatchFace_State)
 			{
-				RTC.read(m_currentTime);
+				m_rtc.read(m_currentTime);
 				UpdateScreen(); //partial updates on tick
 			}
 			break;
@@ -55,7 +52,7 @@ void CWatchyExpanded::Init()
 
 void CWatchyExpanded::DisplayBusyCallback(const void*)
 {
-	gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
+	gpio_wakeup_enable(static_cast<gpio_num_t>(wcd::busy), GPIO_INTR_LOW_LEVEL);
 	esp_sleep_enable_gpio_wakeup();
 	esp_light_sleep_start();
 }
@@ -67,7 +64,7 @@ void CWatchyExpanded::UpdateScreen()
 	DrawBasicClock(); // Temp
 
 	m_display.display(true); //partial refresh
-	m_guiState = kWatchFace_State;
+	m_guiState = wc::kWatchFace_State;
 }
 
 void CWatchyExpanded::DrawBasicClock()
@@ -98,12 +95,12 @@ void CWatchyExpanded::DrawBasicClock()
 void CWatchyExpanded::DeepSleep()
 {
 	m_display.hibernate();
-	RTC.clearAlarm(); //resets the alarm flag in the RTC
+	m_rtc.clearAlarm(); //resets the alarm flag in the RTC
 
 	for(int i=0; i<40; i++) // Set pins 0-39 to input to avoid power leaking out
 		pinMode(i, INPUT);
 
-	esp_sleep_enable_ext0_wakeup((gpio_num_t)RTC_INT_PIN, 0); //enable deep sleep wake on RTC interrupt
-	esp_sleep_enable_ext1_wakeup(BTN_PIN_MASK, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
+	esp_sleep_enable_ext0_wakeup(wc::rtc_pin, 0); //enable deep sleep wake on RTC interrupt
+	esp_sleep_enable_ext1_wakeup(wc::btn_pin_mask, ESP_EXT1_WAKEUP_ANY_HIGH); //enable deep sleep wake on button press
 	esp_deep_sleep_start();
 }

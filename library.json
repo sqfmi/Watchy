@@ -20,6 +20,8 @@
     { "name": "Arduino_JSON" },
     { "name": "DS3232RTC" },
     { "name": "NTPClient" },
+    { "name": "ESP32 BLE Arduino" },
+    { "name": "Adafruit BusIO" },
     {
       "name": "Rtc_Pcf8563",
       "version": "https://github.com/orbitalair/Rtc_Pcf8563.git#master"
