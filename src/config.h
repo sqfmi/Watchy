@@ -1,14 +1,14 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 //display
 #define DISPLAY_WIDTH 200
 #define DISPLAY_HEIGHT 200
+#define BTN_PIN_MASK MENU_BTN_MASK|BACK_BTN_MASK|UP_BTN_MASK|DOWN_BTN_MASK
 //wifi
 #define WIFI_AP_TIMEOUT 60
 #define WIFI_AP_SSID "Watchy AP"
 //menu
-constexpr std::int8_t kWatchFace_State -1
+constexpr std::int8_t kWatchFace_State{-1}
 #define MAIN_MENU_STATE 0
 #define APP_STATE 1
 #define FW_UPDATE_STATE 2
@@ -31,4 +31,3 @@ constexpr std::int8_t kWatchFace_State -1
 #define HARDWARE_VERSION_MINOR 0
 //Versioning
 #define WATCHY_LIB_VER "1.4.0"
-#endif

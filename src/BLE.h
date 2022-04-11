@@ -1,5 +1,4 @@
-#ifndef _BLE_H_
-#define _BLE_H_
+#pragma once
 
 #include "Arduino.h"
 
@@ -11,8 +10,6 @@
 #include "esp_ota_ops.h"
 
 #include "config.h"
-
-class BLE;
 
 class BLE
 {
@@ -38,5 +35,3 @@ class BLE
     BLECharacteristic * pOtaCharacteristic = NULL;
     BLECharacteristic * pWatchFaceNameCharacteristic = NULL;
 };
-
-#endif

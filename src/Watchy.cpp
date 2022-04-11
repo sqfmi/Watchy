@@ -48,7 +48,7 @@ void Watchy::init(String datetime)
 
 void Watchy::displayBusyCallback(const void*)
 {
-	gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
+	gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
 	esp_sleep_enable_gpio_wakeup();
 	esp_light_sleep_start();
 }

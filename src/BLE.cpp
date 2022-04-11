@@ -148,6 +148,7 @@ int BLE::updateStatus(){
   return status;
 }
 
-int BLE::howManyBytes(){
+int BLE::howManyBytes()
+{
   return bytesReceived;
 }

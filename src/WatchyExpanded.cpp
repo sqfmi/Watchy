@@ -6,11 +6,17 @@
 // Wire
 #include <Wire.h>
 
+// Fonts
+#include <Fonts/FreeMonoBold9pt7b.h>
+
+// Watchy
+#include "WatchyRTC.h"
+
 CWatchyExpanded::CWatchyExpanded() : m_display(GxEPD2_154_D67(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY))
 {
 }
 
-void CWatchyExpanded::AddWatchFace(Watchy* pFace)
+void CWatchyExpanded::AddWatchFace(CWatchFace* pFace)
 {
 	m_faces.push_back(pFace);
 }
@@ -23,44 +29,45 @@ void CWatchyExpanded::Init()
 
 	// Init the display here for all cases, if unused, it will do nothing
 	m_display.init(0, true, 10, true); // 10ms by spec, and fast pulldown reset
-	display.epd2.setBusyCallback(displayBusyCallback);
+	m_display.epd2.setBusyCallback(DisplayBusyCallback);
 
 	switch (wakeup_reason)
 	{
 		case ESP_SLEEP_WAKEUP_EXT0: //RTC Alarm
-			if(guiState == kWatchFace_State){
+			if(m_guiState == kWatchFace_State)
+			{
 				RTC.read(m_currentTime);
-				showWatchFace(true); //partial updates on tick
+				UpdateScreen(); //partial updates on tick
 			}
 			break;
 	//	case ESP_SLEEP_WAKEUP_EXT1: //button Press
 	//		handleButtonPress();
 	//	break;
-	//	default: //reset
-	//		RTC.config(datetime);
-	//		_bmaConfig();
-	//		RTC.read(currentTime);
-	//		//showWatchFace(false); //full update on reset
+		default: //reset
+			//RTC.config(datetime);
+			//_bmaConfig();
+			//RTC.read(currentTime);
+			//showWatchFace(false); //full update on reset
 		break;
 	}
-	//deepSleep();
+	DeepSleep();
 }
 
-void Watchy::DisplayBusyCallback(const void*)
+void CWatchyExpanded::DisplayBusyCallback(const void*)
 {
-	gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
+	gpio_wakeup_enable((gpio_num_t)BUSY, GPIO_INTR_LOW_LEVEL);
 	esp_sleep_enable_gpio_wakeup();
 	esp_light_sleep_start();
 }
 
-void UpdateScreen()
+void CWatchyExpanded::UpdateScreen()
 {
 	m_display.setFullWindow();
 	//drawWatchFace();
 	DrawBasicClock(); // Temp
 
 	m_display.display(true); //partial refresh
-	guiState = kWatchFace_State;
+	m_guiState = kWatchFace_State;
 }
 
 void CWatchyExpanded::DrawBasicClock()
@@ -90,7 +97,7 @@ void CWatchyExpanded::DrawBasicClock()
 
 void CWatchyExpanded::DeepSleep()
 {
-	display.hibernate();
+	m_display.hibernate();
 	RTC.clearAlarm(); //resets the alarm flag in the RTC
 
 	for(int i=0; i<40; i++) // Set pins 0-39 to input to avoid power leaking out

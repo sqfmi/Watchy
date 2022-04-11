@@ -9,6 +9,12 @@
 // Time
 #include <TimeLib.h>
 
+// Watchy
+#include "config.h"
+
+// Expanded
+#include "WatchFace.h"
+
 // Defs
 class CWatchFace;
 
@@ -22,7 +28,8 @@ class CWatchyExpanded
 		void Init();
 
 	private:
-		void DisplayBusyCallback(const void*);
+		static void DisplayBusyCallback(const void*);
+
 		void UpdateScreen();
 		void DeepSleep();
 
@@ -33,4 +40,5 @@ class CWatchyExpanded
 
 		GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> m_display;
 		tmElements_t m_currentTime;
+		std::int8_t m_guiState = kWatchFace_State;
 };

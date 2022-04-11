@@ -2,5 +2,6 @@
 
 class CWatchFace
 {
-
+	public:
+		CWatchFace() = default;
 };
