@@ -1,20 +1,17 @@
 #pragma once
 
-// Time
-#include <TimeLib.h>
-
 // Expanded
 #include "WatchFace.h"
 #include "WatchyExpanded.h"
 
-class CTimeWatchFace : public CWatchFace
+// Faces
+#include "TimeWatchFace.h"
+
+class CDateWatchFace : public CTimeWatchFace
 {
 	public:
-		virtual void Draw(CWatchyExpanded& expanded) override;
+		void Draw(CWatchyExpanded& expanded) override;
 
 		void StartDraw(CWatchyExpanded::ADisplay& display);
 		void DrawInternal(CWatchyExpanded& expanded);
-
-	protected:
-		tm m_currentLocalTime;
 };

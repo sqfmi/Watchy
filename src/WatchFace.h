@@ -10,6 +10,5 @@ class CWatchFace
 {
 	public:
 		CWatchFace() = default;
-		//override this method for different watch faces
-		virtual void Draw(CWatchyExpanded::ADisplay& display, const tmElements_t& time) = 0;
+		virtual void Draw(CWatchyExpanded& expanded) = 0; //override this method for different watch faces
 };

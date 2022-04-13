@@ -30,9 +30,6 @@
 namespace watchy_config
 {
 
-// Menu
-constexpr std::int8_t kWatchFace_State{-1};
-
 namespace display
 {
 // Display
@@ -46,16 +43,32 @@ constexpr std::uint8_t reset{9};
 constexpr std::uint8_t busy{19};
 };
 
+namespace pins
+{
+
 // RTC pins
 constexpr gpio_num_t rtc_pin{GPIO_NUM_27};
+
+#define ARDUINO_WATCHY_V20 1
+
+#if defined (ARDUINO_WATCHY_V10)
+	constexpr std::uint64_t up_btn_mask{GPIO_SEL_32};
+#elif defined (ARDUINO_WATCHY_V15)
+	constexpr std::uint64_t up_btn_mask{GPIO_SEL_32};
+#elif defined (ARDUINO_WATCHY_V20)
+	constexpr std::uint64_t up_btn_mask{GPIO_SEL_35};
+	constexpr std:: uint8_t batt_adc_pin{34};
+#endif
 
 // btn pins & masks
 constexpr std::uint64_t menu_btn_mask{GPIO_SEL_26};
 constexpr std::uint64_t back_btn_mask{GPIO_SEL_25};
-constexpr std::uint64_t up_btn_mask{GPIO_SEL_32};
 constexpr std::uint64_t down_btn_mask{GPIO_SEL_4};
 constexpr std::uint64_t btn_pin_mask{menu_btn_mask|back_btn_mask|up_btn_mask|down_btn_mask};
+
+};
 };
 
 namespace wc  = watchy_config;
 namespace wcd = watchy_config::display;
+namespace wcp = watchy_config::pins;
