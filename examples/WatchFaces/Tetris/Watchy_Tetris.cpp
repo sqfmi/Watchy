@@ -2,8 +2,6 @@
 
 const unsigned char *tetris_nums [10] = {tetris0, tetris1, tetris2, tetris3, tetris4, tetris5, tetris6, tetris7, tetris8, tetris9};
 
-WatchyTetris::WatchyTetris(){} //constructor
-
 void WatchyTetris::drawWatchFace(){
     display.fillScreen(GxEPD_WHITE);
     display.drawBitmap(0, 0, tetrisbg, DISPLAY_WIDTH, DISPLAY_HEIGHT, GxEPD_BLACK);
