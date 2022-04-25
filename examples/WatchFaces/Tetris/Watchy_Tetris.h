@@ -5,9 +5,8 @@
 #include "tetris.h"
 
 class WatchyTetris : public Watchy{
-    using Watchy::Watchy;
     public:
-        WatchyTetris();
+        using Watchy::Watchy;
         void drawWatchFace();
 };
 
