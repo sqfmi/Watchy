@@ -1,20 +1,20 @@
 #ifndef WATCHY_H
 #define WATCHY_H
 
-#include "BLE.h"
-#include "DSEG7_Classic_Bold_53.h"
-#include "WatchyRTC.h"
-#include "bma.h"
-#include "config.h"
 #include <Arduino.h>
-#include <Arduino_JSON.h>
-#include <Fonts/FreeMonoBold9pt7b.h>
-#include <GxEPD2_BW.h>
+#include <WiFiManager.h>
 #include <HTTPClient.h>
 #include <NTPClient.h>
-#include <WiFiManager.h>
 #include <WiFiUdp.h>
+#include <Arduino_JSON.h>
+#include <GxEPD2_BW.h>
 #include <Wire.h>
+#include <Fonts/FreeMonoBold9pt7b.h>
+#include "DSEG7_Classic_Bold_53.h"
+#include "WatchyRTC.h"
+#include "BLE.h"
+#include "bma.h"
+#include "config.h"
 
 typedef struct weatherData {
   int8_t temperature;
