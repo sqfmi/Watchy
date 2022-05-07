@@ -3,10 +3,10 @@
 
 #include "Arduino.h"
 
+#include <BLE2902.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
-#include <BLE2902.h>
 
 #include "esp_ota_ops.h"
 
@@ -14,29 +14,27 @@
 
 class BLE;
 
-class BLE
-{
-  public:
+class BLE {
+public:
+  BLE(void);
+  ~BLE(void);
 
-    BLE(void);
-    ~BLE(void);
+  bool begin(const char *localName);
+  int updateStatus();
+  int howManyBytes();
 
-    bool begin(const char* localName);
-    int updateStatus();
-    int howManyBytes();
-  
-  private:
-    String local_name;
+private:
+  String local_name;
 
-    BLEServer *pServer = NULL;
+  BLEServer *pServer = NULL;
 
-    BLEService *pESPOTAService = NULL;
-    BLECharacteristic * pESPOTAIdCharacteristic = NULL;
+  BLEService *pESPOTAService                 = NULL;
+  BLECharacteristic *pESPOTAIdCharacteristic = NULL;
 
-    BLEService *pService = NULL;
-    BLECharacteristic * pVersionCharacteristic = NULL;
-    BLECharacteristic * pOtaCharacteristic = NULL;
-    BLECharacteristic * pWatchFaceNameCharacteristic = NULL;
+  BLEService *pService                            = NULL;
+  BLECharacteristic *pVersionCharacteristic       = NULL;
+  BLECharacteristic *pOtaCharacteristic           = NULL;
+  BLECharacteristic *pWatchFaceNameCharacteristic = NULL;
 };
 
 #endif

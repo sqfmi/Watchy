@@ -1,91 +1,91 @@
 /*
-*
-****************************************************************************
-* Copyright (C) 2015 - 2016 Bosch Sensortec GmbH
-*
-* File : bma4.h
-*
-* Date: 12 Oct 2017
-*
-* Revision: 2.1.9 $
-*
-* Usage: Sensor Driver for BMA4 family of sensors
-*
-****************************************************************************
-*
-* Disclaimer
-*
-* Common:
-* Bosch Sensortec products are developed for the consumer goods industry.
-* They may only be used within the parameters of the respective valid
-* product data sheet.  Bosch Sensortec products are provided with the
-* express understanding that there is no warranty of fitness for a
-* particular purpose.They are not fit for use in life-sustaining,
-* safety or security sensitive systems or any system or device
-* that may lead to bodily harm or property damage if the system
-* or device malfunctions. In addition,Bosch Sensortec products are
-* not fit for use in products which interact with motor vehicle systems.
-* The resale and or use of products are at the purchasers own risk and
-* his own responsibility. The examination of fitness for the intended use
-* is the sole responsibility of the Purchaser.
-*
-* The purchaser shall indemnify Bosch Sensortec from all third party
-* claims, including any claims for incidental, or consequential damages,
-* arising from any product use not covered by the parameters of
-* the respective valid product data sheet or not approved by
-* Bosch Sensortec and reimburse Bosch Sensortec for all costs in
-* connection with such claims.
-*
-* The purchaser must monitor the market for the purchased products,
-* particularly with regard to product safety and inform Bosch Sensortec
-* without delay of all security relevant incidents.
-*
-* Engineering Samples are marked with an asterisk (*) or (e).
-* Samples may vary from the valid technical specifications of the product
-* series. They are therefore not intended or fit for resale to third
-* parties or for use in end products. Their sole purpose is internal
-* client testing. The testing of an engineering sample may in no way
-* replace the testing of a product series. Bosch Sensortec assumes
-* no liability for the use of engineering samples.
-* By accepting the engineering samples, the Purchaser agrees to indemnify
-* Bosch Sensortec from all claims arising from the use of engineering
-* samples.
-*
-* Special:
-* This software module (hereinafter called "Software") and any information
-* on application-sheets (hereinafter called "Information") is provided
-* free of charge for the sole purpose to support your application work.
-* The Software and Information is subject to the following
-* terms and conditions:
-*
-* The Software is specifically designed for the exclusive use for
-* Bosch Sensortec products by personnel who have special experience
-* and training. Do not use this Software if you do not have the
-* proper experience or training.
-*
-* This Software package is provided `` as is `` and without any expressed
-* or implied warranties,including without limitation, the implied warranties
-* of merchantability and fitness for a particular purpose.
-*
-* Bosch Sensortec and their representatives and agents deny any liability
-* for the functional impairment
-* of this Software in terms of fitness, performance and safety.
-* Bosch Sensortec and their representatives and agents shall not be liable
-* for any direct or indirect damages or injury, except as
-* otherwise stipulated in mandatory applicable law.
-*
-* The Information provided is believed to be accurate and reliable.
-* Bosch Sensortec assumes no responsibility for the consequences of use
-* of such Information nor for any infringement of patents or
-* other rights of third parties which may result from its use.
-* No license is granted by implication or otherwise under any patent or
-* patent rights of Bosch. Specifications mentioned in the Information are
-* subject to change without notice.
-**************************************************************************/
+ *
+ ****************************************************************************
+ * Copyright (C) 2015 - 2016 Bosch Sensortec GmbH
+ *
+ * File : bma4.h
+ *
+ * Date: 12 Oct 2017
+ *
+ * Revision: 2.1.9 $
+ *
+ * Usage: Sensor Driver for BMA4 family of sensors
+ *
+ ****************************************************************************
+ *
+ * Disclaimer
+ *
+ * Common:
+ * Bosch Sensortec products are developed for the consumer goods industry.
+ * They may only be used within the parameters of the respective valid
+ * product data sheet.  Bosch Sensortec products are provided with the
+ * express understanding that there is no warranty of fitness for a
+ * particular purpose.They are not fit for use in life-sustaining,
+ * safety or security sensitive systems or any system or device
+ * that may lead to bodily harm or property damage if the system
+ * or device malfunctions. In addition,Bosch Sensortec products are
+ * not fit for use in products which interact with motor vehicle systems.
+ * The resale and or use of products are at the purchasers own risk and
+ * his own responsibility. The examination of fitness for the intended use
+ * is the sole responsibility of the Purchaser.
+ *
+ * The purchaser shall indemnify Bosch Sensortec from all third party
+ * claims, including any claims for incidental, or consequential damages,
+ * arising from any product use not covered by the parameters of
+ * the respective valid product data sheet or not approved by
+ * Bosch Sensortec and reimburse Bosch Sensortec for all costs in
+ * connection with such claims.
+ *
+ * The purchaser must monitor the market for the purchased products,
+ * particularly with regard to product safety and inform Bosch Sensortec
+ * without delay of all security relevant incidents.
+ *
+ * Engineering Samples are marked with an asterisk (*) or (e).
+ * Samples may vary from the valid technical specifications of the product
+ * series. They are therefore not intended or fit for resale to third
+ * parties or for use in end products. Their sole purpose is internal
+ * client testing. The testing of an engineering sample may in no way
+ * replace the testing of a product series. Bosch Sensortec assumes
+ * no liability for the use of engineering samples.
+ * By accepting the engineering samples, the Purchaser agrees to indemnify
+ * Bosch Sensortec from all claims arising from the use of engineering
+ * samples.
+ *
+ * Special:
+ * This software module (hereinafter called "Software") and any information
+ * on application-sheets (hereinafter called "Information") is provided
+ * free of charge for the sole purpose to support your application work.
+ * The Software and Information is subject to the following
+ * terms and conditions:
+ *
+ * The Software is specifically designed for the exclusive use for
+ * Bosch Sensortec products by personnel who have special experience
+ * and training. Do not use this Software if you do not have the
+ * proper experience or training.
+ *
+ * This Software package is provided `` as is `` and without any expressed
+ * or implied warranties,including without limitation, the implied warranties
+ * of merchantability and fitness for a particular purpose.
+ *
+ * Bosch Sensortec and their representatives and agents deny any liability
+ * for the functional impairment
+ * of this Software in terms of fitness, performance and safety.
+ * Bosch Sensortec and their representatives and agents shall not be liable
+ * for any direct or indirect damages or injury, except as
+ * otherwise stipulated in mandatory applicable law.
+ *
+ * The Information provided is believed to be accurate and reliable.
+ * Bosch Sensortec assumes no responsibility for the consequences of use
+ * of such Information nor for any infringement of patents or
+ * other rights of third parties which may result from its use.
+ * No license is granted by implication or otherwise under any patent or
+ * patent rights of Bosch. Specifications mentioned in the Information are
+ * subject to change without notice.
+ **************************************************************************/
 /*! \file bma4.h
     \brief Sensor Driver for BMA4 family of sensors */
 #ifndef BMA4_H__
-#define	BMA4_H__
+#define BMA4_H__
 
 /*********************************************************************/
 /* header files */
@@ -157,7 +157,8 @@ uint16_t bma4_write_config_file(struct bma4_dev *dev);
  *	@retval 0 -> Success
  *	@retval Any non zero value -> Fail
  */
-uint16_t bma4_write_regs(uint8_t addr, uint8_t *data, uint8_t len, struct bma4_dev *dev);
+uint16_t bma4_write_regs(uint8_t addr, uint8_t *data, uint8_t len,
+                         struct bma4_dev *dev);
 
 /*!
  *	@brief This API checks whether the read operation requested is for
@@ -172,7 +173,8 @@ uint16_t bma4_write_regs(uint8_t addr, uint8_t *data, uint8_t len, struct bma4_d
  *	@retval 0 -> Success
  *	@retval Any non zero value -> Fail
  */
-uint16_t bma4_read_regs(uint8_t addr, uint8_t *data, uint8_t len, struct bma4_dev *dev);
+uint16_t bma4_read_regs(uint8_t addr, uint8_t *data, uint8_t len,
+                        struct bma4_dev *dev);
 
 /*!
  *	@brief This API reads the error status from the sensor.
@@ -211,7 +213,8 @@ uint16_t bma4_read_regs(uint8_t addr, uint8_t *data, uint8_t len, struct bma4_de
  *	@retval 0 -> Success
  *	@retval Any non zero value -> Fail
  */
-uint16_t bma4_get_error_status(struct bma4_err_reg *err_reg, struct bma4_dev *dev);
+uint16_t bma4_get_error_status(struct bma4_err_reg *err_reg,
+                               struct bma4_dev *dev);
 
 /*!
  *	@brief This API reads the sensor status from the dev sensor.
@@ -291,7 +294,8 @@ uint16_t bma4_get_sensor_time(uint32_t *sensor_time, struct bma4_dev *dev);
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_get_temperature(int32_t *temp, uint8_t temp_unit, struct bma4_dev *dev);
+uint16_t bma4_get_temperature(int32_t *temp, uint8_t temp_unit,
+                              struct bma4_dev *dev);
 
 /*!
  *	@brief This API reads the Output data rate, Bandwidth, perf_mode
@@ -342,7 +346,8 @@ uint16_t bma4_get_temperature(int32_t *temp, uint8_t temp_unit, struct bma4_dev 
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_get_accel_config(struct bma4_accel_config *accel, struct bma4_dev *dev);
+uint16_t bma4_get_accel_config(struct bma4_accel_config *accel,
+                               struct bma4_dev *dev);
 
 /*!
  *	@brief This API sets the output_data_rate, bandwidth, perf_mode
@@ -393,7 +398,8 @@ uint16_t bma4_get_accel_config(struct bma4_accel_config *accel, struct bma4_dev 
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_set_accel_config(const struct bma4_accel_config *accel, struct bma4_dev *dev);
+uint16_t bma4_set_accel_config(const struct bma4_accel_config *accel,
+                               struct bma4_dev *dev);
 
 /*!
  *	@brief This API sets the advance power save mode in the sensor.
@@ -411,7 +417,7 @@ uint16_t bma4_set_accel_config(const struct bma4_accel_config *accel, struct bma
  *
  */
 uint16_t bma4_set_advance_power_save(uint8_t adv_pwr_save,
-	struct bma4_dev *dev);
+                                     struct bma4_dev *dev);
 
 /*!
  *	@brief This API reads the status of advance power save mode
@@ -429,7 +435,8 @@ uint16_t bma4_set_advance_power_save(uint8_t adv_pwr_save,
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_get_advance_power_save(uint8_t *adv_pwr_save, struct bma4_dev *dev);
+uint16_t bma4_get_advance_power_save(uint8_t *adv_pwr_save,
+                                     struct bma4_dev *dev);
 
 /*!
  *	@brief This API sets the FIFO self wake up functionality in the sensor.
@@ -446,7 +453,8 @@ uint16_t bma4_get_advance_power_save(uint8_t *adv_pwr_save, struct bma4_dev *dev
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_set_fifo_self_wakeup(uint8_t fifo_self_wakeup, struct bma4_dev *dev);
+uint16_t bma4_set_fifo_self_wakeup(uint8_t fifo_self_wakeup,
+                                   struct bma4_dev *dev);
 
 /*!
  *	@brief This API gets the status of FIFO self wake up functionality from
@@ -464,7 +472,8 @@ uint16_t bma4_set_fifo_self_wakeup(uint8_t fifo_self_wakeup, struct bma4_dev *de
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_get_fifo_self_wakeup(uint8_t *fifo_self_wake_up, struct bma4_dev *dev);
+uint16_t bma4_get_fifo_self_wakeup(uint8_t *fifo_self_wake_up,
+                                   struct bma4_dev *dev);
 
 /*!
  *	@brief This API enables or disables the Accel in the sensor.
@@ -562,7 +571,7 @@ uint16_t bma4_get_spi_interface(uint8_t *spi, struct bma4_dev *dev);
  */
 uint16_t bma4_set_spi_interface(uint8_t spi, struct bma4_dev *dev);
 
- /*!
+/*!
  *	@brief This API writes the available sensor specific commands
  *	to the sensor.
  *
@@ -851,7 +860,8 @@ uint16_t bma4_set_fifo_wm(uint16_t fifo_wm, struct bma4_dev *dev);
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_get_accel_fifo_filter_data(uint8_t *accel_fifo_filter, struct bma4_dev *dev);
+uint16_t bma4_get_accel_fifo_filter_data(uint8_t *accel_fifo_filter,
+                                         struct bma4_dev *dev);
 
 /*!
  *	@brief This API sets the condition of Accel FIFO data either to
@@ -870,7 +880,8 @@ uint16_t bma4_get_accel_fifo_filter_data(uint8_t *accel_fifo_filter, struct bma4
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_set_accel_fifo_filter_data(uint8_t accel_fifo_filter, struct bma4_dev *dev);
+uint16_t bma4_set_accel_fifo_filter_data(uint8_t accel_fifo_filter,
+                                         struct bma4_dev *dev);
 
 /*!
  *	@brief This API reads the down sampling rates which is configured
@@ -939,9 +950,10 @@ uint16_t bma4_get_fifo_length(uint16_t *fifo_length, struct bma4_dev *dev);
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_second_if_mag_compensate_xyz(struct bma4_mag_fifo_data mag_fifo_data,
-							uint8_t mag_second_if,
-							struct bma4_mag *compensated_mag_data);
+uint16_t
+bma4_second_if_mag_compensate_xyz(struct bma4_mag_fifo_data mag_fifo_data,
+                                  uint8_t mag_second_if,
+                                  struct bma4_mag *compensated_mag_data);
 
 /*!
  *	@brief This API reads Mag. x,y and z axis data from either BMM150 or
@@ -963,7 +975,8 @@ uint16_t bma4_second_if_mag_compensate_xyz(struct bma4_mag_fifo_data mag_fifo_da
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_read_mag_xyz(struct bma4_mag *mag, uint8_t sensor_select, struct bma4_dev *dev);
+uint16_t bma4_read_mag_xyz(struct bma4_mag *mag, uint8_t sensor_select,
+                           struct bma4_dev *dev);
 
 /*!
  *	@brief This API reads the auxiliary I2C interface configuration which
@@ -1056,7 +1069,8 @@ uint16_t bma4_get_mag_data_rdy(uint8_t *data_rdy, struct bma4_dev *dev);
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_get_asic_status(struct bma4_asic_status *asic_status, struct bma4_dev *dev);
+uint16_t bma4_get_asic_status(struct bma4_asic_status *asic_status,
+                              struct bma4_dev *dev);
 
 /*!
  *	@brief This API enables the offset compensation for filtered and
@@ -1122,7 +1136,8 @@ uint16_t bma4_get_offset_comp(uint8_t *offset_en, struct bma4_dev *dev);
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_extract_accel(struct bma4_accel *accel_data, uint16_t *accel_length, const struct bma4_dev *dev);
+uint16_t bma4_extract_accel(struct bma4_accel *accel_data,
+                            uint16_t *accel_length, const struct bma4_dev *dev);
 
 /*!
  *	@brief This API parses and extracts the magnetometer frames from
@@ -1148,7 +1163,8 @@ uint16_t bma4_extract_accel(struct bma4_accel *accel_data, uint16_t *accel_lengt
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_extract_mag(struct bma4_mag *mag_data, uint16_t *mag_length, const struct bma4_dev *dev);
+uint16_t bma4_extract_mag(struct bma4_mag *mag_data, uint16_t *mag_length,
+                          const struct bma4_dev *dev);
 
 /*!
  *	@brief This API performs Fast Offset Compensation for Accel.
@@ -1170,7 +1186,8 @@ uint16_t bma4_extract_mag(struct bma4_mag *mag_data, uint16_t *mag_length, const
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_perform_accel_foc(const int32_t accel_g_value[3], struct bma4_dev *dev);
+uint16_t bma4_perform_accel_foc(const int32_t accel_g_value[3],
+                                struct bma4_dev *dev);
 /*!
  *	@brief This API checks whether the self test functionality of the sensor
  *	is working or not
@@ -1230,7 +1247,8 @@ uint16_t bma4_selftest_config(uint8_t sign, struct bma4_dev *dev);
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_map_interrupt(uint8_t int_line, uint16_t int_map, uint8_t enable, struct bma4_dev *dev);
+uint16_t bma4_map_interrupt(uint8_t int_line, uint16_t int_map, uint8_t enable,
+                            struct bma4_dev *dev);
 
 /*!
  *	@brief This API sets the interrupt mode in the sensor.
@@ -1305,7 +1323,8 @@ uint16_t bma4_get_interrupt_mode(uint8_t *mode, struct bma4_dev *dev);
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_set_aux_mag_config(const struct bma4_aux_mag_config *aux_mag, struct bma4_dev *dev);
+uint16_t bma4_set_aux_mag_config(const struct bma4_aux_mag_config *aux_mag,
+                                 struct bma4_dev *dev);
 
 /*!
  *	@brief This API reads the auxiliary Mag(BMM150 or AKM9916) output data
@@ -1343,7 +1362,8 @@ uint16_t bma4_set_aux_mag_config(const struct bma4_aux_mag_config *aux_mag, stru
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_get_aux_mag_config(struct bma4_aux_mag_config *aux_mag, struct bma4_dev *dev);
+uint16_t bma4_get_aux_mag_config(struct bma4_aux_mag_config *aux_mag,
+                                 struct bma4_dev *dev);
 
 /*!	@brief This API sets the FIFO configuration in the sensor.
  *
@@ -1372,7 +1392,8 @@ uint16_t bma4_get_aux_mag_config(struct bma4_aux_mag_config *aux_mag, struct bma
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_set_fifo_config(uint8_t config, uint8_t enable, struct bma4_dev *dev);
+uint16_t bma4_set_fifo_config(uint8_t config, uint8_t enable,
+                              struct bma4_dev *dev);
 
 /*!	@brief This API reads the FIFO configuration from the sensor.
  *
@@ -1441,8 +1462,9 @@ uint16_t bma4_get_fifo_config(uint8_t *fifo_config, struct bma4_dev *dev);
  *	@retval 0 -> Success
  *	@retval Any non zero value -> Fail
  */
-uint16_t bma4_set_int_pin_config(const struct bma4_int_pin_config *int_pin_config, uint8_t int_line,
-		struct bma4_dev *dev);
+uint16_t
+bma4_set_int_pin_config(const struct bma4_int_pin_config *int_pin_config,
+                        uint8_t int_line, struct bma4_dev *dev);
 
 /*! @brief This API reads the electrical behavior of interrupt pin1 or pin2
  *  from the sensor.
@@ -1483,10 +1505,12 @@ uint16_t bma4_set_int_pin_config(const struct bma4_int_pin_config *int_pin_confi
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_get_int_pin_config(struct bma4_int_pin_config *int_pin_config, uint8_t int_line, struct bma4_dev *dev);
+uint16_t bma4_get_int_pin_config(struct bma4_int_pin_config *int_pin_config,
+                                 uint8_t int_line, struct bma4_dev *dev);
 
 /*!
- *	@brief This API reads the Feature and Hardware interrupt status from the sensor.
+ *	@brief This API reads the Feature and Hardware interrupt status from the
+ *sensor.
  *
  *	@param[out] int_status : Variable used to get the interrupt status.
  *	@param[in] dev       : Structure instance of bma4_dev.
@@ -1544,14 +1568,16 @@ uint16_t bma4_aux_interface_init(struct bma4_dev *dev);
  *	@param[in]	len : User specified data length
  *	@param[out]	aux_data : Pointer variable to store data read
  *	@param[in]	aux_reg_addr : Variable to pass address from where
- *								data is to be read
+ *								data is to be
+ *read
  *
  *	@return Result of API execution status
  *	@retval 0 -> Success
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_aux_read(uint8_t aux_reg_addr, uint8_t *aux_data, uint16_t len, struct bma4_dev *dev);
+uint16_t bma4_aux_read(uint8_t aux_reg_addr, uint8_t *aux_data, uint16_t len,
+                       struct bma4_dev *dev);
 
 /*!
  *	@brief This API writes the data into the auxiliary sensor
@@ -1560,15 +1586,16 @@ uint16_t bma4_aux_read(uint8_t aux_reg_addr, uint8_t *aux_data, uint16_t len, st
  *	@param[in]	len : User specified data length
  *	@param[out]	aux_data : Pointer variable to store data read
  *	@param[in]	aux_reg_addr : Variable to pass address from where
- *								data is to be written
+ *								data is to be
+ *written
  *
  *	@return Result of API execution status
  *	@retval 0 -> Success
  *	@retval Any non zero value -> Fail
  *
  */
-uint16_t bma4_aux_write(uint8_t aux_reg_addr, uint8_t *aux_data, uint16_t len, struct bma4_dev *dev);
-
+uint16_t bma4_aux_write(uint8_t aux_reg_addr, uint8_t *aux_data, uint16_t len,
+                        struct bma4_dev *dev);
 
 #endif
 /* End of __BMA4_H__ */
