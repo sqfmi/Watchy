@@ -15,9 +15,8 @@ Visit [**https://watchy.sqfmi.com**](https://watchy.sqfmi.com) for documentation
 2. Install this library (search for **Watchy** in the library manager), and any other dependencies when prompted
 3. Check out the examples under ```Examples``` -> ```Watchy```
 4. Compile & Upload with these board settings:
-    * Board: "Watchy"
+    * Board: "ESP32 Dev Module"
     * Partition Scheme: "Huge App"
-    * Board Revision: "Watchy v2.0" (if purchased in 2022)
     * All Other Settings: leave to default
 
 You may also have to install the [CP2104 USB to Serial drivers](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers) if the port is not automatically detected.
