@@ -114,6 +114,7 @@ void Watchy::handleButtonPress() {
     } else if (guiState == FW_UPDATE_STATE) {
       showMenu(menuIndex, false); // exit to menu if already in app
     } else if (guiState == WATCHFACE_STATE) {
+      button1();
       return;
     }
   }
@@ -126,6 +127,7 @@ void Watchy::handleButtonPress() {
       }
       showMenu(menuIndex, true);
     } else if (guiState == WATCHFACE_STATE) {
+      button2();
       return;
     }
   }
@@ -138,6 +140,7 @@ void Watchy::handleButtonPress() {
       }
       showMenu(menuIndex, true);
     } else if (guiState == WATCHFACE_STATE) {
+      button3();
       return;
     }
   }
@@ -578,6 +581,17 @@ void Watchy::drawWatchFace() {
   }
   display.println(currentTime.Minute);
 }
+
+void Watchy::button1()
+{
+}
+void Watchy::button2()
+{
+}
+void Watchy::button3()
+{
+}
+
 
 weatherData Watchy::getWeatherData() {
   return getWeatherData(settings.cityID, settings.weatherUnit,

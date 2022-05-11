@@ -73,6 +73,9 @@ public:
   void showWatchFace(bool partialRefresh);
   virtual void drawWatchFace(); // override this method for different watch
                                 // faces
+  virtual void button1(); // override these methods to handle different non-menu button presses
+  virtual void button2();
+  virtual void button3();
 
 private:
   void _bmaConfig();
