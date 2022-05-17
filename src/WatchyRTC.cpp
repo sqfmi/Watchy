@@ -47,6 +47,7 @@ void WatchyRTC::read(tmElements_t &tm) {
   if (rtcType == DS3231) {
     rtc_ds.read(tm);
   } else {
+    rtc_pcf.getDateTime();
     tm.Year  = y2kYearToTm(rtc_pcf.getYear());
     tm.Month = rtc_pcf.getMonth();
     tm.Day   = rtc_pcf.getDay();
