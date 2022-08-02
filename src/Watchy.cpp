@@ -604,13 +604,16 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
       http.begin(weatherQueryURL.c_str());
       int httpResponseCode = http.GET();
       if (httpResponseCode == 200) {
-        String payload             = http.getString();
-        JSONVar responseObject     = JSON.parse(payload);
-        currentWeather.temperature = int(responseObject["main"]["temp"]);
-        currentWeather.weatherConditionCode =
-            int(responseObject["weather"][0]["id"]);
-        currentWeather.weatherDescription =
-            responseObject["weather"][0]["main"];
+        String payload = http.getString();
+        DynamicJsonDocument doc(1024);
+        if (auto error = deserializeJson(doc, payload)) {
+          Serial.println(error.c_str());
+        } else {
+          currentWeather.temperature = doc["main"]["temp"].as<int>();
+          currentWeather.isMetric = settings.weatherUnit == String("metric");
+          currentWeather.weatherConditionCode = doc["weather"][0]["id"].as<int16_t>();
+          currentWeather.weatherDescription = doc["weather"][0]["main"].as<String>();
+        }
       } else {
         // http error
       }

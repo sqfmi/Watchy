@@ -17,7 +17,7 @@
   "platforms": ["espressif32"],
   "dependencies": [
     { "name": "Adafruit GFX Library" },
-    { "name": "Arduino_JSON" },
+    { "name": "ArduinoJSON" },
     { "name": "DS3232RTC" },
     { "name": "NTPClient" },
     {
