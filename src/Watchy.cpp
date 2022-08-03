@@ -52,10 +52,16 @@ void Watchy::displayBusyCallback(const void *) {
 
 void Watchy::deepSleep() {
   display.hibernate();
+  if (displayFullInit) // For some reason, seems to be enabled on first boot
+    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
   displayFullInit = false; // Notify not to init it again
   RTC.clearAlarm();        // resets the alarm flag in the RTC
-                    // Set pins 0-39 to input to avoid power leaking out
-  for (int i = 0; i < 40; i++) {
+
+  // Set GPIOs 0-39 to input to avoid power leaking out
+  const uint64_t ignore = 0b11110001000000110000100111000010; // Ignore some GPIOs due to resets
+  for (int i = 0; i < GPIO_NUM_MAX; i++) {
+    if ((ignore >> i) & 0b1)
+      continue;
     pinMode(i, INPUT);
   }
   esp_sleep_enable_ext0_wakeup((gpio_num_t)RTC_INT_PIN,
