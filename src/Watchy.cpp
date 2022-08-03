@@ -20,6 +20,7 @@ void Watchy::init(String datetime) {
   RTC.init();
 
   // Init the display here for all cases, if unused, it will do nothing
+  display.epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0)); // Set SPI to 20Mhz (default is 4Mhz)
   display.init(0, displayFullInit, 10,
                true); // 10ms by spec, and fast pulldown reset
   display.epd2.setBusyCallback(displayBusyCallback);
