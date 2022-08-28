@@ -12,8 +12,6 @@
 
 #include "config.h"
 
-class BLE;
-
 class BLE {
 public:
   BLE(void);
