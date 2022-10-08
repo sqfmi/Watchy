@@ -2,6 +2,14 @@
 #define CONFIG_H
 
 //pins
+#if !defined(ARDUINO_WATCHY_V10) && !defined(ARDUINO_WATCHY_V15) && !defined(ARDUINO_WATCHY_V20)
+
+#pragma message "Please install the latest ESP32 Arduino Core (2.0.5+) and choose Watchy as the target board"
+#pragma message "Hardware revision is not defined at the project level, please define in config.h. Defaulting to ARDUINO_WATCHY_V20"
+
+//Change to your board version
+#define ARDUINO_WATCHY_V20
+
 #define MENU_BTN_PIN 26
 #define BACK_BTN_PIN 25
 #define DOWN_BTN_PIN 4
@@ -13,12 +21,6 @@
 #define ACC_INT_2_PIN 12
 #define VIB_MOTOR_PIN 13
 #define RTC_INT_PIN 27
-
-
-#if !defined(ARDUINO_WATCHY_V10) && !defined(ARDUINO_WATCHY_V15) && !defined(ARDUINO_WATCHY_V20)
-    #warning Hardware revision is not defined at the project level. Using hard-coded value
-    #define ARDUINO_WATCHY_V20
-#endif
 
 #if defined (ARDUINO_WATCHY_V10)
     #define UP_BTN_PIN 32
@@ -42,6 +44,8 @@
 #define DOWN_BTN_MASK GPIO_SEL_4
 #define ACC_INT_MASK  GPIO_SEL_14
 #define BTN_PIN_MASK  MENU_BTN_MASK|BACK_BTN_MASK|UP_BTN_MASK|DOWN_BTN_MASK
+
+#endif
 
 //display
 #define DISPLAY_WIDTH 200
@@ -72,5 +76,5 @@
 #define HARDWARE_VERSION_MAJOR 1
 #define HARDWARE_VERSION_MINOR 0
 // Versioning
-#define WATCHY_LIB_VER "1.4.1"
+#define WATCHY_LIB_VER "1.4.2"
 #endif
