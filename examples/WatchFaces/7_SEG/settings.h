@@ -10,8 +10,7 @@
 #define WEATHER_UPDATE_INTERVAL 30 //must be greater than 5, measured in minutes
 //NTP Settings
 #define NTP_SERVER "pool.ntp.org"
-#define GMT_OFFSET_SEC 3600 * -5 //New York is UTC -5
-#define DST_OFFSET_SEC 3600
+#define GMT_OFFSET_SEC 3600 * -5 //New York is UTC -5 EST, -4 EDT
 
 watchySettings settings{
     CITY_ID,
@@ -21,8 +20,7 @@ watchySettings settings{
     TEMP_LANG,
     WEATHER_UPDATE_INTERVAL,
     NTP_SERVER,
-    GMT_OFFSET_SEC,
-    DST_OFFSET_SEC
+    GMT_OFFSET_SEC
 };
 
 #endif

@@ -62,7 +62,8 @@ public:
   void showUpdateFW();
   void showSyncNTP();
   bool syncNTP();
-  bool syncNTP(long gmt, int dst, String ntpServer);
+  bool syncNTP(long gmt);
+  bool syncNTP(long gmt, String ntpServer);
   void setTime();
   void setupWifi();
   bool connectWiFi();

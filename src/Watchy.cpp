@@ -54,7 +54,7 @@ void Watchy::displayBusyCallback(const void *) {
 void Watchy::deepSleep() {
   display.hibernate();
   if (displayFullInit) // For some reason, seems to be enabled on first boot
-    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
+    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
   displayFullInit = false; // Notify not to init it again
   RTC.clearAlarm();        // resets the alarm flag in the RTC
 
@@ -618,6 +618,8 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
             int(responseObject["weather"][0]["id"]);
         currentWeather.weatherDescription =
             responseObject["weather"][0]["main"];
+        // sync NTP during weather API call and use timezone of city
+        syncNTP(long(responseObject["timezone"]));
       } else {
         // http error
       }
@@ -975,13 +977,17 @@ void Watchy::showSyncNTP() {
 
 bool Watchy::syncNTP() { // NTP sync - call after connecting to WiFi and
                          // remember to turn it back off
-  return syncNTP(settings.gmtOffset, settings.dstOffset,
+  return syncNTP(settings.gmtOffset,
                  settings.ntpServer.c_str());
 }
 
-bool Watchy::syncNTP(long gmt, int dst,
-                     String ntpServer) { // NTP sync - call after connecting to
-                                         // WiFi and remember to turn it back off
+bool Watchy::syncNTP(long gmt) {
+  return syncNTP(gmt, settings.ntpServer.c_str());
+}
+
+bool Watchy::syncNTP(long gmt, String ntpServer) {
+  // NTP sync - call after connecting to
+  // WiFi and remember to turn it back off
   WiFiUDP ntpUDP;
   NTPClient timeClient(ntpUDP, ntpServer.c_str(), gmt);
   timeClient.begin();
