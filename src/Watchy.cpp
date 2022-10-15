@@ -12,6 +12,7 @@ RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR bool displayFullInit       = true;
+RTC_DATA_ATTR bool alreadyVibrated       = false;
 
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -30,6 +31,15 @@ void Watchy::init(String datetime) {
     if (guiState == WATCHFACE_STATE) {
       RTC.read(currentTime);
       showWatchFace(true); // partial updates on tick
+      if (settings.vibrateOClock) {
+        if (currentTime.Minute == 0
+            && !alreadyVibrated) {
+          vibMotor(75, 4);
+          alreadyVibrated = true;
+        } else {
+          alreadyVibrated = false;
+        }
+      }
     }
     break;
   case ESP_SLEEP_WAKEUP_EXT1: // button Press
@@ -40,6 +50,7 @@ void Watchy::init(String datetime) {
     _bmaConfig();
     RTC.read(currentTime);
     showWatchFace(false); // full update on reset
+    vibMotor(75, 4);
     break;
   }
   deepSleep();
