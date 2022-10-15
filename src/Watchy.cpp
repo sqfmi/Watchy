@@ -12,6 +12,7 @@ RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR bool displayFullInit       = true;
+RTC_DATA_ATTR long gmtOffset = 0;
 
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -38,6 +39,7 @@ void Watchy::init(String datetime) {
   default: // reset
     RTC.config(datetime);
     _bmaConfig();
+    gmtOffset = settings.gmtOffset;
     RTC.read(currentTime);
     showWatchFace(false); // full update on reset
     break;
@@ -619,7 +621,7 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
         currentWeather.weatherDescription =
             responseObject["weather"][0]["main"];
         // sync NTP during weather API call and use timezone of city
-        syncNTP(long(responseObject["timezone"]));
+        gmtOffset = int(responseObject["timezone"]);
       } else {
         // http error
       }
@@ -940,6 +942,8 @@ void Watchy::showSyncNTP() {
   display.setTextColor(GxEPD_WHITE);
   display.setCursor(0, 30);
   display.println("Syncing NTP... ");
+  display.print("GMT offset: ");
+  display.println(gmtOffset);
   display.display(false); // full refresh
   if (connectWiFi()) {
     if (syncNTP()) {
@@ -977,7 +981,7 @@ void Watchy::showSyncNTP() {
 
 bool Watchy::syncNTP() { // NTP sync - call after connecting to WiFi and
                          // remember to turn it back off
-  return syncNTP(settings.gmtOffset,
+  return syncNTP(gmtOffset,
                  settings.ntpServer.c_str());
 }
 
