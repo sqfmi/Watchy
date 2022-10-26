@@ -12,7 +12,6 @@ RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR bool displayFullInit       = true;
-RTC_DATA_ATTR bool alreadyVibrated       = false;
 
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -32,12 +31,9 @@ void Watchy::init(String datetime) {
       RTC.read(currentTime);
       showWatchFace(true); // partial updates on tick
       if (settings.vibrateOClock) {
-        if (currentTime.Minute == 0
-            && !alreadyVibrated) {
+        if (currentTime.Minute == 0) {
+          // The RTC wakes us up once per minute
           vibMotor(75, 4);
-          alreadyVibrated = true;
-        } else {
-          alreadyVibrated = false;
         }
       }
     }
