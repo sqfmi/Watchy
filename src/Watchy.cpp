@@ -30,6 +30,12 @@ void Watchy::init(String datetime) {
     if (guiState == WATCHFACE_STATE) {
       RTC.read(currentTime);
       showWatchFace(true); // partial updates on tick
+      if (settings.vibrateOClock) {
+        if (currentTime.Minute == 0) {
+          // The RTC wakes us up once per minute
+          vibMotor(75, 4);
+        }
+      }
     }
     break;
   case ESP_SLEEP_WAKEUP_EXT1: // button Press
@@ -40,6 +46,7 @@ void Watchy::init(String datetime) {
     _bmaConfig();
     RTC.read(currentTime);
     showWatchFace(false); // full update on reset
+    vibMotor(75, 4);
     break;
   }
   deepSleep();
