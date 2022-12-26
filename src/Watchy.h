@@ -11,6 +11,7 @@
 #include <Wire.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include "DSEG7_Classic_Bold_53.h"
+#include "Display.h"
 #include "WatchyRTC.h"
 #include "BLE.h"
 #include "bma.h"
@@ -42,7 +43,7 @@ typedef struct watchySettings {
 class Watchy {
 public:
   static WatchyRTC RTC;
-  static GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> display;
+  static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> display;
   tmElements_t currentTime;
   watchySettings settings;
 
