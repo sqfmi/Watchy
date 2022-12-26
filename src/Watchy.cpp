@@ -13,6 +13,7 @@ RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR bool displayFullInit       = true;
 RTC_DATA_ATTR long gmtOffset = 0;
+RTC_DATA_ATTR bool alreadyInMenu         = true;
 
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -28,9 +29,26 @@ void Watchy::init(String datetime) {
 
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0: // RTC Alarm
-    if (guiState == WATCHFACE_STATE) {
-      RTC.read(currentTime);
+    RTC.read(currentTime);
+    switch (guiState) {
+    case WATCHFACE_STATE:
       showWatchFace(true); // partial updates on tick
+      if (settings.vibrateOClock) {
+        if (currentTime.Minute == 0) {
+          // The RTC wakes us up once per minute
+          vibMotor(75, 4);
+        }
+      }
+      break;
+    case MAIN_MENU_STATE:
+      // Return to watchface if in menu for more than one tick
+      if (alreadyInMenu) {
+        guiState = WATCHFACE_STATE;
+        showWatchFace(false);
+      } else {
+        alreadyInMenu = true;
+      }
+      break;
     }
     break;
   case ESP_SLEEP_WAKEUP_EXT1: // button Press
@@ -42,6 +60,7 @@ void Watchy::init(String datetime) {
     gmtOffset = settings.gmtOffset;
     RTC.read(currentTime);
     showWatchFace(false); // full update on reset
+    vibMotor(75, 4);
     break;
   }
   deepSleep();
@@ -259,6 +278,7 @@ void Watchy::showMenu(byte menuIndex, bool partialRefresh) {
   display.display(partialRefresh);
 
   guiState = MAIN_MENU_STATE;
+  alreadyInMenu = false;
 }
 
 void Watchy::showFastMenu(byte menuIndex) {
