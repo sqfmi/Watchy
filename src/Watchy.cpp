@@ -639,7 +639,7 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
         currentWeather.weatherConditionCode =
             int(responseObject["weather"][0]["id"]);
         currentWeather.weatherDescription =
-            responseObject["weather"][0]["main"];
+	  JSONVar::stringify(responseObject["weather"][0]["main"]);
         // sync NTP during weather API call and use timezone of city
         gmtOffset = int(responseObject["timezone"]);
         syncNTP(gmtOffset);
