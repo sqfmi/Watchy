@@ -25,3 +25,8 @@ You may also have to install the [CP2104 USB to Serial drivers](https://www.sila
 ### Have Fun! :)
 
 
+### Got Questions?
+
+Join our [Discord](https://discord.gg/ZXDegGV8E7)
+
+
