@@ -784,6 +784,8 @@ void Watchy::setupWifi() {
   } else {
     display.println("Connected to");
     display.println(WiFi.SSID());
+		display.println("Local IP:");
+		display.println(WiFi.localIP());
   }
   display.display(false); // full refresh
   // turn off radios
@@ -805,6 +807,8 @@ void Watchy::_configModeCallback(WiFiManager *myWiFiManager) {
   display.println(WIFI_AP_SSID);
   display.print("IP: ");
   display.println(WiFi.softAPIP());
+	display.println("MAC address:");
+	display.println(WiFi.softAPmacAddress().c_str());
   display.display(false); // full refresh
 }
 
