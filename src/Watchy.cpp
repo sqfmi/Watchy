@@ -640,6 +640,7 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
             int(responseObject["weather"][0]["id"]);
         currentWeather.weatherDescription =
 	  JSONVar::stringify(responseObject["weather"][0]["main"]);
+	    currentWeather.external = true;
         // sync NTP during weather API call and use timezone of city
         gmtOffset = int(responseObject["timezone"]);
         syncNTP(gmtOffset);
@@ -657,6 +658,7 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
       }
       currentWeather.temperature          = temperature;
       currentWeather.weatherConditionCode = 800;
+      currentWeather.external             = false;
     }
     weatherIntervalCounter = 0;
   } else {
