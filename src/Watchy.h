@@ -56,8 +56,7 @@ public:
   void vibMotor(uint8_t intervalMs = 100, uint8_t length = 20);
 
   void handleButtonPress();
-  void showMenu(byte menuIndex, bool partialRefresh);
-  void showFastMenu(byte menuIndex);
+  void showMainMenu();
   void showAbout();
   void showBuzz();
   void showAccelerometer();
@@ -75,10 +74,10 @@ public:
   void updateFWBegin();
 
   void showWatchFace(bool partialRefresh);
-  virtual void drawWatchFace(); // override this method for different watch
-                                // faces
+  virtual void drawWatchFace(); // override this method for different watch faces
 
 private:
+  int getMenuSelection(const char* menuItems[], int menuLength, int selectionStartIndex, int timeOut);
   void _bmaConfig();
   static void _configModeCallback(WiFiManager *myWiFiManager);
   static uint16_t _readRegister(uint8_t address, uint8_t reg, uint8_t *data,
@@ -88,7 +87,7 @@ private:
 };
 
 extern RTC_DATA_ATTR int guiState;
-extern RTC_DATA_ATTR int menuIndex;
+extern RTC_DATA_ATTR int mainMenuIndex;
 extern RTC_DATA_ATTR BMA423 sensor;
 extern RTC_DATA_ATTR bool WIFI_CONFIGURED;
 extern RTC_DATA_ATTR bool BLE_CONFIGURED;
