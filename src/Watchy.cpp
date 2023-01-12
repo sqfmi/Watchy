@@ -14,6 +14,7 @@ RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR bool displayFullInit       = true;
 RTC_DATA_ATTR long gmtOffset = 0;
 RTC_DATA_ATTR bool alreadyInMenu         = true;
+RTC_DATA_ATTR tmElements_t bootTime;
 
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -59,6 +60,7 @@ void Watchy::init(String datetime) {
     _bmaConfig();
     gmtOffset = settings.gmtOffset;
     RTC.read(currentTime);
+    RTC.read(bootTime);
     showWatchFace(false); // full update on reset
     vibMotor(75, 4);
     break;
@@ -332,6 +334,21 @@ void Watchy::showAbout() {
   display.print(voltage);
   display.println("V");
 
+  display.print("Uptime: ");
+  RTC.read(currentTime);
+  time_t b = makeTime(bootTime);
+  time_t c = makeTime(currentTime);
+  int totalSeconds = c-b;
+  //int seconds = (totalSeconds % 60);
+  int minutes = (totalSeconds % 3600) / 60;
+  int hours = (totalSeconds % 86400) / 3600;
+  int days = (totalSeconds % (86400 * 30)) / 86400; 
+  display.print(days);
+  display.print("d");
+  display.print(hours);
+  display.print("h");
+  display.print(minutes);
+  display.print("m");    
   display.display(false); // full refresh
 
   guiState = APP_STATE;
