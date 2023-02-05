@@ -13,6 +13,7 @@ RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR bool displayFullInit       = true;
 RTC_DATA_ATTR long gmtOffset = 0;
+RTC_DATA_ATTR tmElements_t bootTime;
 
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -45,6 +46,7 @@ void Watchy::init(String datetime) {
     _bmaConfig();
     gmtOffset = settings.gmtOffset;
     RTC.read(currentTime);
+    RTC.read(bootTime);
     showWatchFace(false); // full update on reset
     vibMotor(75, 4);
     break;
@@ -208,7 +210,22 @@ void Watchy::showAbout() {
   display.print(voltage);
   display.println("V");
 
-  display.display(true); // partial refresh
+  display.print("Uptime: ");
+  RTC.read(currentTime);
+  time_t b = makeTime(bootTime);
+  time_t c = makeTime(currentTime);
+  int totalSeconds = c-b;
+  //int seconds = (totalSeconds % 60);
+  int minutes = (totalSeconds % 3600) / 60;
+  int hours = (totalSeconds % 86400) / 3600;
+  int days = (totalSeconds % (86400 * 30)) / 86400; 
+  display.print(days);
+  display.print("d");
+  display.print(hours);
+  display.print("h");
+  display.print(minutes);
+  display.print("m");    
+  display.display(false); // full refresh
 
   while (1) {
     if (digitalRead(BACK_BTN_PIN) == 1 || digitalRead(MENU_BTN_PIN) == 1) {
@@ -514,6 +531,7 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
             int(responseObject["weather"][0]["id"]);
         currentWeather.weatherDescription =
 	  JSONVar::stringify(responseObject["weather"][0]["main"]);
+	    currentWeather.external = true;
         // sync NTP during weather API call and use timezone of city
         gmtOffset = int(responseObject["timezone"]);
         syncNTP(gmtOffset);
@@ -531,6 +549,7 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
       }
       currentWeather.temperature          = temperature;
       currentWeather.weatherConditionCode = 800;
+      currentWeather.external             = false;
     }
     weatherIntervalCounter = 0;
   } else {
@@ -682,6 +701,8 @@ void Watchy::setupWifi() {
   } else {
     display.println("Connected to");
     display.println(WiFi.SSID());
+		display.println("Local IP:");
+		display.println(WiFi.localIP());
   }
   display.display(false); // full refresh
   // turn off radios
@@ -701,6 +722,8 @@ void Watchy::_configModeCallback(WiFiManager *myWiFiManager) {
   display.println(WIFI_AP_SSID);
   display.print("IP: ");
   display.println(WiFi.softAPIP());
+	display.println("MAC address:");
+	display.println(WiFi.softAPmacAddress().c_str());
   display.display(false); // full refresh
 }
 
