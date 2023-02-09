@@ -16,4 +16,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: binaries
-        path: $GITHUB_WORKSPACE/src/*/build/*.bin
+        path: $GITHUB_WORKSPACE/examples/WatchFaces/*/build/*.bin
