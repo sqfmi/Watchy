@@ -5,7 +5,7 @@ jobs:
     name: Compile example projects
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
     - uses: ArminJo/arduino-test-compile@v3
       with:
         arduino-board-fqbn: esp32:esp32:watchy:Revision=v20,PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
