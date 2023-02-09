@@ -1,13 +1,19 @@
-name: Compile Example Programs
+name: Compile Example Watchfaces
 on: [push, pull_request]
 jobs:
   test-compilation:
-    name: Compile example projects
+    name: Compile example watchfaces
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v3
     - uses: ArminJo/arduino-test-compile@v3
       with:
         arduino-board-fqbn: esp32:esp32:watchy:Revision=v20,PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
+        extra-arduino-cli-args: "--export-binaries"
+        set-build-path: true
         platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
         required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
+    - uses: actions/upload-artifact@v3
+      with:
+        name: binaries
+        path: $GITHUB_WORKSPACE/src/*/build/*.bin
