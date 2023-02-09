@@ -14,4 +14,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: binaries
-        path: /home/runner/work/Watchy/Watchy/./examples/WatchFaces/*/build/*.bin
+        path: /home/runner/work/Watchy/Watchy/examples/WatchFaces/*/build/*.bin
