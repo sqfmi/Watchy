@@ -8,6 +8,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: ArminJo/arduino-test-compile@v3
       with:
-        arduino-board-fqbn: esp32:esp32:esp32:PSRAM=disabled,PartitionScheme=min_spiffs,CPUFreq=240,FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,LoopCore=1,EventsCore=1,DebugLevel=none
+        arduino-board-fqbn: esp32:esp32:watchy:Revision=WATCHY_V20,PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=None,EraseFlash=Disabled
         platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-        required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,Rtc_Pcf8563,GxEPD2,WiFiManager
+        required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
