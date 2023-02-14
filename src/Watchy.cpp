@@ -828,6 +828,7 @@ void Watchy::setupWifi() {
     display.println(WiFi.SSID());
 		display.println("Local IP:");
 		display.println(WiFi.localIP());
+    weatherIntervalCounter = -1; // Reset to force weather to be read again
   }
   display.display(false); // full refresh
   // turn off radios
