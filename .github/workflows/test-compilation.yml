@@ -15,4 +15,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: binaries
-        path: $GITHUB_WORKSPACE/src/**/build/
+        path: /home/runner/work/Watchy/Watchy/examples/WatchFaces/**/build/*.bin
