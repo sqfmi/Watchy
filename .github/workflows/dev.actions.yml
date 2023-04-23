@@ -17,4 +17,5 @@ jobs:
         name: binaries
         path: ${{ github.workspace }}/examples/WatchFaces/**/build/*.bin
     - uses: actions/download-artifact@v3
+    - name: Display structure of downloaded files
       run: ls -R
