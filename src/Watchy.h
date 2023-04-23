@@ -36,7 +36,6 @@ typedef struct watchySettings {
   // NTP Settings
   String ntpServer;
   int gmtOffset;
-  int dstOffset;
   //
   bool vibrateOClock;
 } watchySettings;
