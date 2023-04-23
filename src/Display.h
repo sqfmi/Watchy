@@ -23,6 +23,7 @@ class WatchyDisplay : public GxEPD2_EPD
   public:
     // attributes
     static const uint16_t WIDTH = 200;
+    static const uint16_t WIDTH_VISIBLE = WIDTH;
     static const uint16_t HEIGHT = 200;
     static const GxEPD2::Panel panel = GxEPD2::GDEH0154D67;
     static const bool hasColor = false;
