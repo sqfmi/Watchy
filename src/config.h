@@ -1,6 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+// Versioning
+#define WATCHY_LIB_VER "1.4.7"
+
 //pins
 #if !defined(ARDUINO_WATCHY_V10) && !defined(ARDUINO_WATCHY_V15) && !defined(ARDUINO_WATCHY_V20)
 
@@ -75,6 +78,4 @@
 #define SOFTWARE_VERSION_PATCH 0
 #define HARDWARE_VERSION_MAJOR 1
 #define HARDWARE_VERSION_MINOR 0
-// Versioning
-#define WATCHY_LIB_VER "1.4.6"
 #endif
