@@ -142,6 +142,8 @@ void Watchy7SEG::drawWeather(){
     weatherIcon = drizzle;
     }else if(weatherConditionCode >=200){//Thunderstorm
     weatherIcon = thunderstorm;
+    }else if(weatherConditionCode == -1){//chip
+    weatherIcon = chip;
     }else
     return;
     display.drawBitmap(145, 158, weatherIcon, WEATHER_ICON_WIDTH, WEATHER_ICON_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);

@@ -662,19 +662,18 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
         gmtOffset = int(responseObject["timezone"]);
         syncNTP(gmtOffset);
       } else {
-        // http error
+        // http error, use internal temperature sensor
+        currentWeather.temperature          = currentWeather.isMetric ? (uint8_t)sensor.readTemperature() : (uint8_t)sensor.readTemperatureF();
+        currentWeather.weatherConditionCode = -1;
+        currentWeather.external             = false;        
       }
       http.end();
       // turn off radios
       WiFi.mode(WIFI_OFF);
       btStop();
     } else { // No WiFi, use internal temperature sensor
-      uint8_t temperature = sensor.readTemperature(); // celsius
-      if (!currentWeather.isMetric) {
-        temperature = temperature * 9. / 5. + 32.; // fahrenheit
-      }
-      currentWeather.temperature          = temperature;
-      currentWeather.weatherConditionCode = 800;
+      currentWeather.temperature          = currentWeather.isMetric ? (uint8_t)sensor.readTemperature() : (uint8_t)sensor.readTemperatureF();
+      currentWeather.weatherConditionCode = -1;
       currentWeather.external             = false;
     }
     weatherIntervalCounter = 0;
