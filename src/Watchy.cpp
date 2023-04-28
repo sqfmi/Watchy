@@ -322,18 +322,19 @@ void Watchy::showAbout() {
   display.setTextColor(GxEPD_WHITE);
   display.setCursor(0, 20);
 
+  //Library Version
   display.print("LibVer: ");
   display.println(WATCHY_LIB_VER);
-
+  //RTC Type
   const char *RTC_HW[3] = {"<UNKNOWN>", "DS3231", "PCF8563"};
   display.print("RTC: ");
   display.println(RTC_HW[RTC.rtcType]); // 0 = UNKNOWN, 1 = DS3231, 2 = PCF8563
-
+  //Battery Level
   display.print("Batt: ");
   float voltage = getBatteryVoltage();
   display.print(voltage);
   display.println("V");
-
+  //Uptime
   display.print("Uptime: ");
   RTC.read(currentTime);
   time_t b = makeTime(bootTime);
@@ -342,13 +343,19 @@ void Watchy::showAbout() {
   //int seconds = (totalSeconds % 60);
   int minutes = (totalSeconds % 3600) / 60;
   int hours = (totalSeconds % 86400) / 3600;
-  int days = (totalSeconds % (86400 * 30)) / 86400; 
+  int days = (totalSeconds % (86400 * 30)) / 86400;
   display.print(days);
   display.print("d");
   display.print(hours);
   display.print("h");
   display.print(minutes);
-  display.print("m");    
+  display.println("m");
+  //WiFi Info
+  display.print("IP: ");
+  display.println(WiFi.localIP());
+	display.println("MAC Address:");
+	display.println(WiFi.macAddress());
+
   display.display(false); // full refresh
 
   guiState = APP_STATE;
