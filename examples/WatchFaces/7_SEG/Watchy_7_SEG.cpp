@@ -125,24 +125,29 @@ void Watchy7SEG::drawWeather(){
     display.drawBitmap(165, 110, currentWeather.isMetric ? celsius : fahrenheit, 26, 20, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     const unsigned char* weatherIcon;
 
-    //https://openweathermap.org/weather-conditions
-    if(weatherConditionCode > 801){//Cloudy
-    weatherIcon = cloudy;
-    }else if(weatherConditionCode == 801){//Few Clouds
-    weatherIcon = cloudsun;
-    }else if(weatherConditionCode == 800){//Clear
-    weatherIcon = sunny;
-    }else if(weatherConditionCode >=700){//Atmosphere
-    weatherIcon = atmosphere;
-    }else if(weatherConditionCode >=600){//Snow
-    weatherIcon = snow;
-    }else if(weatherConditionCode >=500){//Rain
-    weatherIcon = rain;
-    }else if(weatherConditionCode >=300){//Drizzle
-    weatherIcon = drizzle;
-    }else if(weatherConditionCode >=200){//Thunderstorm
-    weatherIcon = thunderstorm;
-    }else
-    return;
+    if(WIFI_CONFIGURED){
+      //https://openweathermap.org/weather-conditions
+      if(weatherConditionCode > 801){//Cloudy
+        weatherIcon = cloudy;
+      }else if(weatherConditionCode == 801){//Few Clouds
+        weatherIcon = cloudsun;
+      }else if(weatherConditionCode == 800){//Clear
+        weatherIcon = sunny;
+      }else if(weatherConditionCode >=700){//Atmosphere
+        weatherIcon = atmosphere;
+      }else if(weatherConditionCode >=600){//Snow
+        weatherIcon = snow;
+      }else if(weatherConditionCode >=500){//Rain
+        weatherIcon = rain;
+      }else if(weatherConditionCode >=300){//Drizzle
+        weatherIcon = drizzle;
+      }else if(weatherConditionCode >=200){//Thunderstorm
+        weatherIcon = thunderstorm;
+      }else 
+      return;
+    }else{
+      weatherIcon = cputemp;
+    }
+    
     display.drawBitmap(145, 158, weatherIcon, WEATHER_ICON_WIDTH, WEATHER_ICON_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
 }
