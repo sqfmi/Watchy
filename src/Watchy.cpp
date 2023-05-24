@@ -354,6 +354,7 @@ void Watchy::showAbout() {
         display.println(WiFi.SSID());
         display.println("IP address: ");
         display.println(WiFi.localIP());
+        WiFi.mode(WIFI_OFF);
   }
   display.display(false); // full refresh
 
