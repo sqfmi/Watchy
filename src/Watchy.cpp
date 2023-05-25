@@ -350,11 +350,11 @@ void Watchy::showAbout() {
   display.print(minutes);
   display.println("m");    
   if(connectWiFi()){
-        display.print("SSID: ");
-        display.println(WiFi.SSID());
-        display.println("IP address: ");
-        display.println(WiFi.localIP());
-        WiFi.mode(WIFI_OFF);
+    display.print("SSID: ");
+    display.println(WiFi.SSID());
+    display.println("IP address: ");
+    display.println(WiFi.localIP());
+    WiFi.mode(WIFI_OFF);
   }
   display.display(false); // full refresh
 
