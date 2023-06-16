@@ -23,11 +23,14 @@ typedef struct weatherData {
   bool isMetric;
   String weatherDescription;
   bool external;
+  tmElements_t sunrise;
+  tmElements_t sunset;
 } weatherData;
 
 typedef struct watchySettings {
   // Weather Settings
-  String cityID;
+  String lat;
+  String lon;
   String weatherAPIKey;
   String weatherURL;
   String weatherUnit;
@@ -70,7 +73,7 @@ public:
   void setupWifi();
   bool connectWiFi();
   weatherData getWeatherData();
-  weatherData getWeatherData(String cityID, String units, String lang,
+  weatherData getWeatherData(String lat, String lon, String units, String lang,
                              String url, String apiKey, uint8_t updateInterval);
   void updateFWBegin();
 
