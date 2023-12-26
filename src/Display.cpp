@@ -382,6 +382,18 @@ void WatchyDisplay::_InitDisplay()
   _transfer(0xC7);
   _transfer(0x00);
   _transfer(0x00);
+
+  if (reduceBoosterTime) {
+    // SSD1675B controller datasheet
+    _transferCommand(0x0C); // BOOSTER_SOFT_START_CONTROL
+    // Set the driving strength of GDR for all phases to maximun 0b111 -> 0xF
+    // Set the minimum off time of GDR to minimum 0x4 (values below sould be same)
+    _transfer(0xF4); // Phase1 Default value 0x8B
+    _transfer(0xF4); // Phase2 Default value 0x9C
+    _transfer(0xF4); // Phase3 Default value 0x96
+    _transfer(0x00); // Duration of phases, Default 0xF = 0b00 11 11 (40ms Phase 1/2, 10ms Phase 3)
+  }
+
   _transferCommand(0x3C); // BorderWavefrom
   _transfer(darkBorder ? 0x02 : 0x05);
   _transferCommand(0x18); // Read built-in temperature sensor
