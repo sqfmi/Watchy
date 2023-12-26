@@ -2,7 +2,7 @@
 
 WatchyRTC Watchy::RTC;
 GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> Watchy::display(
-    WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY));
+    WatchyDisplay{});
 
 RTC_DATA_ATTR int guiState;
 RTC_DATA_ATTR int menuIndex;
@@ -23,10 +23,8 @@ void Watchy::init(String datetime) {
   RTC.init();
 
   // Init the display here for all cases, if unused, it will do nothing
-  display.epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0)); // Set SPI to 20Mhz (default is 4Mhz)
   display.init(0, displayFullInit, 10,
                true); // 10ms by spec, and fast pulldown reset
-  display.epd2.setBusyCallback(displayBusyCallback);
 
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0: // RTC Alarm
@@ -67,13 +65,6 @@ void Watchy::init(String datetime) {
   }
   deepSleep();
 }
-
-void Watchy::displayBusyCallback(const void *) {
-  gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
-  esp_sleep_enable_gpio_wakeup();
-  esp_light_sleep_start();
-}
-
 void Watchy::deepSleep() {
   display.hibernate();
   if (displayFullInit) // For some reason, seems to be enabled on first boot
@@ -834,8 +825,8 @@ void Watchy::setupWifi() {
   // turn off radios
   WiFi.mode(WIFI_OFF);
   btStop();
-  display.epd2.setBusyCallback(displayBusyCallback); // enable lightsleep on
-                                                     // busy
+  // enable lightsleep on busy
+  display.epd2.setBusyCallback(WatchyDisplay::busyCallback);
   guiState = APP_STATE;
 }
 
