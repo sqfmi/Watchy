@@ -15,8 +15,10 @@
 // Link: https://github.com/sqfmi/Watchy
 
 #include "Display.h"
-
 #include "config.h"
+
+RTC_DATA_ATTR bool displayFullInit       = true;
+
 void WatchyDisplay::busyCallback(const void *) {
   gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
   esp_sleep_enable_gpio_wakeup();
@@ -26,9 +28,14 @@ void WatchyDisplay::busyCallback(const void *) {
 WatchyDisplay::WatchyDisplay() :
   GxEPD2_EPD(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY, HIGH, 10000000, WIDTH, HEIGHT, panel, hasColor, hasPartialUpdate, hasFastPartialUpdate)
 {
-  // Watchy default initialization
-  selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0)); // Set SPI to 20Mhz (default is 4Mhz)
+  // Setup callback and SPI by default
+  selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
   setBusyCallback(busyCallback);
+}
+
+void WatchyDisplay::initWatchy() {
+  // Watchy default initialization
+  init(0, displayFullInit, 2, true);
 }
 
 void WatchyDisplay::clearScreen(uint8_t value)
@@ -404,6 +411,7 @@ void WatchyDisplay::_Update_Full()
   _transferCommand(0x20);
   _endTransfer();
   _waitWhileBusy("_Update_Full", full_refresh_time);
+  displayFullInit = false;
 }
 
 void WatchyDisplay::_Update_Part()

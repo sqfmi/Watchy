@@ -35,6 +35,7 @@ class WatchyDisplay : public GxEPD2_EPD
     static const uint16_t partial_refresh_time = 500; // ms, e.g. 457282us
     // constructor
     WatchyDisplay();
+    void initWatchy();
     static void busyCallback(const void *);
     // methods (virtual)
     //  Support for Bitmaps (Sprites) to Controller Buffer and to Screen

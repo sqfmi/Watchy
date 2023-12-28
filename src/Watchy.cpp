@@ -11,7 +11,6 @@ RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = -1;
-RTC_DATA_ATTR bool displayFullInit       = true;
 RTC_DATA_ATTR long gmtOffset = 0;
 RTC_DATA_ATTR bool alreadyInMenu         = true;
 RTC_DATA_ATTR tmElements_t bootTime;
@@ -22,9 +21,8 @@ void Watchy::init(String datetime) {
   Wire.begin(SDA, SCL);                         // init i2c
   RTC.init();
 
-  // Init the display here for all cases, if unused, it will do nothing
-  display.init(0, displayFullInit, 10,
-               true); // 10ms by spec, and fast pulldown reset
+  // Init the display since is almost sure we will use it
+  display.epd2.initWatchy();
 
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0: // RTC Alarm
@@ -61,15 +59,14 @@ void Watchy::init(String datetime) {
     RTC.read(bootTime);
     showWatchFace(false); // full update on reset
     vibMotor(75, 4);
+    // For some reason, seems to be enabled on first boot
+    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
     break;
   }
   deepSleep();
 }
 void Watchy::deepSleep() {
   display.hibernate();
-  if (displayFullInit) // For some reason, seems to be enabled on first boot
-    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
-  displayFullInit = false; // Notify not to init it again
   RTC.clearAlarm();        // resets the alarm flag in the RTC
 
   // Set GPIOs 0-39 to input to avoid power leaking out
