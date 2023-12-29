@@ -36,6 +36,7 @@ class WatchyDisplay : public GxEPD2_EPD
     // constructor
     WatchyDisplay();
     void initWatchy();
+    void setDarkBorder(bool darkBorder);
     static void busyCallback(const void *);
     // methods (virtual)
     //  Support for Bitmaps (Sprites) to Controller Buffer and to Screen

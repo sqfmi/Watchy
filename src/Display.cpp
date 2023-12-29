@@ -38,6 +38,15 @@ void WatchyDisplay::initWatchy() {
   init(0, displayFullInit, 2, true);
 }
 
+void WatchyDisplay::setDarkBorder(bool dark) {
+  if (_hibernating) return;
+  darkBorder = dark;
+  _startTransfer();
+  _transferCommand(0x3C); // BorderWavefrom
+  _transfer(dark ? 0x02 : 0x05);
+  _endTransfer();
+}
+
 void WatchyDisplay::clearScreen(uint8_t value)
 {
   writeScreenBuffer(value);
@@ -394,11 +403,11 @@ void WatchyDisplay::_InitDisplay()
     _transfer(0x00); // Duration of phases, Default 0xF = 0b00 11 11 (40ms Phase 1/2, 10ms Phase 3)
   }
 
-  _transferCommand(0x3C); // BorderWavefrom
-  _transfer(darkBorder ? 0x02 : 0x05);
   _transferCommand(0x18); // Read built-in temperature sensor
   _transfer(0x80);
   _endTransfer();
+
+  setDarkBorder(darkBorder);
 
   _setPartialRamArea(0, 0, WIDTH, HEIGHT);
 }
