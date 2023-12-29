@@ -372,8 +372,10 @@ void WatchyDisplay::_PowerOff()
 void WatchyDisplay::_InitDisplay()
 {
   if (_hibernating) _reset();
-  _writeCommand(0x12); // soft reset
-  _waitWhileBusy("_SoftReset", 10); // 10ms max according to specs
+
+  // No need to soft reset, the Display goes to same state after hard reset
+  // _writeCommand(0x12); // soft reset
+  // _waitWhileBusy("_SoftReset", 10); // 10ms max according to specs*/
 
   _startTransfer();
   _transferCommand(0x01); // Driver output control
