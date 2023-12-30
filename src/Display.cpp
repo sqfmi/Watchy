@@ -38,6 +38,14 @@ void WatchyDisplay::initWatchy() {
   init(0, displayFullInit, 2, true);
 }
 
+void WatchyDisplay::asyncPowerOn() {
+  // This is expensive if unused
+  if (!waitingPowerOn && !_hibernating) {
+    _InitDisplay();
+    _PowerOnAsync();
+  }
+}
+
 void WatchyDisplay::setDarkBorder(bool dark) {
   if (_hibernating) return;
   darkBorder = dark;
@@ -349,31 +357,52 @@ void WatchyDisplay::_setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint1
   _endTransfer();
 }
 
+void WatchyDisplay::_PowerOnAsync()
+{
+  if (_power_is_on)
+    return;
+  _startTransfer();
+  _transferCommand(0x22);
+  _transfer(0xf8);
+  _transferCommand(0x20);
+  _endTransfer();
+  waitingPowerOn = true;
+  _power_is_on = true;
+}
+
 void WatchyDisplay::_PowerOn()
 {
-  if (!_power_is_on)
+  if (waitingPowerOn)
   {
-    _startTransfer();
-    _transferCommand(0x22);
-    _transfer(0xf8);
-    _transferCommand(0x20);
-    _endTransfer();
+    waitingPowerOn = false;
     _waitWhileBusy("_PowerOn", power_on_time);
   }
+  if (_power_is_on)
+    return;
+  _startTransfer();
+  _transferCommand(0x22);
+  _transfer(0xf8);
+  _transferCommand(0x20);
+  _endTransfer();
+  _waitWhileBusy("_PowerOn", power_on_time);
   _power_is_on = true;
 }
 
 void WatchyDisplay::_PowerOff()
 {
-  if (_power_is_on)
+  if (waitingPowerOn)
   {
-    _startTransfer();
-    _transferCommand(0x22);
-    _transfer(0x83);
-    _transferCommand(0x20);
-    _endTransfer();
-    _waitWhileBusy("_PowerOff", power_off_time);
+    waitingPowerOn = false;
+    _waitWhileBusy("_PowerOn", power_on_time);
   }
+  if (!_power_is_on)
+    return;
+  _startTransfer();
+  _transferCommand(0x22);
+  _transfer(0x83);
+  _transferCommand(0x20);
+  _endTransfer();
+  _waitWhileBusy("_PowerOff", power_off_time);
   _power_is_on = false;
   _using_partial_mode = false;
 }

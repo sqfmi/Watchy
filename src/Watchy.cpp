@@ -594,6 +594,8 @@ void Watchy::showAccelerometer() {
 
 void Watchy::showWatchFace(bool partialRefresh) {
   display.setFullWindow();
+  // At this point it is sure we are going to update
+  display.epd2.asyncPowerOn();
   drawWatchFace();
   display.display(partialRefresh); // partial refresh
   guiState = WATCHFACE_STATE;
