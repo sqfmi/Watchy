@@ -2,7 +2,7 @@
 
 WatchyRTC Watchy::RTC;
 GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> Watchy::display(
-    WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY));
+    WatchyDisplay{});
 
 RTC_DATA_ATTR int guiState;
 RTC_DATA_ATTR int menuIndex;
@@ -11,7 +11,6 @@ RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = -1;
-RTC_DATA_ATTR bool displayFullInit       = true;
 RTC_DATA_ATTR long gmtOffset = 0;
 RTC_DATA_ATTR bool alreadyInMenu         = true;
 RTC_DATA_ATTR tmElements_t bootTime;
@@ -22,11 +21,8 @@ void Watchy::init(String datetime) {
   Wire.begin(SDA, SCL);                         // init i2c
   RTC.init();
 
-  // Init the display here for all cases, if unused, it will do nothing
-  display.epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0)); // Set SPI to 20Mhz (default is 4Mhz)
-  display.init(0, displayFullInit, 10,
-               true); // 10ms by spec, and fast pulldown reset
-  display.epd2.setBusyCallback(displayBusyCallback);
+  // Init the display since is almost sure we will use it
+  display.epd2.initWatchy();
 
   switch (wakeup_reason) {
   case ESP_SLEEP_WAKEUP_EXT0: // RTC Alarm
@@ -63,22 +59,14 @@ void Watchy::init(String datetime) {
     RTC.read(bootTime);
     showWatchFace(false); // full update on reset
     vibMotor(75, 4);
+    // For some reason, seems to be enabled on first boot
+    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
     break;
   }
   deepSleep();
 }
-
-void Watchy::displayBusyCallback(const void *) {
-  gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
-  esp_sleep_enable_gpio_wakeup();
-  esp_light_sleep_start();
-}
-
 void Watchy::deepSleep() {
   display.hibernate();
-  if (displayFullInit) // For some reason, seems to be enabled on first boot
-    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
-  displayFullInit = false; // Notify not to init it again
   RTC.clearAlarm();        // resets the alarm flag in the RTC
 
   // Set GPIOs 0-39 to input to avoid power leaking out
@@ -606,6 +594,8 @@ void Watchy::showAccelerometer() {
 
 void Watchy::showWatchFace(bool partialRefresh) {
   display.setFullWindow();
+  // At this point it is sure we are going to update
+  display.epd2.asyncPowerOn();
   drawWatchFace();
   display.display(partialRefresh); // partial refresh
   guiState = WATCHFACE_STATE;
@@ -834,8 +824,8 @@ void Watchy::setupWifi() {
   // turn off radios
   WiFi.mode(WIFI_OFF);
   btStop();
-  display.epd2.setBusyCallback(displayBusyCallback); // enable lightsleep on
-                                                     // busy
+  // enable lightsleep on busy
+  display.epd2.setBusyCallback(WatchyDisplay::busyCallback);
   guiState = APP_STATE;
 }
 
