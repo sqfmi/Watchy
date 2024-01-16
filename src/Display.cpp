@@ -441,6 +441,23 @@ void WatchyDisplay::_InitDisplay()
   _setPartialRamArea(0, 0, WIDTH, HEIGHT);
 }
 
+void WatchyDisplay::_reset()
+{
+  // Call default method if not configured the same way
+  if (_rst < 0 || !_pulldown_rst_mode) {
+    GxEPD2_EPD::_reset();
+    return;
+  }
+
+  digitalWrite(_rst, LOW);
+  pinMode(_rst, OUTPUT);
+  delay(_reset_duration);
+  pinMode(_rst, INPUT_PULLUP);
+  // Tested calling _powerOn() inmediately, and works ok, no need to sleep
+  // delay(_reset_duration > 10 ? _reset_duration : 0);
+  _hibernating = false;
+}
+
 void WatchyDisplay::_Init_Full()
 {
   _InitDisplay();
