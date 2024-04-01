@@ -336,7 +336,14 @@ void Watchy::showAbout() {
   display.print(hours);
   display.print("h");
   display.print(minutes);
-  display.print("m");    
+  display.println("m");    
+  if(connectWiFi()){
+    display.print("SSID: ");
+    display.println(WiFi.SSID());
+    display.println("IP address: ");
+    display.println(WiFi.localIP());
+    WiFi.mode(WIFI_OFF);
+  }
   display.display(false); // full refresh
 
   guiState = APP_STATE;
