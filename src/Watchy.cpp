@@ -633,12 +633,12 @@ void Watchy::drawWatchFace() {
 }
 
 weatherData Watchy::getWeatherData() {
-  return getWeatherData(settings.cityID, settings.weatherUnit,
+  return getWeatherData(settings.lat, settings.lon, settings.weatherUnit,
                         settings.weatherLang, settings.weatherURL,
                         settings.weatherAPIKey, settings.weatherUpdateInterval);
 }
 
-weatherData Watchy::getWeatherData(String cityID, String units, String lang,
+weatherData Watchy::getWeatherData(String lat, String lon, String units, String lang,
                                    String url, String apiKey,
                                    uint8_t updateInterval) {
   currentWeather.isMetric = units == String("metric");
@@ -651,9 +651,12 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
     if (connectWiFi()) {
       HTTPClient http; // Use Weather API for live data if WiFi is connected
       http.setConnectTimeout(3000); // 3 second max timeout
-      String weatherQueryURL = url + cityID + String("&units=") + units +
-                               String("&lang=") + lang + String("&appid=") +
-                               apiKey;
+      String weatherQueryURL = url;
+      weatherQueryURL.replace("{lat}", lat);
+      weatherQueryURL.replace("{lon}", lon);
+      weatherQueryURL.replace("{units}", units);
+      weatherQueryURL.replace("{lang}", lang);
+      weatherQueryURL.replace("{apiKey}", apiKey);
       http.begin(weatherQueryURL.c_str());
       int httpResponseCode = http.GET();
       if (httpResponseCode == 200) {
@@ -663,9 +666,11 @@ weatherData Watchy::getWeatherData(String cityID, String units, String lang,
         currentWeather.weatherConditionCode =
             int(responseObject["weather"][0]["id"]);
         currentWeather.weatherDescription =
-	  JSONVar::stringify(responseObject["weather"][0]["main"]);
+		JSONVar::stringify(responseObject["weather"][0]["main"]);
 	    currentWeather.external = true;
-        // sync NTP during weather API call and use timezone of city
+		breakTime((time_t)(int)responseObject["sys"]["sunrise"], currentWeather.sunrise);
+		breakTime((time_t)(int)responseObject["sys"]["sunset"], currentWeather.sunset);
+        // sync NTP during weather API call and use timezone of lat & lon
         gmtOffset = int(responseObject["timezone"]);
         syncNTP(gmtOffset);
       } else {
