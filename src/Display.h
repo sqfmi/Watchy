@@ -34,7 +34,13 @@ class WatchyDisplay : public GxEPD2_EPD
     static const uint16_t full_refresh_time = 2600; // ms, e.g. 2509602us
     static const uint16_t partial_refresh_time = 500; // ms, e.g. 457282us
     // constructor
-    WatchyDisplay(int16_t cs, int16_t dc, int16_t rst, int16_t busy);
+    WatchyDisplay();
+    void initWatchy();
+    void setDarkBorder(bool darkBorder);
+    void asyncPowerOn();
+    void _PowerOnAsync();
+    bool waitingPowerOn = false;
+    static void busyCallback(const void *);
     // methods (virtual)
     //  Support for Bitmaps (Sprites) to Controller Buffer and to Screen
     void clearScreen(uint8_t value = 0xFF); // init controller memory and screen (default white)
@@ -69,6 +75,8 @@ class WatchyDisplay : public GxEPD2_EPD
     void hibernate(); // turns powerOff() and sets controller to deep sleep for minimum power use, ONLY if wakeable by RST (rst >= 0)
 
     bool darkBorder = false; // adds a dark border outside the normal screen area
+
+    static constexpr bool reduceBoosterTime = true; // Saves ~200ms
   private:
     void _writeScreenBuffer(uint8_t command, uint8_t value);
     void _writeImage(uint8_t command, const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
@@ -82,6 +90,8 @@ class WatchyDisplay : public GxEPD2_EPD
     void _Init_Part();
     void _Update_Full();
     void _Update_Part();
+
+    void _reset();
 
     void _transferCommand(uint8_t command);
 };

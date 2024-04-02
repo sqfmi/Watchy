@@ -23,11 +23,15 @@ typedef struct weatherData {
   bool isMetric;
   String weatherDescription;
   bool external;
+  tmElements_t sunrise;
+  tmElements_t sunset;
 } weatherData;
 
 typedef struct watchySettings {
   // Weather Settings
   String cityID;
+  String lat;
+  String lon;
   String weatherAPIKey;
   String weatherURL;
   String weatherUnit;
@@ -51,7 +55,6 @@ public:
   explicit Watchy(const watchySettings &s) : settings(s) {} // constructor
   void init(String datetime = "");
   void deepSleep();
-  static void displayBusyCallback(const void *);
   float getBatteryVoltage();
   void vibMotor(uint8_t intervalMs = 100, uint8_t length = 20);
 
@@ -70,8 +73,6 @@ public:
   void setupWifi();
   bool connectWiFi();
   weatherData getWeatherData();
-  weatherData getWeatherData(String cityID, String units, String lang,
-                             String url, String apiKey, uint8_t updateInterval);
   void updateFWBegin();
 
   void showWatchFace(bool partialRefresh);
@@ -85,6 +86,8 @@ private:
                                 uint16_t len);
   static uint16_t _writeRegister(uint8_t address, uint8_t reg, uint8_t *data,
                                  uint16_t len);
+  weatherData _getWeatherData(String cityID, String lat, String lon, String units, String lang,
+                             String url, String apiKey, uint8_t updateInterval);                                 
 };
 
 extern RTC_DATA_ATTR int guiState;
