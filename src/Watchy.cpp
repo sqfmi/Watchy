@@ -337,7 +337,7 @@ void Watchy::showAbout() {
   display.print("h");
   display.print(minutes);
   display.println("m");    
-  if(WIFI_CONFIGURED){
+  if(connectWiFi()){
     display.print("SSID: ");
     display.println(WiFi.SSID());
     display.println("IP: ");
