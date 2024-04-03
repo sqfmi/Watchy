@@ -20,10 +20,10 @@ jobs:
         set-build-path: true
     - name: Rename binaries with board revision
       run: |
-        parent_dir="path/to/parent/directory"
+        parent_dir="${{ github.workspace }}/examples/WatchFaces"
         for dir in "$parent_dir"/*; do
           if [ -d "$dir" ]; then
-            cd "$dir"
+            cd "$dir/build"
             for file in *; do
               name="${file%%.*}"
               ext="${file#$name.}"
