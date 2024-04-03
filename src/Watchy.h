@@ -16,6 +16,7 @@
 #include "BLE.h"
 #include "bma.h"
 #include "config.h"
+#include "esp_chip_info.h"
 
 typedef struct weatherData {
   int8_t temperature;
@@ -56,6 +57,7 @@ public:
   void init(String datetime = "");
   void deepSleep();
   float getBatteryVoltage();
+  uint8_t getBoardRevision();
   void vibMotor(uint8_t intervalMs = 100, uint8_t length = 20);
 
   virtual void handleButtonPress();

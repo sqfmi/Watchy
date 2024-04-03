@@ -315,9 +315,8 @@ void Watchy::showAbout() {
   display.print("LibVer: ");
   display.println(WATCHY_LIB_VER);
 
-  const char *RTC_HW[3] = {"<UNKNOWN>", "DS3231", "PCF8563"};
-  display.print("RTC: ");
-  display.println(RTC_HW[RTC.rtcType]); // 0 = UNKNOWN, 1 = DS3231, 2 = PCF8563
+  display.print("Rev: v");
+  display.println(getBoardRevision());
 
   display.print("Batt: ");
   float voltage = getBatteryVoltage();
@@ -700,6 +699,31 @@ float Watchy::getBatteryVoltage() {
   } else {
     return analogReadMilliVolts(BATT_ADC_PIN) / 1000.0f * 2.0f;
   }
+}
+
+uint8_t Watchy::getBoardRevision() {
+  esp_chip_info_t chip_info;
+  esp_chip_info(&chip_info);
+  if(chip_info.model == CHIP_ESP32){ //Revision 1.0 - 2.0
+    Wire.beginTransmission(0x68); //v1.0 has DS3231
+    if (Wire.endTransmission() == 0){
+      return 10;
+    }
+    delay(1);
+    Wire.beginTransmission(0x51); //v1.5 and v2.0 have PCF8563
+    if (Wire.endTransmission() == 0){
+        pinMode(35, INPUT);
+        if(digitalRead(35) == 0){
+          return 20; //in rev 2.0, pin 35 is BTN 3 and has a pulldown
+        }else{
+          return 15; //in rev 1.5, pin 35 is the battery ADC
+        }
+    }
+  }
+  if(chip_info.model == CHIP_ESP32S3){ //Revision 3.0
+    return 30;
+  }
+  return -1;
 }
 
 uint16_t Watchy::_readRegister(uint8_t address, uint8_t reg, uint8_t *data,
