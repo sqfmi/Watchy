@@ -14,6 +14,8 @@ RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR long gmtOffset = 0;
 RTC_DATA_ATTR bool alreadyInMenu         = true;
 RTC_DATA_ATTR tmElements_t bootTime;
+RTC_DATA_ATTR uint32_t lastIPAddress;
+RTC_DATA_ATTR char lastSSID[30];
 
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -337,14 +339,13 @@ void Watchy::showAbout() {
   display.print("h");
   display.print(minutes);
   display.println("m");    
-  if(connectWiFi()){
+  if(WIFI_CONFIGURED){
     display.print("SSID: ");
-    display.println(WiFi.SSID());
-    display.println("IP: ");
-    display.println(WiFi.localIP());
-    WiFi.mode(WIFI_OFF);
+    display.println(lastSSID);
+    display.print("IP: ");
+    display.println(IPAddress(lastIPAddress).toString());
   }else{
-    display.println("WiFi Not Setup");
+    display.println("WiFi Not Connected");
   }
   display.display(false); // full refresh
 
@@ -832,11 +833,13 @@ void Watchy::setupWifi() {
     display.println("Setup failed &");
     display.println("timed out!");
   } else {
-    display.println("Connected to");
+    display.println("Connected to:");
     display.println(WiFi.SSID());
 		display.println("Local IP:");
 		display.println(WiFi.localIP());
     weatherIntervalCounter = -1; // Reset to force weather to be read again
+    lastIPAddress = WiFi.localIP();
+    WiFi.SSID().toCharArray(lastSSID, 30);
   }
   display.display(false); // full refresh
   // turn off radios
@@ -871,6 +874,8 @@ bool Watchy::connectWiFi() {
   } else {
     if (WL_CONNECTED ==
         WiFi.waitForConnectResult()) { // attempt to connect for 10s
+      lastIPAddress = WiFi.localIP();
+      WiFi.SSID().toCharArray(lastSSID, 30);
       WIFI_CONFIGURED = true;
     } else { // connection failed, time out
       WIFI_CONFIGURED = false;
