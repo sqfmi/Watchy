@@ -146,7 +146,7 @@ void Watchy7SEG::drawWeather(){
       }else 
       return;
     }else{
-      weatherIcon = cputemp;
+      weatherIcon = chip;
     }
     
     display.drawBitmap(145, 158, weatherIcon, WEATHER_ICON_WIDTH, WEATHER_ICON_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
