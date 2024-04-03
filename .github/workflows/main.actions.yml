@@ -20,10 +20,17 @@ jobs:
         set-build-path: true
     - name: Rename binaries with board revision
       run: |
-        for file in *; do
-          name="${file%%.*}"
-          ext="${file#$name.}"
-          mv "$file" "$name"${{ matrix.board-revisions }}."$ext"
+        parent_dir="path/to/parent/directory"
+        for dir in "$parent_dir"/*; do
+          if [ -d "$dir" ]; then
+            cd "$dir"
+            for file in *; do
+              name="${file%%.*}"
+              ext="${file#$name.}"
+              mv "$file" "$name-${{ matrix.board-revisions }}.$ext"
+            done
+            cd -
+          fi
         done
     - uses: softprops/action-gh-release@v1
       with:
