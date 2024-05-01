@@ -1,27 +1,26 @@
-name: Build Example Watchfaces
+name: Build firmware
+
 on:
-  push:
-    branches:
-      - "dev"
   pull_request:
-    branches:
-      - "dev"
+  workflow_dispatch:
+
+env:
+  PROJECT: "7_SEG"
+
 jobs:
   build:
-    name: Build Example Watchfaces
+    name: Build firmware
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v4
+
+    - name: Prerequisites
+      run: mv "${{ env.IMAGE_NAME }}/settings.h.example ${{ env.IMAGE_NAME }}/settings.h"
+
     - uses: ArminJo/arduino-test-compile@v3
       with:
         arduino-board-fqbn: esp32:esp32:watchy:Revision=v20,PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
         platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
         required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
-        set-build-path: true
-    - uses: actions/upload-artifact@v3
-      with:
-        name: binaries
-        path: ${{ github.workspace }}/examples/WatchFaces/**/build/*.bin
-    - uses: actions/download-artifact@v3
-    - name: Display structure of downloaded files
-      run: ls -R
+        sketch-names-find-start: "${{ env.IMAGE_NAME }}/"
+        sketch-names: "${{ env.IMAGE_NAME }}.ino"

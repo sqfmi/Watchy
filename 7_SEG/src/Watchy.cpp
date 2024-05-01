@@ -892,7 +892,7 @@ void Watchy::_configModeCallback(WiFiManager *myWiFiManager) {
 
 bool Watchy::connectWiFi() {
   if (WL_CONNECT_FAILED ==
-      WiFi.begin()) { // WiFi not setup, you can also use hard coded credentials
+      WiFi.begin(settings.wifiSSID, settings.wifiPass)) { // WiFi not setup, you can also use hard coded credentials
                       // with WiFi.begin(SSID,PASS);
     WIFI_CONFIGURED = false;
   } else {

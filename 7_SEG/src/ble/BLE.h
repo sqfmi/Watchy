@@ -10,7 +10,7 @@
 
 #include "esp_ota_ops.h"
 
-#include "config.h"
+#include "../config.h"
 
 class BLE;
 

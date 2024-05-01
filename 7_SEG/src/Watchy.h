@@ -13,8 +13,8 @@
 #include "DSEG7_Classic_Bold_53.h"
 #include "Display.h"
 #include "WatchyRTC.h"
-#include "BLE.h"
-#include "bma.h"
+#include "ble/BLE.h"
+#include "bma/bma.h"
 #include "config.h"
 #include "esp_chip_info.h"
 
@@ -41,6 +41,9 @@ typedef struct watchySettings {
   // NTP Settings
   String ntpServer;
   int gmtOffset;
+  // WIFI Settings
+  String wifiSSID;
+  String wifiPass;
   //
   bool vibrateOClock;
 } watchySettings;

@@ -68,3 +68,5 @@ manifest.mf
 nbbuild.xml
 nbproject
 .vscode
+.envrc
+**/settings.h
