@@ -8,6 +8,9 @@
 #include "DSEG7_Classic_Regular_39.h"
 #include "icons.h"
 
+#include "sendData.h"
+#include "dataFile.h"
+
 class Watchy7SEG : public Watchy{
     using Watchy::Watchy;
     public:
@@ -17,6 +20,8 @@ class Watchy7SEG : public Watchy{
         void drawSteps();
         void drawWeather();
         void drawBattery();
+        void setupFS();
+        void syncAPI();
 };
 
 #endif

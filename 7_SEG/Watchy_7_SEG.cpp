@@ -9,6 +9,8 @@ const uint8_t WEATHER_ICON_WIDTH = 48;
 const uint8_t WEATHER_ICON_HEIGHT = 32;
 
 void Watchy7SEG::drawWatchFace(){
+    Serial.begin(115200);
+
     display.fillScreen(DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);
     display.setTextColor(DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     drawTime();
@@ -20,6 +22,9 @@ void Watchy7SEG::drawWatchFace(){
     if(BLE_CONFIGURED){
         display.drawBitmap(100, 75, bluetooth, 13, 21, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     }
+
+    setupFS();
+    syncAPI();
 }
 
 void Watchy7SEG::drawTime(){
@@ -27,9 +32,9 @@ void Watchy7SEG::drawTime(){
     display.setCursor(5, 53+5);
     int displayHour;
     if(HOUR_12_24==12){
-      displayHour = ((currentTime.Hour+11)%12)+1;
+    	displayHour = ((currentTime.Hour+11)%12)+1;
     } else {
-      displayHour = currentTime.Hour;
+    	displayHour = currentTime.Hour;
     }
     if(displayHour < 10){
         display.print("0");
@@ -73,7 +78,7 @@ void Watchy7SEG::drawDate(){
 void Watchy7SEG::drawSteps(){
     // reset step counter at midnight
     if (currentTime.Hour == 0 && currentTime.Minute == 0){
-      sensor.resetStepCounter();
+    	sensor.resetStepCounter();
     }
     uint32_t stepCount = sensor.getCounter();
     display.drawBitmap(10, 165, steps, 19, 23, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
@@ -126,28 +131,68 @@ void Watchy7SEG::drawWeather(){
     const unsigned char* weatherIcon;
 
     if(WIFI_CONFIGURED){
-      //https://openweathermap.org/weather-conditions
-      if(weatherConditionCode > 801){//Cloudy
-        weatherIcon = cloudy;
-      }else if(weatherConditionCode == 801){//Few Clouds
-        weatherIcon = cloudsun;
-      }else if(weatherConditionCode == 800){//Clear
-        weatherIcon = sunny;
-      }else if(weatherConditionCode >=700){//Atmosphere
-        weatherIcon = atmosphere;
-      }else if(weatherConditionCode >=600){//Snow
-        weatherIcon = snow;
-      }else if(weatherConditionCode >=500){//Rain
-        weatherIcon = rain;
-      }else if(weatherConditionCode >=300){//Drizzle
-        weatherIcon = drizzle;
-      }else if(weatherConditionCode >=200){//Thunderstorm
-        weatherIcon = thunderstorm;
-      }else 
-      return;
+    	//https://openweathermap.org/weather-conditions
+    	if(weatherConditionCode > 801){//Cloudy
+    	  weatherIcon = cloudy;
+    	}else if(weatherConditionCode == 801){//Few Clouds
+    	  weatherIcon = cloudsun;
+    	}else if(weatherConditionCode == 800){//Clear
+    	  weatherIcon = sunny;
+    	}else if(weatherConditionCode >=700){//Atmosphere
+    	  weatherIcon = atmosphere;
+    	}else if(weatherConditionCode >=600){//Snow
+    	  weatherIcon = snow;
+    	}else if(weatherConditionCode >=500){//Rain
+    	  weatherIcon = rain;
+    	}else if(weatherConditionCode >=300){//Drizzle
+    	  weatherIcon = drizzle;
+    	}else if(weatherConditionCode >=200){//Thunderstorm
+    	  weatherIcon = thunderstorm;
+    	}else 
+    	return;
     }else{
-      weatherIcon = chip;
+    	weatherIcon = chip;
     }
     
     display.drawBitmap(145, 158, weatherIcon, WEATHER_ICON_WIDTH, WEATHER_ICON_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+}
+
+void Watchy7SEG::setupFS(){
+	LittleFS.begin(FORMAT_LITTLEFS_IF_FAILED);
+	FSData::createDir(LittleFS, DATA_FOLDER);
+	FSData::createDir(LittleFS, STEPS_FOLDER);
+}
+
+void Watchy7SEG::syncAPI(){
+	if (currentTime.Minute == 59 && sensor.getCounter() > 0){
+		String day_api = (currentTime.Day < 10) ? ("0" + String(currentTime.Day)) : String(currentTime.Day);
+		String month_api = (currentTime.Month < 10) ? ("0" + String(currentTime.Month)) : String(currentTime.Month);
+		String date_api = day_api + "-" + month_api + "-" + String(currentTime.Year);
+
+		String hour_api = (currentTime.Hour < 10) ? ("0" + String(currentTime.Hour)) : String(currentTime.Hour);
+		String json_steps = "{\"event_type\":" + String(ENDPOINT_API) + ",\"client_payload\":{\"data-name\":" + String(ENDPOINT_STEPS) + ",\"date\":" + date_api + ",\"hour\":" + hour_api + ",\"data\":" + String(sensor.getCounter()) + "}}";
+
+		//file_system = FSData();
+		if (WIFI_CONFIGURED) {
+			// Steps
+			SendData::pushAPIData(json_steps);
+			// Sync old steps
+			//for(const std::string& file : file_system.listDir(STEPS_FOLDER), 1) {
+			//	String json_file = file_system.readFile(String(STEPS_FOLDER) + "/" + file.c_str());
+			//	SendData::pushAPIData(json_file);
+			//	FSData::deleteFile(String(STEPS_FOLDER) + "/" + file.c_str());
+			//}
+
+			// turn off radios
+			WiFi.mode(WIFI_OFF);
+			btStop();
+		} else { // No WiFi, register in file
+			String file_name = (String(STEPS_FOLDER) + date_api + "_" + hour_api + ".txt").c_str();
+			if (LittleFS.exists(file_name)){
+			//	FSData::appendFile(LittleFS, file_name, json_steps.c_str());
+			} else {
+				//FSData::writeFile(LittleFS, file_name, json_steps.c_str());
+			}
+		}
+	}
 }

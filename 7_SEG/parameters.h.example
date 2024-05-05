@@ -1,8 +1,8 @@
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef PARAMETERS_H
+#define PARAMETERS_H
 
 //Weather Settings
-#define CITY_ID "5128581" //New York City https://openweathermap.org/current#cityid
+#define CITY_ID "2996944" //New York City https://openweathermap.org/current#cityid
 
 //You can also use LAT,LON for your location instead of CITY_ID, but not both
 //#define LAT "40.7127" //New York City, Looked up on https://www.latlong.net/
@@ -22,27 +22,10 @@
 #define NTP_SERVER "pool.ntp.org"
 #define GMT_OFFSET_SEC 3600 * 2 //New York is UTC -5 EST, -4 EDT, will be overwritten by weather data
 // WIFI Settings
-#define WIFI_SSID "Pastabox-toto"
+#define WIFI_SSID "Pastabox-test"
 #define WIFI_PASS "test"
-
-watchySettings settings{
-    #ifdef CITY_ID
-        .cityID = CITY_ID,
-    #else
-        .cityID = "",
-        .lat = LAT,
-        .lon = LON,
-    #endif
-    .weatherAPIKey = OPENWEATHERMAP_APIKEY,
-    .weatherURL = OPENWEATHERMAP_URL,
-    .weatherUnit = TEMP_UNIT,
-    .weatherLang = TEMP_LANG,
-    .weatherUpdateInterval = WEATHER_UPDATE_INTERVAL,
-    .ntpServer = NTP_SERVER,
-    .gmtOffset = GMT_OFFSET_SEC,
-    .wifiSSID = WIFI_SSID,
-    .wifiPass = WIFI_PASS,
-    .vibrateOClock = true,
-};
+// DATA API
+#define API_URL ""
+#define API_TOKEN ""
 
 #endif

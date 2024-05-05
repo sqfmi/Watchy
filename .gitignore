@@ -69,4 +69,4 @@ nbbuild.xml
 nbproject
 .vscode
 .envrc
-**/settings.h
+**/parameters.h

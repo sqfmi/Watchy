@@ -8,7 +8,7 @@ It's this a work in progress and be considere as experimental !
 
 ### Set seetings
 
-First you need to edit the [settings file](7_SEG/settings.h.example) with your informations and rename it to `settings.h`.
+First you need to edit the [parameters file](7_SEG/parameters.h.example) with your informations and rename it to `parameters.h`.
 
 ### Compile & Upload
 
@@ -27,7 +27,7 @@ You may need to replace the `--port` with your own.
 #### Compile
 
 ```bash
-arduino-cli compile ${SKETCH} --fqbn ${FQBN}
+arduino-cli compile ${SKETCH} --fqbn ${FQBN} --log-level error
 ```
 
 #### Upload
