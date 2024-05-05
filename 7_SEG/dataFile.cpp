@@ -7,8 +7,7 @@
 void FSData::listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     Serial.printf("Listing directory: %s\r\n", dirname);
 
-    while (!files.empty())
-    {
+    while (!files.empty()){
         files.pop_back();
     }
 

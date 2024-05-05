@@ -5,7 +5,6 @@
 #include "FS.h"
 #include <LittleFS.h>
 #include <vector>
-#include <string>
 
 #define FORMAT_LITTLEFS_IF_FAILED true
 #define DATA_FOLDER "/data"

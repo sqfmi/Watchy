@@ -172,27 +172,29 @@ void Watchy7SEG::syncAPI(){
 		String hour_api = (currentTime.Hour < 10) ? ("0" + String(currentTime.Hour)) : String(currentTime.Hour);
 		String json_steps = "{\"event_type\":" + String(ENDPOINT_API) + ",\"client_payload\":{\"data-name\":" + String(ENDPOINT_STEPS) + ",\"date\":" + date_api + ",\"hour\":" + hour_api + ",\"data\":" + String(sensor.getCounter()) + "}}";
 
-		//file_system = FSData();
+		FSData file_system;
 		if (WIFI_CONFIGURED) {
 			// Steps
 			SendData::pushAPIData(json_steps);
-			// Sync old steps
-			//for(const std::string& file : file_system.listDir(STEPS_FOLDER), 1) {
-			//	String json_file = file_system.readFile(String(STEPS_FOLDER) + "/" + file.c_str());
-			//	SendData::pushAPIData(json_file);
-			//	FSData::deleteFile(String(STEPS_FOLDER) + "/" + file.c_str());
-			//}
+			// Sync old data steps
+			file_system.listDir(LittleFS, STEPS_FOLDER, 1);
+			for(const String& file : file_system.files) {
+				String file_name = String(STEPS_FOLDER) + "/" + file;
+				const char * fname = file_name.c_str();
+
+				file_system.readFile(LittleFS, fname);
+				SendData::pushAPIData(file_system.content);
+				FSData::deleteFile(LittleFS, fname);
+			}
 
 			// turn off radios
 			WiFi.mode(WIFI_OFF);
 			btStop();
 		} else { // No WiFi, register in file
-			String file_name = (String(STEPS_FOLDER) + date_api + "_" + hour_api + ".txt").c_str();
-			if (LittleFS.exists(file_name)){
-			//	FSData::appendFile(LittleFS, file_name, json_steps.c_str());
-			} else {
-				//FSData::writeFile(LittleFS, file_name, json_steps.c_str());
-			}
+			String file_name = String(STEPS_FOLDER) + "/" + date_api + "_" + hour_api + ".txt";
+			const char * fname = file_name.c_str();
+			const char * json_content = json_steps.c_str();
+			FSData::writeFile(LittleFS, fname, json_content);
 		}
 	}
 }
