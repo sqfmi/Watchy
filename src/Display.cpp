@@ -28,6 +28,9 @@ WatchyDisplay::WatchyDisplay() :
   GxEPD2_EPD(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY, HIGH, 10000000, WIDTH, HEIGHT, panel, hasColor, hasPartialUpdate, hasFastPartialUpdate)
 {
   // Setup callback and SPI by default
+  #ifdef ARDUINO_ESP32S3_DEV
+  SPI.begin(WATCHY_V3_SCK,WATCHY_V3_MISO,WATCHY_V3_MOSI,WATCHY_V3_SS);
+  #endif
   selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
   setBusyCallback(busyCallback);
 }

@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 // Versioning
-#define WATCHY_LIB_VER "1.4.11"
+#define WATCHY_LIB_VER "1.4.12"
 
 //pins
 //#if !defined(ARDUINO_WATCHY_V10) && !defined(ARDUINO_WATCHY_V15) && !defined(ARDUINO_WATCHY_V20)
