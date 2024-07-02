@@ -1,6 +1,12 @@
 #include "Watchy.h"
 
-WatchyRTC Watchy::RTC;
+#ifdef ARDUINO_ESP32S3_DEV
+  Watchy32KRTC Watchy::RTC;
+  #define ACTIVE_LOW 0
+#else
+  WatchyRTC Watchy::RTC;
+  #define ACTIVE_LOW 1
+#endif
 GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> Watchy::display(
     WatchyDisplay{});
 
@@ -20,14 +26,22 @@ RTC_DATA_ATTR char lastSSID[30];
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause(); // get wake up reason
-  Wire.begin(SDA, SCL);                         // init i2c
+  #ifdef ARDUINO_ESP32S3_DEV
+    Wire.begin(WATCHY_V3_SDA, WATCHY_V3_SCL);     // init i2c
+  #else
+    Wire.begin(SDA, SCL);                         // init i2c
+  #endif
   RTC.init();
 
   // Init the display since is almost sure we will use it
   display.epd2.initWatchy();
 
   switch (wakeup_reason) {
+  #ifdef ARDUINO_ESP32S3_DEV
+  case ESP_SLEEP_WAKEUP_TIMER: // RTC Alarm
+  #else
   case ESP_SLEEP_WAKEUP_EXT0: // RTC Alarm
+  #endif
     RTC.read(currentTime);
     switch (guiState) {
     case WATCHFACE_STATE:
@@ -70,7 +84,18 @@ void Watchy::init(String datetime) {
 void Watchy::deepSleep() {
   display.hibernate();
   RTC.clearAlarm();        // resets the alarm flag in the RTC
+  #ifdef ARDUINO_ESP32S3_DEV
+  esp_sleep_enable_ext1_wakeup(
+      BTN_PIN_MASK,
+      ESP_EXT1_WAKEUP_ANY_LOW); // enable deep sleep wake on button press
 
+  rtc_clk_32k_enable(true);
+  //rtc_clk_slow_freq_set(RTC_SLOW_FREQ_32K_XTAL);
+  struct tm timeinfo;
+  getLocalTime(&timeinfo);
+  int secToNextMin = 60 - timeinfo.tm_sec;
+  esp_sleep_enable_timer_wakeup(secToNextMin * uS_TO_S_FACTOR);
+  #else
   // Set GPIOs 0-39 to input to avoid power leaking out
   const uint64_t ignore = 0b11110001000000110000100111000010; // Ignore some GPIOs due to resets
   for (int i = 0; i < GPIO_NUM_MAX; i++) {
@@ -83,6 +108,8 @@ void Watchy::deepSleep() {
   esp_sleep_enable_ext1_wakeup(
       BTN_PIN_MASK,
       ESP_EXT1_WAKEUP_ANY_HIGH); // enable deep sleep wake on button press
+  #endif
+
   esp_deep_sleep_start();
 }
 
@@ -173,7 +200,7 @@ void Watchy::handleButtonPress() {
     if (millis() - lastTimeout > 5000) {
       timeout = true;
     } else {
-      if (digitalRead(MENU_BTN_PIN) == 1) {
+      if (digitalRead(MENU_BTN_PIN) == ACTIVE_LOW) {
         lastTimeout = millis();
         if (guiState ==
             MAIN_MENU_STATE) { // if already in menu, then select menu item
@@ -205,7 +232,7 @@ void Watchy::handleButtonPress() {
         } else if (guiState == FW_UPDATE_STATE) {
           updateFWBegin();
         }
-      } else if (digitalRead(BACK_BTN_PIN) == 1) {
+      } else if (digitalRead(BACK_BTN_PIN) == ACTIVE_LOW) {
         lastTimeout = millis();
         if (guiState ==
             MAIN_MENU_STATE) { // exit to watch face if already in menu
@@ -217,7 +244,7 @@ void Watchy::handleButtonPress() {
         } else if (guiState == FW_UPDATE_STATE) {
           showMenu(menuIndex, false); // exit to menu if already in app
         }
-      } else if (digitalRead(UP_BTN_PIN) == 1) {
+      } else if (digitalRead(UP_BTN_PIN) == ACTIVE_LOW) {
         lastTimeout = millis();
         if (guiState == MAIN_MENU_STATE) { // increment menu index
           menuIndex--;
@@ -226,7 +253,7 @@ void Watchy::handleButtonPress() {
           }
           showFastMenu(menuIndex);
         }
-      } else if (digitalRead(DOWN_BTN_PIN) == 1) {
+      } else if (digitalRead(DOWN_BTN_PIN) == ACTIVE_LOW) {
         lastTimeout = millis();
         if (guiState == MAIN_MENU_STATE) { // decrement menu index
           menuIndex++;
@@ -323,6 +350,7 @@ void Watchy::showAbout() {
   display.print(voltage);
   display.println("V");
 
+  #ifndef ARDUINO_ESP32S3_DEV
   display.print("Uptime: ");
   RTC.read(currentTime);
   time_t b = makeTime(bootTime);
@@ -337,7 +365,9 @@ void Watchy::showAbout() {
   display.print(hours);
   display.print("h");
   display.print(minutes);
-  display.println("m");    
+  display.println("m");  
+  #endif
+  
   if(WIFI_CONFIGURED){
     display.print("SSID: ");
     display.println(lastSSID);
@@ -379,11 +409,19 @@ void Watchy::setTime() {
 
   RTC.read(currentTime);
 
+  #ifdef ARDUINO_ESP32S3_DEV
+  uint8_t minute = currentTime.Minute;
+  uint8_t hour   = currentTime.Hour;
+  uint8_t day    = currentTime.Day;
+  uint8_t month  = currentTime.Month;
+  uint8_t year   = currentTime.Year;  
+  #else
   int8_t minute = currentTime.Minute;
   int8_t hour   = currentTime.Hour;
   int8_t day    = currentTime.Day;
   int8_t month  = currentTime.Month;
   int8_t year   = tmYearToY2k(currentTime.Year);
+  #endif
 
   int8_t setIndex = SET_HOUR;
 
@@ -398,13 +436,13 @@ void Watchy::setTime() {
 
   while (1) {
 
-    if (digitalRead(MENU_BTN_PIN) == 1) {
+    if (digitalRead(MENU_BTN_PIN) == ACTIVE_LOW) {
       setIndex++;
       if (setIndex > SET_DAY) {
         break;
       }
     }
-    if (digitalRead(BACK_BTN_PIN) == 1) {
+    if (digitalRead(BACK_BTN_PIN) == ACTIVE_LOW) {
       if (setIndex != SET_HOUR) {
         setIndex--;
       }
@@ -412,7 +450,7 @@ void Watchy::setTime() {
 
     blink = 1 - blink;
 
-    if (digitalRead(DOWN_BTN_PIN) == 1) {
+    if (digitalRead(DOWN_BTN_PIN) == ACTIVE_LOW) {
       blink = 1;
       switch (setIndex) {
       case SET_HOUR:
@@ -435,7 +473,7 @@ void Watchy::setTime() {
       }
     }
 
-    if (digitalRead(UP_BTN_PIN) == 1) {
+    if (digitalRead(UP_BTN_PIN) == ACTIVE_LOW) {
       blink = 1;
       switch (setIndex) {
       case SET_HOUR:
@@ -519,7 +557,11 @@ void Watchy::setTime() {
   tmElements_t tm;
   tm.Month  = month;
   tm.Day    = day;
+  #ifdef ARDUINO_ESP32S3_DEV
+  tm.Year   = year;
+  #else
   tm.Year   = y2kYearToTm(year);
+  #endif
   tm.Hour   = hour;
   tm.Minute = minute;
   tm.Second = 0;
@@ -548,7 +590,7 @@ void Watchy::showAccelerometer() {
 
     unsigned long currentMillis = millis();
 
-    if (digitalRead(BACK_BTN_PIN) == 1) {
+    if (digitalRead(BACK_BTN_PIN) == ACTIVE_LOW) {
       break;
     }
 
@@ -693,12 +735,16 @@ weatherData Watchy::_getWeatherData(String cityID, String lat, String lon, Strin
 }
 
 float Watchy::getBatteryVoltage() {
+  #ifdef ARDUINO_ESP32S3_DEV
+    return analogReadMilliVolts(BATT_ADC_PIN) / 1000.0f * ADC_VOLTAGE_DIVIDER;
+  #else
   if (RTC.rtcType == DS3231) {
     return analogReadMilliVolts(BATT_ADC_PIN) / 1000.0f *
            2.0f; // Battery voltage goes through a 1/2 divider.
   } else {
     return analogReadMilliVolts(BATT_ADC_PIN) / 1000.0f * 2.0f;
   }
+  #endif
 }
 
 uint8_t Watchy::getBoardRevision() {

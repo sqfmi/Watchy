@@ -38,7 +38,7 @@ public:
 };
 
 void otaCallback::onWrite(BLECharacteristic *pCharacteristic) {
-  std::string rxData = pCharacteristic->getValue();
+  String rxData = pCharacteristic->getValue();
   if (!updateFlag) { // If it's the first packet of OTA since bootup, begin OTA
     // Serial.println("Begin FW Update");
     esp_ota_begin(esp_ota_get_next_update_partition(NULL), OTA_SIZE_UNKNOWN,

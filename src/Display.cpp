@@ -15,7 +15,6 @@
 // Link: https://github.com/sqfmi/Watchy
 
 #include "Display.h"
-#include "config.h"
 
 RTC_DATA_ATTR bool displayFullInit       = true;
 
