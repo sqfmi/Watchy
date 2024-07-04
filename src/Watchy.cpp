@@ -88,7 +88,6 @@ void Watchy::deepSleep() {
   esp_sleep_enable_ext1_wakeup(
       BTN_PIN_MASK,
       ESP_EXT1_WAKEUP_ANY_LOW); // enable deep sleep wake on button press
-
   rtc_clk_32k_enable(true);
   //rtc_clk_slow_freq_set(RTC_SLOW_FREQ_32K_XTAL);
   struct tm timeinfo;
@@ -109,7 +108,7 @@ void Watchy::deepSleep() {
       BTN_PIN_MASK,
       ESP_EXT1_WAKEUP_ANY_HIGH); // enable deep sleep wake on button press
   #endif
-
+  gpio_deep_sleep_hold_dis();
   esp_deep_sleep_start();
 }
 
