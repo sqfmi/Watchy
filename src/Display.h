@@ -17,6 +17,8 @@
 #pragma once
 
 #include <GxEPD2_EPD.h>
+#include "driver/gpio.h"
+#include "config.h"
 
 class WatchyDisplay : public GxEPD2_EPD
 {

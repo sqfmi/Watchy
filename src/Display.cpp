@@ -15,20 +15,24 @@
 // Link: https://github.com/sqfmi/Watchy
 
 #include "Display.h"
-#include "config.h"
 
 RTC_DATA_ATTR bool displayFullInit       = true;
 
 void WatchyDisplay::busyCallback(const void *) {
+  #ifndef ARDUINO_ESP32S3_DEV
   gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
   esp_sleep_enable_gpio_wakeup();
   esp_light_sleep_start();
+  #endif
 }
 
 WatchyDisplay::WatchyDisplay() :
   GxEPD2_EPD(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY, HIGH, 10000000, WIDTH, HEIGHT, panel, hasColor, hasPartialUpdate, hasFastPartialUpdate)
 {
   // Setup callback and SPI by default
+  #ifdef ARDUINO_ESP32S3_DEV
+  SPI.begin(WATCHY_V3_SCK,WATCHY_V3_MISO,WATCHY_V3_MOSI,WATCHY_V3_SS);
+  #endif
   selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
   setBusyCallback(busyCallback);
 }

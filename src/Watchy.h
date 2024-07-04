@@ -12,10 +12,26 @@
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include "DSEG7_Classic_Bold_53.h"
 #include "Display.h"
-#include "WatchyRTC.h"
 #include "BLE.h"
 #include "bma.h"
 #include "config.h"
+#include "esp_chip_info.h"
+#ifdef ARDUINO_ESP32S3_DEV
+  #include "Watchy32KRTC.h"
+  #include "soc/rtc.h"
+  #include "soc/rtc_io_reg.h"
+  #include "soc/sens_reg.h"
+  #include "esp_sleep.h"
+  #include "rom/rtc.h"
+  #include "soc/soc.h"
+  #include "soc/rtc_cntl_reg.h"
+  #include "time.h"
+  #include "esp_sntp.h"
+  #define uS_TO_S_FACTOR 1000000ULL  //Conversion factor for micro seconds to seconds
+  #define ADC_VOLTAGE_DIVIDER ((360.0f+100.0f)/360.0f) //Voltage divider at battery ADC  
+#else
+  #include "WatchyRTC.h"
+#endif
 
 typedef struct weatherData {
   int8_t temperature;
@@ -46,7 +62,11 @@ typedef struct watchySettings {
 
 class Watchy {
 public:
-  static WatchyRTC RTC;
+  #ifdef ARDUINO_ESP32S3_DEV
+   static Watchy32KRTC RTC;
+  #else
+   static WatchyRTC RTC;
+  #endif
   static GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> display;
   tmElements_t currentTime;
   watchySettings settings;
@@ -56,6 +76,7 @@ public:
   void init(String datetime = "");
   void deepSleep();
   float getBatteryVoltage();
+  uint8_t getBoardRevision();
   void vibMotor(uint8_t intervalMs = 100, uint8_t length = 20);
 
   virtual void handleButtonPress();
