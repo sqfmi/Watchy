@@ -37,11 +37,11 @@
 #define USB_DET_PIN 21
 #define RTC_INT_PIN -1 //not used
 
-#define MENU_BTN_MASK (BIT(7))
-#define BACK_BTN_MASK (BIT(6))
-#define UP_BTN_MASK   (BIT(0))
-#define DOWN_BTN_MASK (BIT(8))
-#define ACC_INT_MASK  (BIT(14))
+#define MENU_BTN_MASK (BIT64(7))
+#define BACK_BTN_MASK (BIT64(6))
+#define UP_BTN_MASK   (BIT64(0))
+#define DOWN_BTN_MASK (BIT64(8))
+#define ACC_INT_MASK  (BIT64(14))
 #define BTN_PIN_MASK  MENU_BTN_MASK|BACK_BTN_MASK|DOWN_BTN_MASK
 
 #else //V1,V1.5,V2
@@ -61,24 +61,24 @@
 #if defined (ARDUINO_WATCHY_V10)
     #define UP_BTN_PIN 32
     #define BATT_ADC_PIN 33
-    #define UP_BTN_MASK  (BIT(32))
+    #define UP_BTN_MASK  (BIT64(32))
     #define RTC_TYPE 1 //DS3231
 #elif defined (ARDUINO_WATCHY_V15)
     #define UP_BTN_PIN 32
     #define BATT_ADC_PIN 35
-    #define UP_BTN_MASK  (BIT(32))
+    #define UP_BTN_MASK  (BIT64(32))
     #define RTC_TYPE 2 //PCF8563
 #elif defined (ARDUINO_WATCHY_V20)
     #define UP_BTN_PIN 35
     #define BATT_ADC_PIN 34
-    #define UP_BTN_MASK  (BIT(35))
+    #define UP_BTN_MASK  (BIT64(35))
     #define RTC_TYPE 2 //PCF8563
 #endif
 
-#define MENU_BTN_MASK (BIT(26))
-#define BACK_BTN_MASK (BIT(25))
-#define DOWN_BTN_MASK (BIT(4))
-#define ACC_INT_MASK  (BIT(14))
+#define MENU_BTN_MASK (BIT64(26))
+#define BACK_BTN_MASK (BIT64(25))
+#define DOWN_BTN_MASK (BIT64(4))
+#define ACC_INT_MASK  (BIT64(14))
 #define BTN_PIN_MASK  MENU_BTN_MASK|BACK_BTN_MASK|UP_BTN_MASK|DOWN_BTN_MASK
 
 #endif
