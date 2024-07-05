@@ -977,6 +977,7 @@ void Watchy::showUpdateFW() {
 }
 
 void Watchy::updateFWBegin() {
+  int connectionTimeOutSeconds = BLE_WAIT_FOR_CONNECTION_TIMEOUT;
   display.setFullWindow();
   display.fillScreen(GxEPD_BLACK);
   display.setFont(&FreeMonoBold9pt7b);
@@ -988,16 +989,33 @@ void Watchy::updateFWBegin() {
   display.println(" ");
   display.println("Waiting for");
   display.println("connection...");
+  display.println(String(connectionTimeOutSeconds) + " seconds timeout");
   display.display(false); // full refresh
 
   BLE BT;
   BT.begin("Watchy BLE OTA");
   int prevStatus = -1;
   int currentStatus;
+  bool checkTimeout = true;
+  bool proceed = true;
+  long startTime = millis();
+  int lastTimeSeconds = 0;
 
-  while (1) {
+  while (proceed) {
     currentStatus = BT.updateStatus();
+    int seconds = (millis() - startTime)/1000;
+    if(seconds > lastTimeSeconds) {
+      lastTimeSeconds = seconds;
+      display.print(".");
+      display.display(true);
+    }
+
+    if (checkTimeout && lastTimeSeconds > connectionTimeOutSeconds) {
+        proceed = false;
+    }
+    
     if (prevStatus != currentStatus || prevStatus == 1) {
+      checkTimeout = false;
       if (currentStatus == 0) {
         display.setFullWindow();
         display.fillScreen(GxEPD_BLACK);
