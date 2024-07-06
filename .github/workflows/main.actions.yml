@@ -14,7 +14,7 @@ jobs:
     - uses: actions/checkout@master
     - uses: ArminJo/arduino-test-compile@v3
       with:
-        arduino-board-fqbn: esp32:esp32:watchy:Revision=${{ matrix.board-revisions }},PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
+        arduino-board-fqbn: esp32:esp32:watchy:Revision=${{ matrix.board-revisions }},PartitionScheme=huge_app,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
         platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
         arduino-platform: esp32:esp32@2.0.17
         required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
