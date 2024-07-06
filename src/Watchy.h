@@ -27,6 +27,8 @@
   #include "soc/rtc_cntl_reg.h"
   #include "time.h"
   #include "esp_sntp.h"
+  #include "hal/rtc_io_types.h"
+  #include "driver/rtc_io.h"
   #define uS_TO_S_FACTOR 1000000ULL  //Conversion factor for micro seconds to seconds
   #define ADC_VOLTAGE_DIVIDER ((360.0f+100.0f)/360.0f) //Voltage divider at battery ADC  
 #else
@@ -116,5 +118,6 @@ extern RTC_DATA_ATTR int menuIndex;
 extern RTC_DATA_ATTR BMA423 sensor;
 extern RTC_DATA_ATTR bool WIFI_CONFIGURED;
 extern RTC_DATA_ATTR bool BLE_CONFIGURED;
+extern RTC_DATA_ATTR bool USB_PLUGGED_IN;
 
 #endif

@@ -19,11 +19,9 @@
 RTC_DATA_ATTR bool displayFullInit       = true;
 
 void WatchyDisplay::busyCallback(const void *) {
-  #ifndef ARDUINO_ESP32S3_DEV
   gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
   esp_sleep_enable_gpio_wakeup();
   esp_light_sleep_start();
-  #endif
 }
 
 WatchyDisplay::WatchyDisplay() :

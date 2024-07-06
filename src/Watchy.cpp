@@ -19,6 +19,7 @@ RTC_DATA_ATTR weatherData currentWeather;
 RTC_DATA_ATTR int weatherIntervalCounter = -1;
 RTC_DATA_ATTR long gmtOffset = 0;
 RTC_DATA_ATTR bool alreadyInMenu         = true;
+RTC_DATA_ATTR bool USB_PLUGGED_IN = false;
 RTC_DATA_ATTR tmElements_t bootTime;
 RTC_DATA_ATTR uint32_t lastIPAddress;
 RTC_DATA_ATTR char lastSSID[30];
@@ -32,7 +33,6 @@ void Watchy::init(String datetime) {
     Wire.begin(SDA, SCL);                         // init i2c
   #endif
   RTC.init();
-
   // Init the display since is almost sure we will use it
   display.epd2.initWatchy();
 
@@ -67,9 +67,23 @@ void Watchy::init(String datetime) {
   case ESP_SLEEP_WAKEUP_EXT1: // button Press
     handleButtonPress();
     break;
+  #ifdef ARDUINO_ESP32S3_DEV
+  case ESP_SLEEP_WAKEUP_EXT0: // USB plug in
+    pinMode(USB_DET_PIN, INPUT);
+    USB_PLUGGED_IN = (digitalRead(USB_DET_PIN) == 1);
+    if(guiState == WATCHFACE_STATE){
+      RTC.read(currentTime);
+      showWatchFace(true);
+    }
+    break;
+  #endif
   default: // reset
     RTC.config(datetime);
     _bmaConfig();
+    #ifdef ARDUINO_ESP32S3_DEV
+    pinMode(USB_DET_PIN, INPUT);
+    USB_PLUGGED_IN = (digitalRead(USB_DET_PIN) == 1);
+    #endif    
     gmtOffset = settings.gmtOffset;
     RTC.read(currentTime);
     RTC.read(bootTime);
@@ -85,9 +99,16 @@ void Watchy::deepSleep() {
   display.hibernate();
   RTC.clearAlarm();        // resets the alarm flag in the RTC
   #ifdef ARDUINO_ESP32S3_DEV
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)USB_DET_PIN, USB_PLUGGED_IN ? LOW : HIGH); //// enable deep sleep wake on USB plug in/out
+  rtc_gpio_set_direction((gpio_num_t)USB_DET_PIN, RTC_GPIO_MODE_INPUT_ONLY);
+  rtc_gpio_pullup_en((gpio_num_t)USB_DET_PIN);
+
   esp_sleep_enable_ext1_wakeup(
       BTN_PIN_MASK,
       ESP_EXT1_WAKEUP_ANY_LOW); // enable deep sleep wake on button press
+  rtc_gpio_set_direction((gpio_num_t)UP_BTN_PIN, RTC_GPIO_MODE_INPUT_ONLY);
+  rtc_gpio_pullup_en((gpio_num_t)UP_BTN_PIN);
+
   rtc_clk_32k_enable(true);
   //rtc_clk_slow_freq_set(RTC_SLOW_FREQ_32K_XTAL);
   struct tm timeinfo;
@@ -108,7 +129,6 @@ void Watchy::deepSleep() {
       BTN_PIN_MASK,
       ESP_EXT1_WAKEUP_ANY_HIGH); // enable deep sleep wake on button press
   #endif
-  gpio_deep_sleep_hold_dis();
   esp_deep_sleep_start();
 }
 
