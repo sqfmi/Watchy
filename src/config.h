@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 // Versioning
-#define WATCHY_LIB_VER "1.4.13"
+#define WATCHY_LIB_VER "1.4.14"
 
 //pins
 
