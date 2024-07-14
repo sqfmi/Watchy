@@ -30,7 +30,7 @@
     },
     {
       "name": "WiFiManager",
-      "version": "https://github.com/tzapu/WiFiManager.git#2.0.3-alpha"
+      "version": "https://github.com/tzapu/WiFiManager.git#master"
     }
   ]
 }
