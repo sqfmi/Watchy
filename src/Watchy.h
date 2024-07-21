@@ -17,6 +17,7 @@
 #include "config.h"
 #include "esp_chip_info.h"
 #include "TimezonesGMT.h"
+#include "MoonPhase.h"
 #ifdef ARDUINO_ESP32S3_DEV
   #include "Watchy32KRTC.h"
   #include "soc/rtc.h"
@@ -86,6 +87,7 @@ public:
   void showMenu(byte menuIndex, bool partialRefresh);
   void showFastMenu(byte menuIndex);
   void showAbout();
+  void showMoonPhase();
   void showBuzz();
   void showAccelerometer();
   void showUpdateFW();
