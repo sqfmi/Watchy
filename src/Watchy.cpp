@@ -27,6 +27,7 @@ RTC_DATA_ATTR bool USB_PLUGGED_IN = false;
 RTC_DATA_ATTR tmElements_t bootTime;
 RTC_DATA_ATTR uint32_t lastIPAddress;
 RTC_DATA_ATTR char lastSSID[30];
+RTC_DATA_ATTR MoonPhase mp;
 
 void Watchy::init(String datetime) {
   esp_sleep_wakeup_cause_t wakeup_reason;
@@ -39,7 +40,7 @@ void Watchy::init(String datetime) {
   RTC.init();
   // Init the display since is almost sure we will use it
   display.epd2.initWatchy();
-
+  mp = MoonPhase();
   switch (wakeup_reason) {
   #ifdef ARDUINO_ESP32S3_DEV
   case ESP_SLEEP_WAKEUP_TIMER: // RTC Alarm
@@ -97,6 +98,9 @@ void Watchy::init(String datetime) {
     esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
     break;
   }
+
+  time_t epoch = makeTime(currentTime);
+  mp.calculate(epoch);
   deepSleep();
 }
 void Watchy::deepSleep() {
@@ -167,6 +171,8 @@ void Watchy::handleButtonPress() {
       case 6:
         showSyncNTP();
         break;
+      case 7:
+        showMoonPhase();
       default:
         break;
       }
@@ -249,6 +255,8 @@ void Watchy::handleButtonPress() {
           case 6:
             showSyncNTP();
             break;
+          case 7:
+            showMoonPhase();
           default:
             break;
           }
@@ -302,9 +310,9 @@ void Watchy::showMenu(byte menuIndex, bool partialRefresh) {
   const char *menuItems[] = {
       "About Watchy", "Vibrate Motor", "Show Accelerometer",
       "Set Time",     "Setup WiFi",    "Update Firmware",
-      "Sync NTP"};
+      "Sync NTP",     "Moon Phase"};
   for (int i = 0; i < MENU_LENGTH; i++) {
-    yPos = MENU_HEIGHT + (MENU_HEIGHT * i);
+    yPos = MENU_HEIGHT/2 + (MENU_HEIGHT * i);
     display.setCursor(0, yPos);
     if (i == menuIndex) {
       display.getTextBounds(menuItems[i], 0, yPos, &x1, &y1, &w, &h);
@@ -335,9 +343,9 @@ void Watchy::showFastMenu(byte menuIndex) {
   const char *menuItems[] = {
       "About Watchy", "Vibrate Motor", "Show Accelerometer",
       "Set Time",     "Setup WiFi",    "Update Firmware",
-      "Sync NTP"};
+      "Sync NTP",     "Moon Phase"};
   for (int i = 0; i < MENU_LENGTH; i++) {
-    yPos = MENU_HEIGHT + (MENU_HEIGHT * i);
+    yPos = MENU_HEIGHT/2 + (MENU_HEIGHT * i);
     display.setCursor(0, yPos);
     if (i == menuIndex) {
       display.getTextBounds(menuItems[i], 0, yPos, &x1, &y1, &w, &h);
@@ -404,6 +412,57 @@ void Watchy::showAbout() {
   guiState = APP_STATE;
 }
 
+void Watchy::showMoonPhase() {
+    
+    RTC.read(currentTime);
+    time_t epoch = makeTime(currentTime);
+    mp.calculate(epoch);
+
+    display.setFullWindow();
+    display.fillScreen(GxEPD_BLACK);
+    display.setFont(&FreeMonoBold9pt7b);
+    display.setTextColor(GxEPD_WHITE);
+    display.setCursor(0, 10);
+   
+    display.setCursor(0, MENU_HEIGHT);
+
+    display.print("Date: ");
+    display.println(mp.jDate);
+    
+    display.print("Phase: ");
+    display.println(mp.phase);
+
+    display.print("Age: ");
+    display.print(mp.age);
+    display.println(" days");
+
+    display.print("Visibility: ");
+    display.print(mp.fraction);
+    display.println("%");
+
+    display.print("Distance: ");
+    display.print(mp.distance);
+    display.println(" er");
+
+    display.print("Latitude: ");
+    display.print(mp.latitude);
+    display.println("°");
+
+    display.print("Longitude: ");
+    display.print(mp.longitude);
+    display.println("°");
+
+    display.print("Ph.: ");
+    display.println(mp.phaseName);
+
+    display.print("Zodiac: ");
+    display.println(mp.zodiacName);
+    
+    display.display(true); // full refresh
+
+    guiState = APP_STATE;
+}
+
 void Watchy::showBuzz() {
   display.setFullWindow();
   display.fillScreen(GxEPD_BLACK);
@@ -443,7 +502,7 @@ void Watchy::setTime() {
   int8_t hour   = currentTime.Hour;
   int8_t day    = currentTime.Day;
   int8_t month  = currentTime.Month;
-  int8_t year   = currentTime.Year; //tmYearToY2k(currentTime.Year);
+  int8_t year   = tmYearToY2k(currentTime.Year);
   #endif
   int8_t gmt    = gmtOffset / 3600;
 
@@ -580,7 +639,7 @@ void Watchy::setTime() {
     if (setIndex == SET_YEAR) { // blink minute digits
       display.setTextColor(blink ? GxEPD_WHITE : GxEPD_BLACK);
     }
-    display.print(year);
+    display.print(1970 + year);
 
     display.setTextColor(GxEPD_WHITE);
     display.print("/");
@@ -613,7 +672,7 @@ void Watchy::setTime() {
   #ifdef ARDUINO_ESP32S3_DEV
   tm.Year   = year;
   #else
-  tm.Year   = year; //y2kYearToTm(year);
+  tm.Year   = y2kYearToTm(year);
   #endif
   tm.Hour   = hour;
   tm.Minute = minute;
@@ -1200,5 +1259,9 @@ bool Watchy::syncNTP(long gmt, String ntpServer) {
   tmElements_t tm;
   breakTime((time_t)timeClient.getEpochTime(), tm);
   RTC.set(tm);
+  //Update also moon calendar.
+  RTC.read(currentTime);
+  time_t epoch = makeTime(currentTime);
+  mp.calculate(epoch);
   return true;
 }
