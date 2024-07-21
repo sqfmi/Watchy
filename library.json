@@ -1,6 +1,6 @@
 {
   "name": "Watchy",
-  "version": "1.4.13",
+  "version": "1.4.14",
   "description": "Watchy - An Open Source E-Paper Watch by SQFMI",
   "authors": [
     {
@@ -30,7 +30,7 @@
     },
     {
       "name": "WiFiManager",
-      "version": "https://github.com/tzapu/WiFiManager.git#2.0.3-alpha"
+      "version": "https://github.com/tzapu/WiFiManager.git#master"
     }
   ]
 }

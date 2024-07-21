@@ -1,17 +1,19 @@
 #include "Watchy32KRTC.h"
+#include "TimezonesGMT.h"
 
 Watchy32KRTC::Watchy32KRTC(){}
 
 void Watchy32KRTC::init() {
+  if(TIMEZONES_NON_GMT_OVERRIDE == 0){
+    setenv("TZ", timeZones[TIMEZONES_SELECTED].timezone, 1);
+  } else if (TIMEZONES_NON_GMT_OVERRIDE == 1) {
+    setenv("TZ", tz_override.timezone, 1);
+  } else {
+    setenv("TZ", "GMT0", 1);  
+  }
 
-}
-
-/*
-
-  setenv("TZ", "", 1);
   tzset();
-
-*/
+}
 
 void Watchy32KRTC::config(String datetime) { // String datetime format is YYYY:MM:DD:HH:MM:SS
     struct tm timeInfo;
