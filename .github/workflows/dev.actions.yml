@@ -16,7 +16,7 @@ jobs:
       with:
         arduino-board-fqbn: esp32:esp32:watchy:Revision=v20,PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
         platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-        arduino-platform: esp32:esp32@2.0.17
+        arduino-platform: esp32:esp32@6.7.0
         required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
         set-build-path: true
     - uses: actions/upload-artifact@v3
