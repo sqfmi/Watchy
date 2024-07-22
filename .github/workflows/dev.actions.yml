@@ -7,8 +7,27 @@ on:
     branches:
       - "dev"
 jobs:
-  build:
-    name: Build Example Watchfaces
+  build_v3:
+    name: Build Example Watchfaces (v3)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: ArminJo/arduino-test-compile@v3
+      with:
+        arduino-board-fqbn: esp32:esp32:esp32s3:Revision=v30,PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
+        platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+        arduino-platform: esp32:esp32@3.0.3
+        required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
+        set-build-path: true
+    - uses: actions/upload-artifact@v3
+      with:
+        name: binaries
+        path: ${{ github.workspace }}/examples/WatchFaces/**/build/*.bin
+    - uses: actions/download-artifact@v3
+    - name: Display structure of downloaded files
+      run: ls -R
+  build_others:
+    name: Build Example Watchfaces (Others)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -25,4 +44,4 @@ jobs:
         path: ${{ github.workspace }}/examples/WatchFaces/**/build/*.bin
     - uses: actions/download-artifact@v3
     - name: Display structure of downloaded files
-      run: ls -R
+      run: ls -R      
