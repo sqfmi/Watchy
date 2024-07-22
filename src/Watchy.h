@@ -58,7 +58,7 @@ typedef struct watchySettings {
   int8_t weatherUpdateInterval;
   // NTP Settings
   String ntpServer;
-  int gmtOffset;
+  long gmtOffset;
   //
   bool vibrateOClock;
 } watchySettings;

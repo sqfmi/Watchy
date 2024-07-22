@@ -12,7 +12,7 @@ GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> Watchy::display(
 
 RTC_DATA_ATTR int guiState;
 RTC_DATA_ATTR int menuIndex;
-RTC_DATA_ATTR BMA423 sensor;
+RTC_DATA_ATTR BMA423 sensor;  
 RTC_DATA_ATTR bool WIFI_CONFIGURED;
 RTC_DATA_ATTR bool BLE_CONFIGURED;
 RTC_DATA_ATTR weatherData currentWeather;
@@ -36,6 +36,7 @@ void Watchy::init(String datetime) {
   #else
     Wire.begin(SDA, SCL);                         // init i2c
   #endif
+
   RTC.init();
   // Init the display since is almost sure we will use it
   display.epd2.initWatchy();
@@ -87,8 +88,8 @@ void Watchy::init(String datetime) {
     #ifdef ARDUINO_ESP32S3_DEV
     pinMode(USB_DET_PIN, INPUT);
     USB_PLUGGED_IN = (digitalRead(USB_DET_PIN) == 1);
-    #endif    
-    gmtOffset = settings.gmtOffset;
+    #endif  
+    gmtOffset = settings.gmtOffset;  
     RTC.read(currentTime);
     RTC.read(bootTime);
     showWatchFace(false); // full update on reset
@@ -445,9 +446,10 @@ void Watchy::setTime() {
   int8_t month  = currentTime.Month;
   int8_t year   = currentTime.Year; //tmYearToY2k(currentTime.Year);
   #endif
-  int8_t gmt    = gmtOffset / 3600;
+  // gmt variable defaults to TIMEZONES_SELECTED if defined
+  int8_t gmt    = OFFSETS_SEC[tzIndex] / 3600;
 
-  int8_t tzIndex = TIMEZONES_SELECTED;
+
 
   int8_t setIndex = SET_HOUR;
 
@@ -529,13 +531,8 @@ void Watchy::setTime() {
     }
 
  
-    if(tzIndex < 13){
-      gmt = (tzIndex);
-    }else if(tzIndex == 13){
-      gmt = 0;
-    }else{
-      gmt = - (tzIndex - 13);
-    }
+    gmt = OFFSETS_SEC[tzIndex] / 3600; 
+    gmtOffset = gmt * 3600;
 
     display.fillScreen(GxEPD_BLACK);
     display.setTextColor(GxEPD_WHITE);
@@ -618,15 +615,15 @@ void Watchy::setTime() {
   tm.Hour   = hour;
   tm.Minute = minute;
   tm.Second = 0;
-
-  gmtOffset = gmt * 3600;
   
   if(TIMEZONES_NON_GMT_OVERRIDE == 0){
     setenv("TZ", timeZones[tzIndex].timezone, 1);
-  } else if (TIMEZONES_NON_GMT_OVERRIDE == 1) {
+  } else{
+    #if TIMEZONES_NON_GMT_OVERRIDE == 1
     setenv("TZ", tz_override.timezone, 1);
-  } else {
-    setenv("TZ", timeZones[TIMEZONES_SELECTED].timezone, 1);  
+    #else
+    setenv("TZ", timeZones[TIMEZONES_SELECTED].timezone, 1);
+    #endif
   }
 
   tzset();
@@ -775,7 +772,7 @@ weatherData Watchy::_getWeatherData(String cityID, String lat, String lon, Strin
 		        breakTime((time_t)(int)responseObject["sys"]["sunset"], currentWeather.sunset);
         // sync NTP during weather API call and use timezone of lat & lon
         gmtOffset = int(responseObject["timezone"]);
-        syncNTP();
+        syncNTP(gmtOffset);
       } else {
         // http error
       }
@@ -1144,7 +1141,7 @@ void Watchy::showSyncNTP() {
   display.println(gmtOffset);
   display.display(true); // full refresh
   if (connectWiFi()) {
-    if (syncNTP()) {
+    if (syncNTP(gmtOffset)) {
       display.println("NTP Sync Success\n");
       display.println("Current Time Is:");
 

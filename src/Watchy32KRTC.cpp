@@ -64,7 +64,6 @@ void Watchy32KRTC::set(tmElements_t tm) {
   timeInfo.tm_hour = tm.Hour;
   timeInfo.tm_min  = tm.Minute;
   timeInfo.tm_sec  = tm.Second;
-
   // Convert tm to timeval
   struct timeval tv;
   tv.tv_sec = mktime(&timeInfo);
