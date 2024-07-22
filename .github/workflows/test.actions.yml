@@ -14,9 +14,9 @@ jobs:
     - uses: actions/checkout@master
     - uses: ArminJo/arduino-test-compile@v3
       with:
-        arduino-board-fqbn: espressif32:arduino-esp32:esp32-s3-devkitc-1:Revision=v20,PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
+        arduino-board-fqbn: espressif32:esp32:esp32:Revision=v20,PartitionScheme=min_spiffs,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
         platform-url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
-        arduino-platform: espressif32:arduino-esp32:esp32-s3-devkitc-1
+        arduino-platform: espressif32:esp32:esp32
         required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
         set-build-path: true
     - uses: actions/upload-artifact@v3
