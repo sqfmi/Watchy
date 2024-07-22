@@ -16,7 +16,7 @@ jobs:
       with:
         arduino-board-fqbn: esp32:esp32:watchy:Revision=${{ matrix.board-revisions }},PartitionScheme=huge_app,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
         platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-        arduino-platform: esp32:esp32@6.7.0
+        arduino-platform: esp32:esp32@3.0.3
         required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
         set-build-path: true
     - name: Rename binaries with board revision
