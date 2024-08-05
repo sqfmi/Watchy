@@ -135,6 +135,7 @@ void WatchyPipBoy::drawBattery(){
     display.fillRect(15, 155, 27, 11, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);//clear battery segments
     int8_t batteryLevel = 0;
     float VBAT = getBatteryVoltage();
+    #ifndef ARDUINO_ESP32S3_DEV
     if(VBAT > 4.1){
         batteryLevel = 3;
     }
@@ -147,6 +148,20 @@ void WatchyPipBoy::drawBattery(){
     else if(VBAT <= 3.80){
         batteryLevel = 0;
     }
+    #else
+     if (VBAT > 3.90) {
+        batteryLevel = 3;
+    }
+    else if (VBAT > 3.75 && VBAT <= 3.90) {
+        batteryLevel = 2;
+    }
+    else if (VBAT > 3.60 && VBAT <= 3.75) {
+        batteryLevel = 1;
+    }
+    else if (VBAT <= 3.60) {
+        batteryLevel = 0;
+    }
+    #endif
 
     for(int8_t batterySegments = 0; batterySegments < batteryLevel; batterySegments++){
         display.fillRect(15 + (batterySegments * 9), 155, 7, 11, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);

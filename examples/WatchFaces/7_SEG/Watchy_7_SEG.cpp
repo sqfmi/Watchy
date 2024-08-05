@@ -90,18 +90,33 @@ void Watchy7SEG::drawBattery(){
     display.fillRect(163, 78, 27, BATTERY_SEGMENT_HEIGHT, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);//clear battery segments
     int8_t batteryLevel = 0;
     float VBAT = getBatteryVoltage();
-    if(VBAT > 4.0){
+        #ifndef ARDUINO_ESP32S3_DEV
+    if(VBAT > 4.1){
         batteryLevel = 3;
     }
-    else if(VBAT > 3.6 && VBAT <= 4.0){
+    else if(VBAT > 3.95 && VBAT <= 4.1){
         batteryLevel = 2;
     }
-    else if(VBAT > 3.20 && VBAT <= 3.6){
+    else if(VBAT > 3.80 && VBAT <= 3.95){
         batteryLevel = 1;
     }
-    else if(VBAT <= 3.20){
+    else if(VBAT <= 3.80){
         batteryLevel = 0;
     }
+    #else
+     if (VBAT > 3.90) {
+        batteryLevel = 3;
+    }
+    else if (VBAT > 3.75 && VBAT <= 3.90) {
+        batteryLevel = 2;
+    }
+    else if (VBAT > 3.60 && VBAT <= 3.75) {
+        batteryLevel = 1;
+    }
+    else if (VBAT <= 3.60) {
+        batteryLevel = 0;
+    }
+    #endif
 
     for(int8_t batterySegments = 0; batterySegments < batteryLevel; batterySegments++){
         display.fillRect(163 + (batterySegments * BATTERY_SEGMENT_SPACING), 78, BATTERY_SEGMENT_WIDTH, BATTERY_SEGMENT_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
