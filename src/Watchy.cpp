@@ -705,10 +705,12 @@ weatherData Watchy::_getWeatherData(String cityID, String lat, String lon, Strin
         currentWeather.weatherDescription =
           JSONVar::stringify(responseObject["weather"][0]["main"]);
         currentWeather.external = true;
-        breakTime((time_t)(int)responseObject["sys"]["sunrise"], currentWeather.sunrise);
-        breakTime((time_t)(int)responseObject["sys"]["sunset"], currentWeather.sunset);
-        // sync NTP during weather API call and use timezone of lat & lon
+        // use timezone of lat & lon
         gmtOffset = int(responseObject["timezone"]);
+        // adjust timezone of sunrise & sunset
+        breakTime((time_t)(int)responseObject["sys"]["sunrise"] + gmtOffset, currentWeather.sunrise);
+        breakTime((time_t)(int)responseObject["sys"]["sunset"] + gmtOffset, currentWeather.sunset);
+        // sync NTP during weather API call using timezone
         syncNTP(gmtOffset);
       } else {
         // http error
