@@ -358,15 +358,15 @@ void Watchy::showAbout() {
   //int seconds = (totalSeconds % 60);
   int minutes = (totalSeconds % 3600) / 60;
   int hours = (totalSeconds % 86400) / 3600;
-  int days = (totalSeconds % (86400 * 30)) / 86400; 
+  int days = (totalSeconds % (86400 * 30)) / 86400;
   display.print(days);
   display.print("d");
   display.print(hours);
   display.print("h");
   display.print(minutes);
-  display.println("m");  
+  display.println("m");
   #endif
-  
+
   if(WIFI_CONFIGURED){
     display.print("SSID: ");
     display.println(lastSSID);
@@ -413,7 +413,7 @@ void Watchy::setTime() {
   uint8_t hour   = currentTime.Hour;
   uint8_t day    = currentTime.Day;
   uint8_t month  = currentTime.Month;
-  uint8_t year   = currentTime.Year;  
+  uint8_t year   = currentTime.Year;
   #else
   int8_t minute = currentTime.Minute;
   int8_t hour   = currentTime.Hour;
@@ -701,12 +701,12 @@ weatherData Watchy::_getWeatherData(String cityID, String lat, String lon, Strin
         JSONVar responseObject     = JSON.parse(payload);
         currentWeather.temperature = int(responseObject["main"]["temp"]);
         currentWeather.weatherConditionCode =
-            int(responseObject["weather"][0]["id"]);
+          int(responseObject["weather"][0]["id"]);
         currentWeather.weatherDescription =
-		        JSONVar::stringify(responseObject["weather"][0]["main"]);
-	      currentWeather.external = true;
-		        breakTime((time_t)(int)responseObject["sys"]["sunrise"], currentWeather.sunrise);
-		        breakTime((time_t)(int)responseObject["sys"]["sunset"], currentWeather.sunset);
+          JSONVar::stringify(responseObject["weather"][0]["main"]);
+        currentWeather.external = true;
+        breakTime((time_t)(int)responseObject["sys"]["sunrise"], currentWeather.sunrise);
+        breakTime((time_t)(int)responseObject["sys"]["sunset"], currentWeather.sunset);
         // sync NTP during weather API call and use timezone of lat & lon
         gmtOffset = int(responseObject["timezone"]);
         syncNTP(gmtOffset);
@@ -904,8 +904,8 @@ void Watchy::setupWifi() {
   } else {
     display.println("Connected to:");
     display.println(WiFi.SSID());
-		display.println("Local IP:");
-		display.println(WiFi.localIP());
+    display.println("Local IP:");
+    display.println(WiFi.localIP());
     weatherIntervalCounter = -1; // Reset to force weather to be read again
     lastIPAddress = WiFi.localIP();
     WiFi.SSID().toCharArray(lastSSID, 30);
@@ -930,8 +930,8 @@ void Watchy::_configModeCallback(WiFiManager *myWiFiManager) {
   display.println(WIFI_AP_SSID);
   display.print("IP: ");
   display.println(WiFi.softAPIP());
-	display.println("MAC address:");
-	display.println(WiFi.softAPmacAddress().c_str());
+  display.println("MAC address:");
+  display.println(WiFi.softAPmacAddress().c_str());
   display.display(false); // full refresh
 }
 
