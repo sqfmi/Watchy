@@ -4,10 +4,13 @@
 Watchy32KRTC::Watchy32KRTC(){}
 
 void Watchy32KRTC::init() {
+  long gmtOffset = TimezonesGMT::OFFSETS_SEC[TimezonesGMT::tzIndex];
+  Serial.print("GMT Offset: ");
+  Serial.println(gmtOffset);
   if(TIMEZONES_NON_GMT_OVERRIDE == 0){
-    setenv("TZ", timeZones[TIMEZONES_SELECTED].timezone, 1);
+    setenv("TZ", TimezonesGMT::timeZones[TimezonesGMT::tzIndex].timezone, 1);
   } else if (TIMEZONES_NON_GMT_OVERRIDE == 1) {
-    setenv("TZ", tz_override.timezone, 1);
+    setenv("TZ", TimezonesGMT::tz_override.timezone, 1);
   } else {
     setenv("TZ", "GMT0", 1);  
   }
@@ -64,7 +67,6 @@ void Watchy32KRTC::set(tmElements_t tm) {
   timeInfo.tm_hour = tm.Hour;
   timeInfo.tm_min  = tm.Minute;
   timeInfo.tm_sec  = tm.Second;
-
   // Convert tm to timeval
   struct timeval tv;
   tv.tv_sec = mktime(&timeInfo);
@@ -99,7 +101,6 @@ String Watchy32KRTC::_getValue(String data, char separator, int index) {
 void Watchy32KRTC::_timeval_to_tm(struct timeval *tv, struct tm *tm) {
   // Get the seconds and microseconds from the timeval struct
   time_t seconds = tv->tv_sec;
-  int microseconds = tv->tv_usec;
   // Convert the seconds to a tm struct
   *tm = *localtime(&seconds);
 }

@@ -16,7 +16,6 @@
 #include "bma.h"
 #include "config.h"
 #include "esp_chip_info.h"
-#include "TimezonesGMT.h"
 #include "MoonPhase.h"
 #ifdef ARDUINO_ESP32S3_DEV
   #include "Watchy32KRTC.h"
@@ -59,7 +58,7 @@ typedef struct watchySettings {
   int8_t weatherUpdateInterval;
   // NTP Settings
   String ntpServer;
-  int gmtOffset;
+  long gmtOffset;
   //
   bool vibrateOClock;
 } watchySettings;
