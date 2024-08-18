@@ -1,4 +1,5 @@
 #include "Watchy.h"
+#include "TimezonesGMT.h"
 
 #ifdef ARDUINO_ESP32S3_DEV
   Watchy32KRTC Watchy::RTC;
@@ -506,7 +507,7 @@ void Watchy::setTime() {
   int8_t year   = tmYearToY2k(currentTime.Year);
   #endif
   // gmt variable defaults to TIMEZONES_SELECTED if defined
-  int8_t gmt    = OFFSETS_SEC[tzIndex] / 3600;
+  int8_t gmt    = TimezonesGMT::OFFSETS_SEC[TimezonesGMT::tzIndex] / 3600;
 
 
 
@@ -556,7 +557,7 @@ void Watchy::setTime() {
         day == 31 ? (day = 1) : day++;
         break;
       case SET_TZ:       
-        tzIndex == TIMEZONES_LENGTH - 1 ? (tzIndex = 0) : tzIndex++;
+        TimezonesGMT::tzIndex == TIMEZONES_LENGTH - 1 ? (TimezonesGMT::tzIndex = 0) : TimezonesGMT::tzIndex++;
         break;
       default:
         break;
@@ -582,7 +583,7 @@ void Watchy::setTime() {
         day == 1 ? (day = 31) : day--;
         break;
       case SET_TZ:
-        tzIndex == 0 ? (tzIndex = TIMEZONES_LENGTH - 1) : tzIndex--;
+        TimezonesGMT::tzIndex == 0 ? (TimezonesGMT::tzIndex = TIMEZONES_LENGTH - 1) :  TimezonesGMT::tzIndex--;
         break;
       default:
         break;
@@ -590,7 +591,7 @@ void Watchy::setTime() {
     }
 
  
-    gmt = OFFSETS_SEC[tzIndex] / 3600; 
+    gmt =  TimezonesGMT::OFFSETS_SEC[TimezonesGMT::tzIndex] / 3600; 
     gmtOffset = gmt * 3600;
 
     display.fillScreen(GxEPD_BLACK);
@@ -676,12 +677,12 @@ void Watchy::setTime() {
   tm.Second = 0;
   
   if(TIMEZONES_NON_GMT_OVERRIDE == 0){
-    setenv("TZ", timeZones[tzIndex].timezone, 1);
+    setenv("TZ", TimezonesGMT::timeZones[TimezonesGMT::tzIndex].timezone, 1);
   } else{
     if (TIMEZONES_NON_GMT_OVERRIDE == 1){
-        setenv("TZ", tz_override.timezone, 1);
-    }else {
-        setenv("TZ", timeZones[TIMEZONES_SELECTED].timezone, 1);
+      setenv("TZ", TimezonesGMT::tz_override.timezone, 1);
+    } else {
+      setenv("TZ", TimezonesGMT::timeZones[TIMEZONES_SELECTED].timezone, 1);
     }
   }
 
