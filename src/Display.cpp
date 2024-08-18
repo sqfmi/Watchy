@@ -19,11 +19,9 @@
 RTC_DATA_ATTR bool displayFullInit       = true;
 
 void WatchyDisplay::busyCallback(const void *) {
-  #ifndef ARDUINO_ESP32S3_DEV
   gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
   esp_sleep_enable_gpio_wakeup();
   esp_light_sleep_start();
-  #endif
 }
 
 WatchyDisplay::WatchyDisplay() :
@@ -50,13 +48,33 @@ void WatchyDisplay::asyncPowerOn() {
   }
 }
 
-void WatchyDisplay::setDarkBorder(bool dark) {
+void WatchyDisplay::drawDarkBorder(bool dark) {
   if (_hibernating) return;
-  darkBorder = dark;
+  //This line overrides the intended behaviour that I want for the
+  //darkBorder variable. I want to set the darkBorder variable to dark
+  //and then paint the border always dark, not always putting the opposite
+  //colour of the background, like it is done here.
+  //darkBorder = dark;
   _startTransfer();
   _transferCommand(0x3C); // BorderWavefrom
   _transfer(dark ? 0x02 : 0x05);
   _endTransfer();
+}
+
+/*
+  This is a setter for the darkBorder variable. It sets the darkBorder.
+*/
+void WatchyDisplay::setDarkBorder(bool dark) {
+  if (_hibernating) return;
+  darkBorder = dark;
+  drawDarkBorder(dark);
+}
+
+/*
+  This is a getter for the darkBorder variable. It returns the darkBorder.
+*/
+bool WatchyDisplay::isDarkBorder() {
+  return darkBorder;
 }
 
 void WatchyDisplay::clearScreen(uint8_t value)

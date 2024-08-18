@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 // Versioning
-#define WATCHY_LIB_VER "1.4.13"
+#define WATCHY_LIB_VER "1.4.14"
 
 //pins
 
@@ -99,14 +99,16 @@
 #define MAIN_MENU_STATE 0
 #define APP_STATE       1
 #define FW_UPDATE_STATE 2
-#define MENU_HEIGHT     25
-#define MENU_LENGTH     7
+#define MENU_HEIGHT     24
+#define MENU_LENGTH     8
 // set time
 #define SET_HOUR   0
 #define SET_MINUTE 1
-#define SET_YEAR   2
-#define SET_MONTH  3
-#define SET_DAY    4
+#define SET_TZ     2
+#define SET_YEAR   3
+#define SET_MONTH  4
+#define SET_DAY    5
+
 #define HOUR_12_24 24
 // BLE OTA
 #define BLE_DEVICE_NAME        "Watchy BLE OTA"
