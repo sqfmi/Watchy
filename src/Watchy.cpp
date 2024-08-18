@@ -678,11 +678,11 @@ void Watchy::setTime() {
   if(TIMEZONES_NON_GMT_OVERRIDE == 0){
     setenv("TZ", timeZones[tzIndex].timezone, 1);
   } else{
-    #if TIMEZONES_NON_GMT_OVERRIDE == 1
-    setenv("TZ", tz_override.timezone, 1);
-    #else
-    setenv("TZ", timeZones[TIMEZONES_SELECTED].timezone, 1);
-    #endif
+    if (TIMEZONES_NON_GMT_OVERRIDE == 1){
+        setenv("TZ", tz_override.timezone, 1);
+    }else {
+        setenv("TZ", timeZones[TIMEZONES_SELECTED].timezone, 1);
+    }
   }
 
   tzset();
