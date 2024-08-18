@@ -16,10 +16,15 @@ void Watchy7SEG::drawWatchFace(){
     drawSteps();
     drawWeather();
     drawBattery();
-    display.drawBitmap(120, 77, WIFI_CONFIGURED ? wifi : wifioff, 26, 18, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+    display.drawBitmap(116, 75, WIFI_CONFIGURED ? wifi : wifioff, 26, 18, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     if(BLE_CONFIGURED){
-        display.drawBitmap(100, 75, bluetooth, 13, 21, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+        display.drawBitmap(100, 73, bluetooth, 13, 21, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     }
+    #ifdef ARDUINO_ESP32S3_DEV
+    if(USB_PLUGGED_IN){
+      display.drawBitmap(140, 75, charge, 16, 18, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+    }
+    #endif
 }
 
 void Watchy7SEG::drawTime(){
@@ -81,10 +86,11 @@ void Watchy7SEG::drawSteps(){
     display.println(stepCount);
 }
 void Watchy7SEG::drawBattery(){
-    display.drawBitmap(154, 73, battery, 37, 21, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
-    display.fillRect(159, 78, 27, BATTERY_SEGMENT_HEIGHT, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);//clear battery segments
+    display.drawBitmap(158, 73, battery, 37, 21, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+    display.fillRect(163, 78, 27, BATTERY_SEGMENT_HEIGHT, DARKMODE ? GxEPD_BLACK : GxEPD_WHITE);//clear battery segments
     int8_t batteryLevel = 0;
     float VBAT = getBatteryVoltage();
+        #ifndef ARDUINO_ESP32S3_DEV
     if(VBAT > 4.1){
         batteryLevel = 3;
     }
@@ -97,9 +103,23 @@ void Watchy7SEG::drawBattery(){
     else if(VBAT <= 3.80){
         batteryLevel = 0;
     }
+    #else
+     if (VBAT > 3.90) {
+        batteryLevel = 3;
+    }
+    else if (VBAT > 3.75 && VBAT <= 3.90) {
+        batteryLevel = 2;
+    }
+    else if (VBAT > 3.60 && VBAT <= 3.75) {
+        batteryLevel = 1;
+    }
+    else if (VBAT <= 3.60) {
+        batteryLevel = 0;
+    }
+    #endif
 
     for(int8_t batterySegments = 0; batterySegments < batteryLevel; batterySegments++){
-        display.fillRect(159 + (batterySegments * BATTERY_SEGMENT_SPACING), 78, BATTERY_SEGMENT_WIDTH, BATTERY_SEGMENT_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
+        display.fillRect(163 + (batterySegments * BATTERY_SEGMENT_SPACING), 78, BATTERY_SEGMENT_WIDTH, BATTERY_SEGMENT_HEIGHT, DARKMODE ? GxEPD_WHITE : GxEPD_BLACK);
     }
 }
 
