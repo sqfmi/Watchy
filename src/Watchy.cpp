@@ -1118,6 +1118,8 @@ void Watchy::showSyncNTP() {
     } else {
       display.println("NTP Sync Failed");
     }
+    WiFi.mode(WIFI_OFF);
+    btStop();
   } else {
     display.println("WiFi Not Configured");
   }
