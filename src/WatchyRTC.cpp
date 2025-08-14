@@ -1,6 +1,6 @@
 #include "WatchyRTC.h"
 
-WatchyRTC::WatchyRTC() : rtc_ds(false) {}
+WatchyRTC::WatchyRTC(){}
 
 void WatchyRTC::init() {
   byte error;
@@ -8,6 +8,7 @@ void WatchyRTC::init() {
   error = Wire.endTransmission();
   if (error == 0) {
     rtcType = DS3231;
+    rtc_ds.begin();
   } else {
     Wire.beginTransmission(RTC_PCF_ADDR);
     error = Wire.endTransmission();
