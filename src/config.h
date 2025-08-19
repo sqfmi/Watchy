@@ -110,6 +110,7 @@
 #define HOUR_12_24 24
 // BLE OTA
 #define BLE_DEVICE_NAME        "Watchy BLE OTA"
+#define BLE_WAIT_FOR_CONNECTION_TIMEOUT 60 
 #define WATCHFACE_NAME         "Watchy 7 Segment"
 #define SOFTWARE_VERSION_MAJOR 1
 #define SOFTWARE_VERSION_MINOR 0
