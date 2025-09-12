@@ -71,6 +71,14 @@
             "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/8_Bahn.png",
             "source" : "https://github.com/BraininaBowl/Bahn-for-Watchy",
             "version" : "1.0.0"
+        },
+        {
+            "id" : "9",
+            "name" : "Chaos - Lorenz Attractor",
+            "author" : "Ajey Pai Karkala",
+            "screenshot" : "https://raw.githubusercontent.com/sqfmi/Watchy/master/extras/WatchFaces/9_Chaos.bmp",
+            "source" : "https://github.com/AjeyPai/chaos",
+            "version" : "1.0.0"
         }                                      
     ]
 }
