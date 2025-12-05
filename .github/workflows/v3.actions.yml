@@ -1,0 +1,39 @@
+name: ReleaseV3
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        board-revisions: [v30]
+    steps:
+    - uses: actions/checkout@master
+    - uses: ArminJo/arduino-test-compile@v3
+      with:
+        arduino-board-fqbn: esp32:esp32:esp32s3:FlashSize=8M,PartitionScheme=default_8MB,UploadSpeed=921600,DebugLevel=none,EraseFlash=none
+        platform-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+        arduino-platform: esp32:esp32@2.0.17
+        required-libraries: Adafruit GFX Library,Arduino_JSON,DS3232RTC,NTPClient,Rtc_Pcf8563,GxEPD2,WiFiManager
+        set-build-path: true
+    - name: Rename binaries with board revision
+      run: |
+        parent_dir="${{ github.workspace }}/examples/WatchFaces"
+        for dir in "$parent_dir"/*; do
+          if [ -d "$dir" ]; then
+            cd "$dir/build"
+            for file in *; do
+              name="${file%%.*}"
+              ext="${file#$name.}"
+              mv "$file" "$name-${{ matrix.board-revisions }}.$ext"
+            done
+            cd -
+          fi
+        done
+    - uses: softprops/action-gh-release@v1
+      with:
+        name: "Watchy Arduino Library ${{ github.ref_name }}"
+        files: ${{ github.workspace }}/examples/WatchFaces/**/build/*.bin
