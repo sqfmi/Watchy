@@ -16,6 +16,21 @@
   "frameworks": "arduino",
   "platforms": ["espressif32"],
   "dependencies": [
-    { "name": "Watchy", "version": "1.4.14" }
+    { "name": "Adafruit GFX Library" },
+    { "name": "Arduino_JSON" },
+    { "name": "DS3232RTC" },
+    { "name": "NTPClient" },
+    {
+      "name": "Rtc_Pcf8563",
+      "version": "https://github.com/orbitalair/Rtc_Pcf8563.git#master"
+    },
+    {
+      "name": "GxEPD2",
+      "version": "https://github.com/ZinggJM/GxEPD2.git#master"
+    },
+    {
+      "name": "WiFiManager",
+      "version": "https://github.com/tzapu/WiFiManager.git#master"
+    }
   ]
 }
