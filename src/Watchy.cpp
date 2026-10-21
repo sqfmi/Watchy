@@ -32,6 +32,7 @@ void Watchy::init(String datetime) {
     Wire.begin(SDA, SCL);                         // init i2c
   #endif
   RTC.init();
+  RTC.setTimeZone(settings.timeZone);
 
   // Init the display since is almost sure we will use it
   display.epd2.initWatchy();
@@ -708,10 +709,15 @@ weatherData Watchy::_getWeatherData(String cityID, String lat, String lon, Strin
 		        breakTime((time_t)(int)responseObject["sys"]["sunrise"], currentWeather.sunrise);
 		        breakTime((time_t)(int)responseObject["sys"]["sunset"], currentWeather.sunset);
         // sync NTP during weather API call and use timezone of lat & lon
-        gmtOffset = int(responseObject["timezone"]);
+        if (!settings.timeZone || !*settings.timeZone) {
+          gmtOffset = int(responseObject["timezone"]);
+        }
         syncNTP(gmtOffset);
       } else {
         // http error
+      }
+      if (httpResponseCode != 200 && settings.timeZone && *settings.timeZone) {
+        syncNTP();
       }
       http.end();
       // turn off radios
@@ -1138,13 +1144,19 @@ bool Watchy::syncNTP(long gmt, String ntpServer) {
   // NTP sync - call after connecting to
   // WiFi and remember to turn it back off
   WiFiUDP ntpUDP;
-  NTPClient timeClient(ntpUDP, ntpServer.c_str(), gmt);
+  const bool useTimeZone = settings.timeZone && *settings.timeZone;
+  NTPClient timeClient(ntpUDP, ntpServer.c_str(), useTimeZone ? 0 : gmt);
   timeClient.begin();
   if (!timeClient.forceUpdate()) {
     return false; // NTP sync failed
   }
   tmElements_t tm;
   breakTime((time_t)timeClient.getEpochTime(), tm);
-  RTC.set(tm);
+  if (useTimeZone) {
+    RTC.setUTC(tm);
+  } else {
+    RTC.set(tm);
+  }
+  RTC.read(currentTime);
   return true;
 }

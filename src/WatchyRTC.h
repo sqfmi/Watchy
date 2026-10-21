@@ -22,6 +22,8 @@ public:
 public:
   WatchyRTC();
   void init();
+  void setTimeZone(const char *zone) { timeZone = zone; }
+  void setUTC(tmElements_t tm);
   void config(String datetime); // String datetime format is YYYY:MM:DD:HH:MM:SS
   void clearAlarm();
   void read(tmElements_t &tm);
@@ -29,6 +31,7 @@ public:
   uint8_t temperature();
 
 private:
+  const char *timeZone = nullptr;
   void _DSConfig(String datetime);
   void _PCFConfig(String datetime);
   int _getDayOfWeek(int d, int m, int y);

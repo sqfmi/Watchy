@@ -58,6 +58,8 @@ typedef struct watchySettings {
   int gmtOffset;
   //
   bool vibrateOClock;
+  // Optional POSIX TZ rule. When set, RTC stores UTC; weather cannot change it.
+  const char *timeZone;
 } watchySettings;
 
 class Watchy {
